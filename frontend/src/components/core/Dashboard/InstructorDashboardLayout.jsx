@@ -32,16 +32,20 @@ const InstructorDashboardLayout = () => {
   }
 
   return (
-    <div className="flex h-screen bg-[#000814] overflow-hidden">
+    <div className="flex h-screen bg-[#000814] overflow-hidden safe-top safe-bottom">
       {/* Sidebar */}
-      <InstructorSidebar />
+      <div className="hidden lg:block h-full shrink-0">
+        <InstructorSidebar />
+      </div>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <DashboardNavbar />
+        <div className="safe-top">
+          <DashboardNavbar />
+        </div>
 
         <main className="flex-1 overflow-y-auto custom-scrollbar bg-[#000814]">
-          <div className="container mx-auto px-4 py-8 md:px-8">
+          <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}

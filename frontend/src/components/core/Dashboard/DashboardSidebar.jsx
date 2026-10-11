@@ -302,7 +302,7 @@ const DashboardSidebar = () => {
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-richblack-700 bg-richblack-800">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-richblack-700 bg-richblack-800 safe-bottom">
         <AnimatePresence>
           {!isCollapsed && (
             <motion.div

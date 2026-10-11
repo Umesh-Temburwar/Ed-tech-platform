@@ -12,7 +12,7 @@ const STORAGE_KEY = "app-theme";
 const prefersDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 export const ThemeProvider = ({ children }) => {
-	const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEY) || (prefersDark() ? "dark" : "dark"));
+	const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEY) || (prefersDark() ? "dark" : "light"));
 
 	const applyTheme = useCallback(
 		(t) => {

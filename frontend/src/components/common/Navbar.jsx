@@ -99,7 +99,7 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className={`fixed w-full z-[100] transition-all duration-500 ${isScrolled
+    <nav role="navigation" aria-label="Main navigation" className={`fixed w-full z-[100] transition-all duration-500 ${isScrolled
         ? 'bg-[#000814]/80 backdrop-blur-md py-3 border-b border-white/10 shadow-2xl shadow-cyan-500/10'
         : 'bg-transparent py-5'
       }`}>
@@ -111,10 +111,11 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-8">
-          <ul className="flex items-center gap-8">
+          <ul role="menubar" className="flex items-center gap-8">
             {currentLinks.map((link) => (
-              <li key={link.name}>
+              <li key={link.name} role="none">
                 <Link
+                  role="menuitem"
                   to={link.path}
                   className={`relative py-2 text-sm font-bold tracking-wide transition-all duration-300 hover:text-cyan-400 ${isActive(link.path) ? 'text-cyan-400' : 'text-slate-300'
                     }`}
@@ -162,6 +163,7 @@ const Navbar = () => {
                   onMouseLeave={() => setShowNotifications(false)}
                 >
                   <button
+                    aria-label="Notifications"
                     onClick={() => {
                       setShowNotifications(!showNotifications);
                       setIsProfileOpen(false);
@@ -189,6 +191,9 @@ const Navbar = () => {
                   onMouseLeave={() => setIsProfileOpen(false)}
                 >
                   <button
+                    aria-label="User menu"
+                    aria-haspopup="true"
+                    aria-expanded={isProfileOpen}
                     onClick={() => {
                       setIsProfileOpen(!isProfileOpen);
                       setShowNotifications(false);
@@ -228,6 +233,9 @@ const Navbar = () => {
 
         {/* Mobile Toggle */}
         <button
+          aria-label="Toggle main menu"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="mobile-menu"
           className="lg:hidden text-white text-2xl"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -239,6 +247,10 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}

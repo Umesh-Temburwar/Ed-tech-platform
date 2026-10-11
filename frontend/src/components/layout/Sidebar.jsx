@@ -29,7 +29,7 @@ export default function Sidebar({ children, logo, userBlock }) {
   }, []);
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[rgba(15,20,32,0.80)] backdrop-blur-xl border-r border-[rgba(108,71,255,0.12)]">
+    <div className="flex flex-col h-full bg-[rgba(15,20,32,0.80)] backdrop-blur-xl border-r border-[rgba(108,71,255,0.12)] safe-bottom">
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         {logo}
         <button

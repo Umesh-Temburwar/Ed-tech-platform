@@ -87,7 +87,6 @@ function CourseDetails() {
     ;(async () => {
       try {
         const res = await fetchCourseDetails(courseId)
-        console.log("course details res: ", res)
         setResponse(res)
 
         // Check user enrollment state securely via backend API
@@ -104,12 +103,10 @@ function CourseDetails() {
               enrolled = true;
             }
           } catch (error) {
-            console.log("Could not check enrollment status", error);
           }
         }
         setIsEnrolled(enrolled);
       } catch (error) {
-        console.log("Could not fetch Course Details")
       }
     })()
   }, [courseId, user])
@@ -281,7 +278,7 @@ function CourseDetails() {
             </div>
           </div>
           {/* Courses Card */}
-          <div className="right-[1rem] top-[60px] mx-auto hidden min-h-[600px] w-full max-w-[410px] translate-y-24 md:translate-y-0 lg:absolute  lg:block">
+          <div className="block lg:absolute lg:top-[60px] lg:right-[1rem] w-full max-w-[410px] mx-auto mt-8 lg:mt-0">
              <div className={`flex flex-col gap-4 rounded-md bg-richblack-700 p-4 text-richblack-5`}>
                 <div className="relative overflow-hidden">
                   <CourseVideoPlayer courseData={courseDetails} isEnrolled={isEnrolled} />

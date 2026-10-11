@@ -18,12 +18,10 @@ const ContactUsForm = () => {
       setLoading(true)
       // Since we are removing Node backend/apiConnector, we'll just show success
       // In a real app, you'd use a Supabase Edge Function or external service here
-      console.log("Contact form data:", data)
       await new Promise(resolve => setTimeout(resolve, 1000))
       setLoading(false)
       toast.success("Message sent successfully!")
     } catch (error) {
-      console.log("ERROR MESSAGE - ", error.message)
       setLoading(false)
     }
   }

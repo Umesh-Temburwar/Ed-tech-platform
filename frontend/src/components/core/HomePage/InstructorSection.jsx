@@ -8,20 +8,20 @@ const InstructorSection = () => {
   return (
     <div>
         <div className="flex flex-col lg:flex-row gap-20 items-center">
-          <div className="lg:w-[50%]">
+          <div className="w-full md:w-1/2">
             <img
               src={Instructor}
               alt=""
               className="shadow-white shadow-[-20px_-20px_0_0]"
             />
           </div>
-          <div className="lg:w-[50%] flex gap-10 flex-col">
-            <h1 className="lg:w-[50%] text-4xl font-semibold ">
+          <div className="w-full md:w-1/2 flex gap-10 flex-col">
+            <h1 className="text-4xl font-semibold w-[50%]">
               Become an
               <HighlightText text={"instructor"} />
             </h1>
 
-            <p className="font-medium text-[16px] text-justify w-[90%] text-richblack-300">
+            <p className="font-medium text-[16px] text-justify w-full md:w-4/5 text-richblack-300">
               Instructors from around the world teach millions of students on
               EdTech . We provide the tools and skills to teach what you
               love.

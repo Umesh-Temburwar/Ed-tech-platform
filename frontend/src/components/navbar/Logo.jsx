@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
-export default function Logo() {
+function Logo() {
   const [scrolled, setScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { scrollY } = useScroll();
@@ -14,6 +14,8 @@ export default function Logo() {
 
   const brandName = "COREDEV";
   const academyName = "ACADEMY";
+
+  const brandNameChars = useMemo(() => brandName.split(''), [brandName]);
 
   return (
     <div 
@@ -100,7 +102,7 @@ export default function Logo() {
             className="flex flex-col ml-3"
           >
             <div className="flex gap-0.5">
-              {brandName.split('').map((char, i) => (
+              {brandNameChars.map((char, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
@@ -138,3 +140,5 @@ export default function Logo() {
     </div>
   );
 }
+
+export default React.memo(Logo);

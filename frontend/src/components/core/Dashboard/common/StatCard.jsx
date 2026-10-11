@@ -1,7 +1,7 @@
 import React from "react";
 
 // Reusable stat display card with soft gradient accent
-export default function StatCard({ title, value, sub, accent = "indigo" }) {
+const StatCard = React.memo(function StatCard({ title, value, sub, accent = "indigo" }) {
   const accentMap = {
     indigo: "from-indigo-500/20 to-indigo-500/5 border-indigo-500/30",
     emerald: "from-emerald-500/20 to-emerald-500/5 border-emerald-500/30",
@@ -16,4 +16,6 @@ export default function StatCard({ title, value, sub, accent = "indigo" }) {
       {sub && <div className="text-xs mt-1 text-richblack-300">{sub}</div>}
     </div>
   );
-}
+});
+
+export default StatCard;

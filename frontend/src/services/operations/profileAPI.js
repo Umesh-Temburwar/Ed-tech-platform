@@ -45,54 +45,89 @@ export function getUserDetails(token, navigate) {
   }
 }
 
-export async function getUserEnrolledCourses(token) {
-  const toastId = toast.loading("Loading...")
-  let result = []
+export async function getUserEnrolledCourses(token, showToast = false) {
+  const toastId = showToast ? toast.loading("Loading...") : null;
+  let result = [];
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error("Not authenticated")
 
-    const { data, error } = await supabase
-      .from('enrollments')
-      .select(`
-        id, created_at, updated_at, progress_percentage, completed,
-        courses:course_id (
-          id, course_name, thumbnail, final_thumbnail_url, youtube_thumbnail_url,
-          categories:category_id ( name ),
-          instructor:instructor_id ( first_name, last_name )
-        )
-      `)
-      .eq('student_id', user.id)
+    let data = null;
+    let error = null;
 
-    if (error) {
-      throw error
+    try {
+      const res1 = await supabase
+        .from('course_enrollments')
+        .select(`
+          id, enrolled_at, updated_at, progress, progress_percent, completed,
+          courses:course_id (
+            id, title, course_name, thumbnail, final_thumbnail_url, youtube_thumbnail_url, thumbnail_url,
+            categories:category_id ( name ),
+            instructor:instructor_id ( first_name, last_name, image )
+          )
+        `)
+        .eq('student_id', user.id);
+      data = res1.data;
+      error = res1.error;
+    } catch (e) {
+      console.log('course_enrollments table failed, trying enrollments table...', e);
     }
 
-    // Format to match what the frontend expects
-    result = data.map(enrollment => {
-      const course = enrollment.courses;
-      return {
-        _id: course?.id,
-        courseName: course?.course_name,
-        thumbnail: course?.final_thumbnail_url || course?.youtube_thumbnail_url || course?.thumbnail,
-        progressPercentage: enrollment.progress_percentage || 0,
-        completed: enrollment.completed || false,
-        category: course?.categories?.name,
-        instructor: {
-          firstName: course?.instructor?.first_name,
-          lastName: course?.instructor?.last_name
-        },
-        createdAt: enrollment.created_at,
-        updatedAt: enrollment.updated_at
+    if (!data && !error) {
+      try {
+        const res2 = await supabase
+          .from('enrollments')
+          .select(`
+            id, created_at, updated_at, progress_percentage, completed,
+            courses:course_id (
+              id, course_name, title, thumbnail, final_thumbnail_url, youtube_thumbnail_url,
+              categories:category_id ( name ),
+              instructor:instructor_id ( first_name, last_name, image )
+            )
+          `)
+          .eq('student_id', user.id);
+        data = res2.data;
+        error = res2.error;
+      } catch (e2) {
+        console.log('enrollments table also failed...', e2);
       }
-    }).filter(c => c._id); // Filter out any null courses
+    }
+
+    if (error) {
+      throw error;
+    }
+
+    if (data && data.length > 0) {
+      result = data.map(enrollment => {
+        const course = enrollment.courses;
+        const thumb = course?.final_thumbnail_url || course?.youtube_thumbnail_url || course?.thumbnail_url || course?.thumbnail;
+        return {
+          _id: course?.id,
+          courseName: course?.title || course?.course_name,
+          thumbnail: thumb,
+          progressPercentage: enrollment.progress_percentage ?? enrollment.progress_percent ?? enrollment.progress ?? 0,
+          completed: enrollment.completed || false,
+          category: course?.categories?.name || course?.category,
+          price: course?.price || 0,
+          instructor: {
+            firstName: course?.instructor?.first_name,
+            lastName: course?.instructor?.last_name,
+            image: course?.instructor?.image
+          },
+          createdAt: enrollment.created_at || enrollment.enrolled_at,
+          updatedAt: enrollment.updated_at || enrollment.enrolled_at
+        }
+      }).filter(c => c._id);
+    }
     
   } catch (error) {
-    console.log("GET_USER_ENROLLED_COURSES_API ERROR............", error)
-    toast.error("Could Not Get Enrolled Courses")
+    console.log("GET_USER_ENROLLED_COURSES_API ERROR............", error);
+    if (showToast) {
+      toast.error("Could Not Get Enrolled Courses");
+    }
   }
-  toast.dismiss(toastId)
-  return result
+  if (toastId) toast.dismiss(toastId);
+  return result;
 }
 
 export async function getInstructorData(token) {

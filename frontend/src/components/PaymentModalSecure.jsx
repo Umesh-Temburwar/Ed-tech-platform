@@ -57,8 +57,6 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
     // HANDLE PAYMENT FLOW
     // ─────────────────────────────────────────────────────────────────────────
     const handlePayment = async () => {
-        console.log("[PaymentModal] handlePayment called - course:", course?.id, "price:", course?.price);
-
         try {
             setStep("processing");
             setLocalError(null);
@@ -70,7 +68,6 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.access_token) {
                     activeToken = session.access_token;
-                    console.log("[PaymentModal] ✅ Fresh token obtained from Supabase session");
                 } else {
                     console.warn("[PaymentModal] ⚠️ No live Supabase session — falling back to Redux token");
                 }
@@ -83,12 +80,10 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
             }
 
             // ─── LOAD RAZORPAY SDK ────────────────────────────────────────────
-            console.log("[PaymentModal] Loading Razorpay SDK...");
             const sdkLoaded = await loadRazorpayScript();
             if (!sdkLoaded) {
                 throw new Error("Razorpay SDK failed to load. Please check your internet connection.");
             }
-            console.log("[PaymentModal] ✅ Razorpay SDK loaded");
 
             // ─── VALIDATE COURSE ──────────────────────────────────────────────
             if (!course?.id) {
@@ -101,15 +96,11 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
             }
 
             // ─── STEP 1: CREATE ORDER ON BACKEND ─────────────────────────────
-            console.log("[PaymentModal] Creating order - courseId:", course.id, "amount:", coursePrice);
-
             const orderResult = await createOrder({
                 courseId: course.id,
                 amount:   coursePrice,
                 token:    activeToken
             });
-
-            console.log("[PaymentModal] createOrder result:", orderResult);
 
             if (!orderResult.success) {
                 throw new Error(orderResult.error || "Failed to create payment order");
@@ -120,8 +111,6 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
             if (!razorpayKey) {
                 throw new Error("Razorpay Key ID not configured. Set REACT_APP_RAZORPAY_KEY_ID in .env");
             }
-            console.log("[PaymentModal] Opening Razorpay with key:", razorpayKey.substring(0, 12) + "...");
-            console.log("[PaymentModal] Order ID:", orderResult.orderId, "Amount (paise):", orderResult.amount);
 
             const options = {
                 key:         razorpayKey,
@@ -143,15 +132,10 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
                 },
                 handler: async function (response) {
                     // ─── PAYMENT CAPTURED → VERIFY ON BACKEND ────────────────
-                    console.log("[PaymentModal] Razorpay payment captured:", {
-                        order_id:   response.razorpay_order_id,
-                        payment_id: response.razorpay_payment_id
-                    });
                     await handlePaymentSuccess(response);
                 },
                 modal: {
                     ondismiss: function () {
-                        console.log("[PaymentModal] Razorpay modal dismissed by user");
                         setStep("confirm");
                         setLocalError("Payment cancelled. You can try again.");
                     }
@@ -182,8 +166,6 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
     // HANDLE PAYMENT SUCCESS — VERIFY ON BACKEND
     // ─────────────────────────────────────────────────────────────────────────
     const handlePaymentSuccess = async (razorpayResponse) => {
-        console.log("[PaymentModal] handlePaymentSuccess - verifying signature...");
-
         try {
             setStep("processing");
             setLocalError(null);
@@ -203,21 +185,16 @@ export default function PaymentModalSecure({ course, onClose, onSuccess }) {
                 token:    verifyToken
             });
 
-            console.log("[PaymentModal] verifyPayment result:", verifyResult);
-
             if (!verifyResult.success) {
                 throw new Error(verifyResult.error || "Payment verification failed");
             }
 
             // ─── PAYMENT VERIFIED — ENROLLMENT CREATED ────────────────────────
-            console.log("[PaymentModal] ✅ Payment verified! Enrollment:", verifyResult.enrollment?.id);
             setStep("success");
-
-            // Give user 2 seconds to see success screen, then callback
-            setTimeout(() => {
-                onSuccess?.(verifyResult.enrollment);
-                onClose?.();
-            }, 2000);
+            
+            // Redirect immediately
+            onSuccess?.(verifyResult.enrollment);
+            onClose?.();
 
         } catch (err) {
             console.error("[PaymentModal] handlePaymentSuccess error:", err.message, err);

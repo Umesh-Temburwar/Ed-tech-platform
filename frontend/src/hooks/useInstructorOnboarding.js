@@ -12,11 +12,7 @@ export const useInstructorOnboarding = (user) => {
   const [payout, setPayout] = useState(null);
 
   const validateInstructorSetup = async () => {
-    console.log("[useInstructorOnboarding] validateInstructorSetup called with user:", user);
-    console.log("[useInstructorOnboarding] user?.id:", user?.id);
-    
     if (!user?.id) {
-      console.log("[useInstructorOnboarding] No user or user.id, resetting state");
       setProfile(null);
       setSkills([]);
       setPayout(null);
@@ -26,7 +22,6 @@ export const useInstructorOnboarding = (user) => {
     }
 
     try {
-      console.log("[useInstructorOnboarding] Fetching tables from Supabase...");
       setLoading(true);
 
       const [profileResult, skillsResult, payoutResult] = await Promise.all([
@@ -46,27 +41,11 @@ export const useInstructorOnboarding = (user) => {
           .maybeSingle(),
       ]);
 
-      console.log("[useInstructorOnboarding] Supabase fetch results:", {
-        profileData: profileResult.data,
-        profileError: profileResult.error,
-        skillsData: skillsResult.data,
-        skillsError: skillsResult.error,
-        payoutData: payoutResult.data,
-        payoutError: payoutResult.error,
-      });
-
       const safeSkills = Array.isArray(skillsResult.data) ? skillsResult.data : [];
       const profileExists = !!profileResult.data;
       const skillsExist = safeSkills.length > 0;
       const payoutExists = !!payoutResult.data;
       const isComplete = profileExists && skillsExist && payoutExists;
-
-      console.log("[validateInstructorSetup] Validation result:", {
-        profileExists,
-        skillsExist,
-        payoutExists,
-        isComplete,
-      });
 
       setProfile(profileResult.data);
       setSkills(safeSkills);
@@ -215,12 +194,9 @@ export const useInstructorOnboarding = (user) => {
   };
 
   useEffect(() => {
-    console.log("[useInstructorOnboarding] useEffect triggered with user:", user);
     if (user?.id) {
-      console.log("[useInstructorOnboarding] Calling validateInstructorSetup...");
       validateInstructorSetup();
     } else {
-      console.log("[useInstructorOnboarding] No user.id, resetting state");
       setProfile(null);
       setSkills([]);
       setPayout(null);

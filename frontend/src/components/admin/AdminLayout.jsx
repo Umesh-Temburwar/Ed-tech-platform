@@ -1,33 +1,55 @@
-import React from "react"
-import { NavLink, Outlet } from "react-router-dom"
-import { FaTachometerAlt, FaUsers, FaBook, FaChartBar, FaClipboardList } from "react-icons/fa"
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import AdminSidebar from "./AdminSidebar";
+import AdminNavbar from "./AdminNavbar";
 
+/**
+ * AdminLayout
+ *
+ * Shell for all /admin/* routes. Pattern mirrors InstructorDashboardLayout:
+ *   Desktop: fixed sidebar (240px) + flex-1 main content
+ *   Mobile:  full-width main + sidebar as animated drawer (controlled here)
+ *
+ * Does NOT handle auth — that is enforced upstream by
+ *   <PrivateRoute> + <RoleRoute allow={["Admin"]}> in App.js
+ */
 export default function AdminLayout() {
+  const location = useLocation();
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-[#000814] text-white flex">
-      <aside className="w-72 hidden md:block bg-white/5 border-r border-white/10 p-6">
-        <div className="text-2xl font-extrabold tracking-tight">Admin</div>
-        <nav className="mt-8 grid gap-2">
-          <NavLink to="/admin/dashboard" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-xl ${isActive ? "bg-yellow-400 text-black" : "hover:bg-white/10"}`}>
-            <FaTachometerAlt /><span>Dashboard</span>
-          </NavLink>
-          <NavLink to="/admin/users" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-xl ${isActive ? "bg-yellow-400 text-black" : "hover:bg-white/10"}`}>
-            <FaUsers /><span>Users</span>
-          </NavLink>
-          <NavLink to="/admin/courses" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-xl ${isActive ? "bg-yellow-400 text-black" : "hover:bg-white/10"}`}>
-            <FaBook /><span>Courses</span>
-          </NavLink>
-          <NavLink to="/admin/reports" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-xl ${isActive ? "bg-yellow-400 text-black" : "hover:bg-white/10"}`}>
-            <FaChartBar /><span>Reports</span>
-          </NavLink>
-          <NavLink to="/admin/enrollments" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-xl ${isActive ? "bg-yellow-400 text-black" : "hover:bg-white/10"}`}>
-            <FaClipboardList /><span>Enrollments</span>
-          </NavLink>
-        </nav>
-      </aside>
-      <main className="flex-1 p-6 md:p-10">
-        <Outlet />
-      </main>
+    <div className="flex h-screen bg-[#000814] overflow-hidden safe-top safe-bottom">
+      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+      <AdminSidebar
+        mobileOpen={mobileDrawerOpen}
+        onMobileClose={() => setMobileDrawerOpen(false)}
+      />
+
+      {/* ── Main content area ────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Top navbar */}
+        <AdminNavbar
+          onMobileMenuOpen={() => setMobileDrawerOpen(true)}
+        />
+
+        {/* Page content with route transition */}
+        <main className="flex-1 overflow-y-auto bg-[#000814]">
+          <div className="container mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1440px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </main>
+      </div>
     </div>
-  )
+  );
 }

@@ -1,19 +1,16 @@
 export const authService = {
     // Register a new user
     register: async (email, password, displayName) => {
-        console.log("Mock Register:", email);
         return { id: 'dummy-id', email, user_metadata: { display_name: displayName } };
     },
 
     // Register without sending verification
     registerWithOtpFlow: async (email, password, displayName) => {
-        console.log("Mock Register OTP:", email);
         return { id: 'dummy-id', email, user_metadata: { display_name: displayName } };
     },
 
     // Login user
     login: async (email, password, accountType = "Student") => {
-        console.log("Mock Login:", email);
         return {
             id: 'dummy-id-' + Date.now(),
             uid: 'dummy-id',
@@ -35,17 +32,14 @@ export const authService = {
         localStorage.removeItem("user");
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
-        console.log("Mock Logout");
     },
 
     // Reset password
     resetPassword: async (email) => {
-        console.log("Mock Reset Password:", email);
     },
 
     // Google Sign In
     signInWithGoogle: async (accountType = "Student") => {
-        console.log("Mock Google Sign In");
         return { user: { id: 'google-dummy-id', email: 'google-user@example.com' } };
     },
     
@@ -53,7 +47,6 @@ export const authService = {
     deleteUserAccount: async () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-        console.log("Mock Account Deletion");
         return { success: true };
     },
 };

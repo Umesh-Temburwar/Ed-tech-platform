@@ -32,11 +32,6 @@ const MyCourses = () => {
     refresh
   } = useCourses();
 
-  // Add useEffect to track course changes
-  useEffect(() => {
-    console.log('MyCourses: Courses updated', courses.length, 'courses');
-  }, [courses]);
-
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'published', 'draft'

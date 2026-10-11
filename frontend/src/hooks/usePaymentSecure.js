@@ -41,8 +41,6 @@ export function usePaymentSecure() {
      * @returns {{ success, orderId, amount, currency, totalAmount } | { success: false, error: string }}
      */
     const createOrder = async ({ courseId, amount, token }) => {
-        console.log("[usePaymentSecure] createOrder called:", { courseId, amount });
-
         try {
             setLoading(true);
             setError(null);
@@ -51,8 +49,6 @@ export function usePaymentSecure() {
             if (!courseId) throw new Error("courseId is required");
             if (!amount || Number(amount) <= 0) throw new Error("A valid amount is required");
             if (!token) throw new Error("Authentication token not found. Please log in again.");
-
-            console.log("[usePaymentSecure] Calling POST", `${API_BASE}/payment/create-order`);
 
             const response = await axios.post(
                 `${API_BASE}/payment/create-order`,
@@ -67,8 +63,6 @@ export function usePaymentSecure() {
                     }
                 }
             );
-
-            console.log("[usePaymentSecure] create-order response:", response.data);
 
             if (!response.data.success) {
                 throw new Error(response.data.message || "Failed to create order");
@@ -120,8 +114,6 @@ export function usePaymentSecure() {
         courseId,
         token
     }) => {
-        console.log("[usePaymentSecure] verifyPayment called:", { razorpayOrderId, courseId });
-
         try {
             setLoading(true);
             setError(null);
@@ -130,8 +122,6 @@ export function usePaymentSecure() {
             if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature || !courseId || !token) {
                 throw new Error("Missing required payment verification parameters");
             }
-
-            console.log("[usePaymentSecure] Calling POST", `${API_BASE}/payment/verify`);
 
             const response = await axios.post(
                 `${API_BASE}/payment/verify`,
@@ -148,8 +138,6 @@ export function usePaymentSecure() {
                     }
                 }
             );
-
-            console.log("[usePaymentSecure] verify response:", response.data);
 
             if (!response.data.success) {
                 throw new Error(response.data.message || "Payment verification failed");
@@ -193,8 +181,6 @@ export function usePaymentSecure() {
      * @returns {{ success, enrollment, message } | { success: false, error: string }}
      */
     const enrollFree = async ({ courseId, token }) => {
-        console.log("[usePaymentSecure] enrollFree called:", { courseId });
-
         try {
             setLoading(true);
             setError(null);

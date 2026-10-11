@@ -5,16 +5,16 @@ import { FaArrowRight, FaCode, FaRocket, FaStar } from 'react-icons/fa';
 
 const Hero = () => {
   return (
-    <div className="relative mx-auto flex flex-col lg:flex-row w-11/12 max-w-maxContent items-center justify-between gap-16 py-20 lg:py-32 overflow-hidden">
+    <div className="relative mx-auto flex flex-col lg:flex-row w-full max-w-7xl items-center justify-between gap-8 py-12 lg:py-24 overflow-hidden">
       {/* Dynamic Background */}
       <div className="absolute inset-0 -z-10 w-full h-full pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] bg-blue-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-1/2 h-1/2 bg-purple-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-1/2 h-1/2 bg-cyan-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-1/3 h-1/3 bg-blue-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
       </div>
 
       {/* Left Content */}
-      <div className="flex flex-col items-start text-left lg:w-1/2 z-10">
+      <div className="flex flex-col items-start text-left w-full md:w-1/2 z-10">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,7 +78,7 @@ const Hero = () => {
         transition={{ duration: 0.7, delay: 0.2 }}
         className="relative lg:w-1/2 w-full max-w-md lg:max-w-none flex justify-center z-10"
       >
-        <div className="relative w-full aspect-square max-w-[500px]">
+        <div className="relative w-full aspect-square max-w-md">
           {/* Main Floating Glass Card */}
           <motion.div
             animate={{ y: [-10, 10, -10] }}

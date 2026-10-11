@@ -58,13 +58,6 @@ export const useInstructorDocumentUpload = (user) => {
       const fileName = `${dbDocType}_${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 
-      console.log("[useInstructorDocumentUpload] Uploading file:", {
-        fileName,
-        filePath,
-        fileType: file.type,
-        fileSize: file.size,
-      });
-
       // Upload to storage
       const { error: storageError } = await supabase.storage
         .from("instructor-documents")
@@ -80,8 +73,6 @@ export const useInstructorDocumentUpload = (user) => {
         console.error("Storage Error:", storageError);
         throw storageError;
       }
-
-      console.log("[useInstructorDocumentUpload] Storage upload success");
 
       // Insert into database
       const { data: documentData, error: dbError } = await supabase
@@ -106,7 +97,6 @@ export const useInstructorDocumentUpload = (user) => {
         throw dbError;
       }
 
-      console.log("[useInstructorDocumentUpload] Upload Success");
       toast.success("Document uploaded successfully! 📎");
 
       return documentData;

@@ -2,6 +2,8 @@
 
 > A fully functional EdTech platform enabling users to create, consume, and rate educational content. Built with React, Node.js/Express, and Supabase.
 
+🌐 **Live Demo:** [EdTech - Modern Learning Platform](https://edtechacademy.vercel.app/)
+
 ---
 
 ## 📁 Project Structure

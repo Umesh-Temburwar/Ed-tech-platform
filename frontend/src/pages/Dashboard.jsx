@@ -11,15 +11,6 @@ function Dashboard() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    
-    console.log("Dashboard - Auth State:", { 
-      profileLoading, 
-      authLoading, 
-      hasUser: !!user, 
-      hasToken: !!token 
-    })
-    
-    
     if (!profileLoading && !authLoading && (!user || !token)) {
       console.warn("Dashboard detected missing auth data, redirecting to login")
       navigate("/login")
@@ -36,7 +27,6 @@ function Dashboard() {
 
   
   if (!user) {
-    console.error("Dashboard rendered without user data")
     return (
       <div className="grid min-h-[calc(100vh-3.5rem)] place-items-center">
         <div className="text-richblack-5">

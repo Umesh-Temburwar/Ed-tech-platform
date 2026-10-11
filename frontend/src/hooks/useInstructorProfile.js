@@ -61,7 +61,6 @@ export const useInstructorProfile = () => {
           profileData = data;
         }
       } catch (err) {
-        console.log('No profile found in profiles table, using auth metadata');
       }
 
       const instructorProfile = {

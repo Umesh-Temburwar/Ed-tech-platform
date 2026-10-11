@@ -251,8 +251,6 @@ export default function CourseLearningPage() {
 
       if (lesErr) throw new Error("Failed to load lessons: " + lesErr.message);
 
-      console.log("[Learning] Raw lessons:", lessons);
-
       // ── 4. Enrich lessons with derived YouTube fields ──────────────────────
       const enriched = (lessons || []).map((l) => {
         const rawUrl = l.youtube_video_url || l.video_url || "";
@@ -299,9 +297,6 @@ export default function CourseLearningPage() {
 
       const flat = curriculumTree.flatMap((s) => s.lessons);
 
-      console.log("[Learning] Curriculum:", curriculumTree);
-      console.log("[Learning] Flat lessons:", flat);
-
       setCurriculum(curriculumTree);
       setFlatLessons(flat);
 
@@ -315,8 +310,6 @@ export default function CourseLearningPage() {
       const firstLesson = firstWithVideo || flat[0] || null;
       if (firstLesson) {
         setActiveLesson(firstLesson);
-        console.log("[Learning] Auto-selected lesson:", firstLesson);
-        console.log("[Learning] Embed URL:", getLessonEmbedUrl(firstLesson));
       }
 
       // ── 9. Load progress ──────────────────────────────────────────────────
@@ -337,8 +330,6 @@ export default function CourseLearningPage() {
   const selectLesson = useCallback((lesson) => {
     setActiveLesson(lesson);
     setNotes((prev) => savedNotes[lesson.id] || "");
-    console.log("[Learning] Selected lesson:", lesson);
-    console.log("[Learning] Embed URL:", getLessonEmbedUrl(lesson));
     playerRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [savedNotes]);
 
@@ -367,9 +358,6 @@ export default function CourseLearningPage() {
     courseData?.thumbnail_url ||
     courseData?.thumbnail ||
     null;
-
-  // ─── Debug log ──────────────────────────────────────────────────────────
-  console.log("[Learning] Active lesson:", activeLesson?.title, "| embed:", embedUrl);
 
   // ─────────────────────────────────────────────────────────────────────────
   if (loading) {

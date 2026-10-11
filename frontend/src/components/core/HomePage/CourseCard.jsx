@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FaClock, FaSignal, FaStar, FaPlay, FaHeart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import RatingStars from '../../common/RatingStars';
 import { getYoutubeThumbnail } from '../../../utils/youtubeUtils';
 import { addToWishlist, removeFromWishlist } from '../../../services/operations/wishlistAPI';
 
-export default function CourseCard({ course }) {
+const CourseCard = React.memo(function CourseCard({ course }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -34,12 +34,14 @@ export default function CourseCard({ course }) {
     isFree,
   } = course;
 
-  // ── Thumbnail priority: DB pre-computed > YouTube generated > uploaded ────────
   const youtubeUrl = preview_video_url || youtube_video_url || null;
   const dbThumb = final_thumbnail_url || youtube_thumbnail_url || null;
-  const resolvedThumbnail = dbThumb || getYoutubeThumbnail(youtubeUrl) || custom_thumbnail_url || thumbnail_url || thumbnail || null;
+  const resolvedThumbnail = useMemo(() => 
+    dbThumb || getYoutubeThumbnail(youtubeUrl) || custom_thumbnail_url || thumbnail_url || thumbnail || null,
+    [dbThumb, youtubeUrl, custom_thumbnail_url, thumbnail_url, thumbnail]
+  );
 
-  function handleImgError(e) {
+  const handleImgError = useCallback((e) => {
     const src = e.target.src;
     if (youtubeUrl && src.includes('maxresdefault')) {
       const hq = getYoutubeThumbnail(youtubeUrl, 'hq');
@@ -48,15 +50,18 @@ export default function CourseCard({ course }) {
     const fallback = custom_thumbnail_url || thumbnail_url || thumbnail;
     if (fallback && src !== fallback) { e.target.src = fallback; return; }
     e.target.style.display = 'none';
-  }
+  }, [youtubeUrl, custom_thumbnail_url, thumbnail_url, thumbnail]);
 
-  const handleNavigate = () => {
+  const handleNavigate = useCallback(() => {
     navigate(`/courses/${id}`);
-  };
+  }, [navigate, id]);
 
-  const isWishlisted = wishlist.some((item) => item.id === id);
+  const isWishlisted = useMemo(() => 
+    wishlist.some((item) => item.id === id),
+    [wishlist, id]
+  );
 
-  const handleWishlistClick = (e) => {
+  const handleWishlistClick = useCallback((e) => {
     e.stopPropagation();
     if (!token) {
       toast.error('Please log in to add to wishlist');
@@ -67,7 +72,12 @@ export default function CourseCard({ course }) {
     } else {
       dispatch(addToWishlist(id, course, token));
     }
-  };
+  }, [token, isWishlisted, dispatch, id, course]);
+
+  const handleButtonClick = useCallback((e) => {
+    e.stopPropagation();
+    handleNavigate();
+  }, [handleNavigate]);
 
   return (
     <motion.div
@@ -151,7 +161,7 @@ export default function CourseCard({ course }) {
             </span>
           </div>
           <button 
-            onClick={(e) => { e.stopPropagation(); handleNavigate(); }}
+            onClick={handleButtonClick}
             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all active:scale-95"
           >
             Enroll Now
@@ -160,5 +170,7 @@ export default function CourseCard({ course }) {
       </div>
     </motion.div>
   );
-}
+});
+
+export default CourseCard;
 

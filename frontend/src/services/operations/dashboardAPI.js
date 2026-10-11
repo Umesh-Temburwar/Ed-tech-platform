@@ -13,13 +13,11 @@ export async function getInstructorDashboardRealTime(token) {
     const response = await apiConnector("GET", GET_INSTRUCTOR_DATA_API, null, {
       Authorization: `Bearer ${token}`,
     })
-    console.log("GET_INSTRUCTOR_DATA_API RESPONSE............", response)
     if (!response.data.success) {
       throw new Error(response.data.message)
     }
     result = response.data
   } catch (error) {
-    console.log("GET_INSTRUCTOR_DATA_API ERROR............", error)
     toast.error("Could Not Get Instructor Dashboard Data")
   }
   toast.dismiss(toastId)
@@ -34,13 +32,11 @@ export async function getStudentDashboardRealTime(token) {
     const response = await apiConnector("GET", profileEndpoints.GET_USER_ENROLLED_COURSES_API, null, {
       Authorization: `Bearer ${token}`,
     })
-    console.log("GET_USER_ENROLLED_COURSES_API RESPONSE............", response)
     if (!response.data.success) {
       throw new Error(response.data.message)
     }
     result = response.data
   } catch (error) {
-    console.log("GET_USER_ENROLLED_COURSES_API ERROR............", error)
     toast.error("Could Not Get Student Dashboard Data")
   }
   toast.dismiss(toastId)
@@ -48,8 +44,6 @@ export async function getStudentDashboardRealTime(token) {
 }
 
 export async function updateUserActivity(token, activityData) {
-  // Activity tracking can be implemented later with Supabase Realtime or custom table
-  console.log("Activity tracked:", activityData?.activityType);
   return { success: true };
 }
 

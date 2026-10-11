@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
+import React from "react";
 
-export default function Button({ 
+const Button = React.memo(function Button({ 
   children, 
   variant = "primary", 
   size = "md",
@@ -30,4 +31,6 @@ export default function Button({
       {children}
     </motion.button>
   );
-}
+});
+
+export default Button;

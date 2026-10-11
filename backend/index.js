@@ -42,9 +42,10 @@ app.use((req, res, next) => {
 app.use(cors({
     origin: [
         "http://localhost:3000",
+        "https://edtechacademy.vercel.app",
         "https://ed-tech-platform-frontend-tawny.vercel.app",
-        "https://ed-tech-platform-frontend-tawny.vercel.app/*"
-    ],
+        process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [

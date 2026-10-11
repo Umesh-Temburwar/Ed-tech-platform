@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import CourseActionButtons from '../../Course/CourseActionButtons';
 
@@ -6,36 +6,47 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { addToCart } from '../../../slices/cartSlice';
+import { FaPlayCircle, FaStar } from 'react-icons/fa';
 
-const CourseCard = ({ course, enrolled }) => {
+const CourseCard = React.memo(function CourseCard({ course, enrolled }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.profile);
   const { cart } = useSelector((state) => state.cart);
 
-  const isCourseInCart = cart.some((item) => (item.id || item._id) === (course.id || course._id));
+  const isCourseInCart = useMemo(() => 
+    cart.some((item) => (item.id || item._id) === (course.id || course._id)),
+    [cart, course.id, course._id]
+  );
 
-  const handleAddToCart = () => {
+  const courseId = course.id || course._id;
+  const coursePath = course.path || `/courses/${courseId}`;
+  const isFree = course.isFree || course.price === 0;
+
+  const handleAddToCart = useCallback(() => {
     if (user && user?.accountType === "Instructor") {
       return;
     }
     dispatch(addToCart(course));
-  };
+  }, [user, dispatch, course]);
 
-  const handleEnrollNow = (e) => {
+  const handleEnrollNow = useCallback((e) => {
     e.stopPropagation();
     if (!user) {
-      navigate("/login", { state: { from: course.path || `/courses/${course.id || course._id}` } });
+      navigate("/login", { state: { from: coursePath } });
       return;
     }
-    const navigationPath = course.path || `/courses/${course.id || course._id}`;
-    navigate(navigationPath);
-  };
+    navigate(coursePath);
+  }, [user, navigate, coursePath]);
 
-  const handleViewDetails = (e) => {
+  const handleViewDetails = useCallback((e) => {
     e.stopPropagation();
-    navigate(course.path || `/courses/${course.id || course._id}`);
-  };
+    navigate(coursePath);
+  }, [navigate, coursePath]);
+
+  const ratingStars = useMemo(() => [...Array(5)], []);
+  const courseRating = course.rating || 4.5;
+  const courseStudents = course.students?.toLocaleString() || '10,000';
 
   return (
     <div 
@@ -51,7 +62,7 @@ const CourseCard = ({ course, enrolled }) => {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-richblack-900 via-transparent to-transparent opacity-60"></div>
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-          {(course.isFree || course.price === 0) ? (
+          {isFree ? (
             <span className="bg-gradient-to-r from-green-400 to-green-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
               100% Free
             </span>
@@ -61,7 +72,7 @@ const CourseCard = ({ course, enrolled }) => {
             </span>
           )}
           <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/20">
-            {course.isFree || course.price === 0 ? "Free Access" : "Paid Course"}
+            {isFree ? "Free Access" : "Paid Course"}
           </span>
         </div>
       </div>
@@ -81,12 +92,12 @@ const CourseCard = ({ course, enrolled }) => {
 
         <div className="flex items-center gap-2 mb-6">
           <div className="flex text-yellow-400 text-[10px]">
-            {[...Array(5)].map((_, i) => (
-              <FaStar key={i} className={i < Math.floor(course.rating || 4.5) ? "text-yellow-400" : "text-richblack-600"} />
+            {ratingStars.map((_, i) => (
+              <FaStar key={i} className={i < Math.floor(courseRating) ? "text-yellow-400" : "text-richblack-600"} />
             ))}
           </div>
-          <span className="text-xs font-black text-white">{course.rating || '4.8'}</span>
-          <span className="text-richblack-500 text-[10px] font-bold">({course.students?.toLocaleString() || '10,000'} Learners)</span>
+          <span className="text-xs font-black text-white">{courseRating}</span>
+          <span className="text-richblack-500 text-[10px] font-bold">({courseStudents} Learners)</span>
         </div>
 
         <div className="flex flex-col gap-4 pt-4 border-t border-white/5">
@@ -94,12 +105,12 @@ const CourseCard = ({ course, enrolled }) => {
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-richblack-500 uppercase tracking-widest">Investment</span>
               <span className="text-xl font-black text-green-500 uppercase tracking-tighter italic">
-                {course.isFree || course.price === 0 ? "Free" : `₹${course.price}`}
+                {isFree ? "Free" : `₹${course.price}`}
               </span>
             </div>
             <CourseActionButtons
-                price={course.isFree || course.price === 0 ? 0 : course.price}
-                isFree={course.isFree || course.price === 0}
+                price={isFree ? 0 : course.price}
+                isFree={isFree}
                 isEnrolled={user && course?.studentsEnrolled?.includes(user._id)}
                 onBuy={handleEnrollNow}
                 disableAddToCart={!user}
@@ -121,6 +132,6 @@ const CourseCard = ({ course, enrolled }) => {
       </div>
     </div>
   );
-};
+});
 
 export default CourseCard;

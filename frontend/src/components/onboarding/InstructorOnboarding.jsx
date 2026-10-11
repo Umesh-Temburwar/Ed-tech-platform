@@ -474,15 +474,6 @@ const StepPayout = ({ user, onSave, savedData }) => {
     try {
       const last4 = accountToken.slice(-4) || "4242";
       const payoutSpeed = getPayoutSpeed(provider);
-      
-      console.log({
-        selectedProvider: provider,
-        selectedMethod: method,
-        accountToken,
-        currency,
-        taxStatus,
-        payoutSpeed,
-      });
 
       const { error } = await supabase.from("instructor_payouts").upsert([
         {
@@ -789,17 +780,8 @@ export default function InstructorOnboarding() {
     completeOnboarding 
   } = useInstructorOnboarding(user);
 
-  console.log("[InstructorOnboarding] Hook data received:", {
-    profile,
-    skills,
-    payout,
-    isSetupComplete,
-  });
-
   // Main useEffect to restore data from hook
   useEffect(() => {
-    console.log("[InstructorOnboarding] Restore useEffect triggered");
-    
     const safeSkills = Array.isArray(skills) ? skills : [];
     
     // Build saved step data from hook
@@ -827,12 +809,6 @@ export default function InstructorOnboarding() {
     if (step < 1 || step > STEPS.length) {
       step = 1;
     }
-
-    console.log("[InstructorOnboarding] Restoring state:", {
-      stepData,
-      completed,
-      step,
-    });
 
     setSavedStepData(stepData);
     setCompletedSteps(completed);
@@ -908,13 +884,6 @@ export default function InstructorOnboarding() {
       </div>
     );
   }
-
-  console.log("[InstructorOnboarding] Final render:", {
-    user: !!user,
-    isSetupComplete,
-    displayStep,
-    savedStepData,
-  });
 
   return (
     <div className="min-h-screen bg-[#060812] text-slate-100 font-['DM_Sans',sans-serif] overflow-x-hidden">
@@ -1025,7 +994,6 @@ export default function InstructorOnboarding() {
               </div>
 
               {/* Step content */}
-              {console.log("[InstructorOnboarding] Rendering step", displayStep, "with user:", user)}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={displayStep}

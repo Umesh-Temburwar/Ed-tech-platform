@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
-export default function Logo({ variant = "full", instructor = false, className = "" }) {
+function Logo({ variant = "full", instructor = false, className = "" }) {
   const [isHovered, setIsHovered] = useState(false);
   const { scrollY } = useScroll();
   const rotation = useTransform(scrollY, [0, 1000], [0, 360]);
 
   const brandName = "COREDEV";
   const academyName = "ACADEMY";
+
+  const brandNameChars = useMemo(() => brandName.split(''), [brandName]);
 
   const logoVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -116,7 +118,7 @@ export default function Logo({ variant = "full", instructor = false, className =
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <div className="flex gap-0.5">
-              {brandName.split('').map((char, i) => (
+              {brandNameChars.map((char, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
@@ -244,7 +246,7 @@ export default function Logo({ variant = "full", instructor = false, className =
         
         <div className="flex flex-col">
           <div className="flex gap-0.5">
-            {brandName.split('').map((char, i) => (
+            {brandNameChars.map((char, i) => (
               <motion.span
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
@@ -366,3 +368,5 @@ export default function Logo({ variant = "full", instructor = false, className =
     </motion.span>
   );
 }
+
+export default React.memo(Logo);

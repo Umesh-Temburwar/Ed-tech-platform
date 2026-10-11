@@ -211,8 +211,6 @@ export async function createCourse(instructorId, payload, status = "draft") {
       return { data: null, error: new Error("Course title is required and cannot be empty") };
     }
 
-    console.log("[createCourse] Creating course with payload:", payload);
-    
     const validStatuses = ["draft", "pending", "published", "rejected", "archived"];
     const finalStatus = validStatuses.includes(status?.toLowerCase()) ? status?.toLowerCase() : "draft";
     
@@ -245,15 +243,11 @@ export async function createCourse(instructorId, payload, status = "draft") {
       preview_type:        payload.preview_type ?? "video",
     };
     
-    console.log("[createCourse] Inserting safe course data:", safeCourseData);
-    
     const response = await supabase
       .from("courses")
       .insert(safeCourseData)
       .select()
       .single();
-
-    console.log("[createCourse] Supabase response:", response);
 
     if (!response || response.error) {
       console.error("[createCourse] Supabase Error:", response?.error);
@@ -380,8 +374,6 @@ export async function addSection(courseId, sectionName, orderIndex = 0) {
       .select()
       .single();
 
-    console.log("[addSection] Response:", response);
-
     if (!response || response.error) {
       console.error("[addSection] Supabase Error:", response?.error);
       return { data: null, error: response?.error || new Error("Failed to insert section") };
@@ -443,8 +435,6 @@ export async function addLesson(sectionId, payload) {
       })
       .select()
       .single();
-
-    console.log("[addLesson] Response:", response);
 
     if (!response || response.error) {
       console.error("[addLesson] Supabase Error:", response?.error);

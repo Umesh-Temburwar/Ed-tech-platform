@@ -56,7 +56,6 @@ export function fetchWishlist(token) {
 
             dispatch(setWishlist(formattedWishlist));
         } catch (error) {
-            console.log("FETCH_WISHLIST ERROR............", error);
             if (error?.status !== 403) {
                 toast.error("Could not fetch wishlist");
             }
@@ -95,7 +94,6 @@ export function addToWishlist(courseId, course, token) {
             dispatch(addToWishlistState(course));
             toast.success("Course added to wishlist");
         } catch (error) {
-            console.log("ADD_TO_WISHLIST ERROR............", error);
             toast.error("Could not add to wishlist");
         }
     };
@@ -122,7 +120,6 @@ export function removeFromWishlist(courseId, token) {
             dispatch(removeFromWishlistState(courseId));
             toast.success("Course removed from wishlist");
         } catch (error) {
-            console.log("REMOVE_FROM_WISHLIST ERROR............", error);
             toast.error("Could not remove from wishlist");
         }
     };

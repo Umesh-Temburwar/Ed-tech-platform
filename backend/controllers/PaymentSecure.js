@@ -338,30 +338,33 @@ exports.verifyPayment = async (req, res) => {
         try {
             if (student?.email) {
                 const name = `${student.first_name || ""} ${student.last_name || ""}`.trim() || "Student";
-                await mailSender(
+                mailSender(
                     student.email,
                     `✅ You're enrolled in ${course.title}!`,
                     `<h2>Payment Successful!</h2><p>Hi ${name},</p><p>You are now enrolled in <strong>${course.title}</strong>.</p><p><a href="${process.env.FRONTEND_URL}/learn/${courseId}">Start Learning →</a></p>`
-                );
-                console.log("[verifyPayment] ✅ Success email sent to student");
+                ).catch(err => console.warn("[verifyPayment] ⚠️  Non-fatal Error: Success email failed to send", err.message));
+                console.log("[verifyPayment] ✅ Success email triggered in background");
             }
         } catch (emailErr) {
-            console.warn("[verifyPayment] ⚠️  Non-fatal Error: Success email failed to send", emailErr.message);
+            console.warn("[verifyPayment] ⚠️  Non-fatal Error in email block", emailErr.message);
         }
 
         try {
             if (course.instructor_id) {
-                await supabase.from("notifications").insert({
+                supabase.from("notifications").insert({
                     recipient_id: course.instructor_id,
                     type:         "new_enrollment",
                     title:        "New Paid Enrollment",
                     message:      `${student?.first_name || "A student"} enrolled in "${course.title}" (₹${paymentRecord?.amount || course.price})`,
                     metadata:     { enrollment_id: enrollment.id, course_id: courseId, student_id: studentId, payment_id: razorpayPaymentId }
+                }).then(() => {
+                    console.log("[verifyPayment] ✅ Notification sent to instructor");
+                }).catch(err => {
+                    console.warn("[verifyPayment] ⚠️  Non-fatal Error: Instructor notification failed", err.message);
                 });
-                console.log("[verifyPayment] ✅ Notification sent to instructor");
             }
         } catch (notifErr) {
-            console.warn("[verifyPayment] ⚠️  Non-fatal Error: Instructor notification failed", notifErr.message);
+            console.warn("[verifyPayment] ⚠️  Non-fatal Error in notification block", notifErr.message);
         }
 
         console.log("[verifyPayment] 🎉 Payment Verification Flow Completed Successfully\n");

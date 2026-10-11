@@ -86,7 +86,7 @@ export default function InstructorSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 scrollbar-thin scrollbar-thumb-white/10">
+      <nav className="flex-1 overflow-y-auto px-3 py-3 pb-20 space-y-0.5 scrollbar-thin scrollbar-thumb-white/10" style={{ paddingBottom: 'max(5rem, calc(env(safe-area-inset-bottom) + 1.25rem))' }}>
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.id}
@@ -150,7 +150,8 @@ export default function InstructorSidebar() {
       {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-[110] w-12 h-12 bg-gradient-to-br from-violet-600 to-cyan-600 text-white rounded-2xl shadow-2xl flex items-center justify-center border border-white/20"
+        className="lg:hidden fixed right-6 z-[110] w-12 h-12 bg-gradient-to-br from-violet-600 to-cyan-600 text-white rounded-2xl shadow-2xl flex items-center justify-center border border-white/20"
+        style={{ bottom: 'max(24px, env(safe-area-inset-bottom))' }}
       >
         <Menu className="w-5 h-5" />
       </button>

@@ -93,7 +93,8 @@ export default function StudentSidebar() {
       {/* Mobile Menu Toggle */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed bottom-6 right-6 z-[110] w-14 h-14 bg-cyan-500 text-white rounded-2xl shadow-2xl flex items-center justify-center text-xl border border-cyan-400/50"
+        className="lg:hidden fixed right-6 z-[110] w-14 h-14 bg-cyan-500 text-white rounded-2xl shadow-2xl flex items-center justify-center text-xl border border-cyan-400/50"
+        style={{ bottom: 'max(24px, env(safe-area-inset-bottom))' }}
       >
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
@@ -141,7 +142,7 @@ export default function StudentSidebar() {
           </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 px-4 py-2 pb-20 space-y-1 overflow-y-auto custom-scrollbar" style={{ paddingBottom: 'max(5rem, calc(env(safe-area-inset-bottom) + 1.25rem))' }}>
           {sidebarLinks.map((link) => (
             <div
               key={link.id}

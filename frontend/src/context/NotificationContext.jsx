@@ -13,13 +13,16 @@ export const NotificationProvider = ({ children }) => {
   // Fetch current user and initial notifications
   useEffect(() => {
     let subscription = null;
+    let mounted = true;
+
     const init = async () => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        console.error('[NotificationProvider] Error getting user:', userError.message);
+      if (!mounted) return;
+      if (userError || !user) {
         setLoading(false);
         return;
       }
+
       // Initial load (most recent 50)
       const { data, error } = await supabase
         .from('notifications')
@@ -27,40 +30,62 @@ export const NotificationProvider = ({ children }) => {
         .eq('recipient_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
-      if (error) {
-        console.error('[NotificationProvider] Error loading notifications:', error.message);
-      } else {
+
+      if (!mounted) return;
+
+      if (!error && data) {
         setNotifications(data);
-        const unread = data.filter((n) => !n.is_read).length;
-        setUnreadCount(unread);
+        setUnreadCount(data.filter((n) => !n.is_read).length);
       }
       setLoading(false);
 
-      // Real-time subscription for INSERTs
+      // Remove any stale channel with the same name before (re)subscribing.
+      // This prevents the "cannot add callbacks after subscribe()" error that
+      // occurs in React StrictMode or on fast hot-reloads.
+      const channelName = `public:notifications:user=${user.id}`;
+      const existingChannel = supabase.getChannels().find(
+        (ch) => ch.topic === `realtime:${channelName}`
+      );
+      if (existingChannel) {
+        await supabase.removeChannel(existingChannel);
+      }
+
+      if (!mounted) return;
+
+      // Real-time subscription for INSERTs — must call .on() BEFORE .subscribe()
       subscription = supabase
-        .channel(`public:notifications:user=${user.id}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${user.id}` },
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `recipient_id=eq.${user.id}`,
+          },
           (payload) => {
+            if (!mounted) return;
             setNotifications((prev) => [payload.new, ...prev]);
             setUnreadCount((prev) => prev + 1);
           }
         )
         .subscribe();
     };
+
     init();
+
     return () => {
+      mounted = false;
       if (subscription) {
         supabase.removeChannel(subscription);
       }
     };
   }, []);
 
+
   const markAsRead = async (id) => {
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
     if (error) {
-      console.error('[NotificationProvider] markAsRead error:', error.message);
       return;
     }
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
@@ -72,7 +97,6 @@ export const NotificationProvider = ({ children }) => {
     if (unreadIds.length === 0) return;
     const { error } = await supabase.from('notifications').update({ is_read: true }).in('id', unreadIds);
     if (error) {
-      console.error('[NotificationProvider] markAllAsRead error:', error.message);
       return;
     }
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
@@ -82,7 +106,6 @@ export const NotificationProvider = ({ children }) => {
   const deleteNotification = async (id) => {
     const { error } = await supabase.from('notifications').delete().eq('id', id);
     if (error) {
-      console.error('[NotificationProvider] deleteNotification error:', error.message);
       return;
     }
     setNotifications((prev) => prev.filter((n) => n.id !== id));

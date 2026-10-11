@@ -148,7 +148,6 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        console.log('[CourseDetail] Fetching course details for id/slug:', courseId);
         setLoading(true);
         
         const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(courseId);
@@ -346,9 +345,7 @@ const CourseDetail = () => {
     setIsEnrolled(true);
     setShowPaymentModal(false);
     toast.success("Payment successful! Redirecting to course...");
-    setTimeout(() => {
-      navigate(`/learn/${courseData.id}`);
-    }, 1000);
+    navigate(`/learn/${courseData.id}`);
   };
 
   if (loading) {

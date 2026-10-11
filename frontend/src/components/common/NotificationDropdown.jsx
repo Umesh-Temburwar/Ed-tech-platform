@@ -25,7 +25,7 @@ const NotificationDropdown = ({ isOpen, onClose, notifications = [] }) => {
   const renderGroup = (title, items) =>
     items.length > 0 && (
       <div>
-        <h4 className="px-4 py-2 text-sm font-bold text-slate-400 bg-black/40">{title}</h4>
+        <h4 className="px-4 py-2 text-sm font-bold text-slate-400 bg-[#000814]">{title}</h4>
         {items.map((n) => (
           <div key={n.id} className="p-4 border-b border-white/5 hover:bg-white/[0.04] transition-colors cursor-pointer group" onClick={() => { if (!n.is_read) markAsRead(n.id); onClose(); }}>
             <h4 className="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">{n.title}</h4>
@@ -43,9 +43,9 @@ const NotificationDropdown = ({ isOpen, onClose, notifications = [] }) => {
           initial={{ opacity: 0, y: 10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
-          className="absolute top-full right-0 w-80 bg-black/[0.6] border border-white/10 rounded-2xl p-0 overflow-hidden shadow-2xl z-[110] backdrop-blur-md mt-2"
+          className="absolute top-full right-0 w-80 bg-[#000814] border border-white/10 rounded-2xl p-0 overflow-hidden shadow-2xl z-[110] backdrop-blur-md mt-2"
         >
-          <div className="p-4 border-b border-white/5 flex justify-between items-center bg-black">
+          <div className="p-4 border-b border-white/5 flex justify-between items-center bg-[#000814]">
             <h3 className="font-bold text-white text-sm">Notifications</h3>
             <button className="text-[10px] font-bold text-cyan-500 uppercase tracking-widest hover:underline" onClick={markAllAsRead}>Mark all read</button>
           </div>

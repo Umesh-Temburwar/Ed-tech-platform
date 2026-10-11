@@ -32,12 +32,8 @@ export const CourseProvider = ({ children }) => {
             course.createdAt
           );
           setCourses(validCourses);
-          console.log('Loaded courses from localStorage:', validCourses.length);
-        } else {
-          console.log('No courses found in localStorage');
         }
       } catch (error) {
-        console.error('Error loading courses from localStorage:', error);
         setError('Failed to load courses');
       } finally {
         setIsLoading(false);
@@ -52,9 +48,7 @@ export const CourseProvider = ({ children }) => {
     if (!isLoading) {
       try {
         localStorage.setItem('courses', JSON.stringify(courses));
-        console.log('Saved courses to localStorage:', courses.length);
       } catch (error) {
-        console.error('Error saving courses to localStorage:', error);
         setError('Failed to save courses');
       }
     }
@@ -62,8 +56,6 @@ export const CourseProvider = ({ children }) => {
 
   // Add a new course
   const addCourse = (courseData) => {
-    console.log('Adding new course:', courseData.title);
-    
     // Validate required fields
     if (!courseData.title || !courseData.description) {
       throw new Error('Title and description are required');
@@ -91,12 +83,9 @@ export const CourseProvider = ({ children }) => {
       status: 'published' // Can be 'draft', 'published', 'archived'
     };
 
-    console.log('New course created:', newCourse);
-
     // Update state - this will trigger the useEffect to save to localStorage
     setCourses(prevCourses => {
       const updatedCourses = [...prevCourses, newCourse];
-      console.log('Updated courses array:', updatedCourses.length, 'courses');
       return updatedCourses;
     });
     

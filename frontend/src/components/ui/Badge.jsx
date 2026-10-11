@@ -1,7 +1,7 @@
 import React from 'react';
 import { componentVariants } from '../../theme';
 
-const Badge = ({
+const Badge = React.memo(function Badge({
   children,
   variant = 'neutral',
   size = 'medium',
@@ -10,7 +10,7 @@ const Badge = ({
   iconPosition = 'left',
   dot = false,
   ...props
-}) => {
+}) {
   // Defensive coding: Ensure children exists
   const content = children || '';
   
@@ -62,6 +62,6 @@ const Badge = ({
       )}
     </span>
   );
-};
+});
 
 export default Badge;

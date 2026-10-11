@@ -48,7 +48,6 @@ async function fetchProfileWithTimeout(userId, timeoutMs = 10000) {
     clearTimeout(timeoutId);
 
     if (error) {
-      console.error("[syncSupabaseSession] Profile fetch error:", error);
       return null;
     }
 
@@ -58,7 +57,6 @@ async function fetchProfileWithTimeout(userId, timeoutMs = 10000) {
     if (err?.name === "TimeoutError") {
       return null;
     }
-    console.error("[syncSupabaseSession] Profile fetch threw:", err);
     return null;
   }
 }
@@ -78,16 +76,9 @@ let _lastAppliedAccessToken = null;
 // ─── core session handler ────────────────────────────────────────────────────
 
 async function applySession(event, session, dispatch) {
-  console.log("[syncSupabaseSession] applySession called:", {
-    event,
-    hasSession: !!session,
-    hasToken: !!session?.access_token,
-    userId: session?.user?.id
-  });
 
   // ── 1. Signed-out / no token ──────────────────────────────────────────────
   if (event === "SIGNED_OUT" || !session?.access_token) {
-    console.log("[syncSupabaseSession] Clearing session (SIGNED_OUT or no token)");
     nuclearClear();
     dispatch(setToken(null));
     dispatch(setUser(null));
@@ -99,7 +90,6 @@ async function applySession(event, session, dispatch) {
 
   // ── 2. Password-recovery — just store the token, nothing else ────────────
   if (event === "PASSWORD_RECOVERY") {
-    console.log("[syncSupabaseSession] PASSWORD_RECOVERY event - storing token only");
     dispatch(setToken(session.access_token));
     return;
   }
@@ -117,11 +107,6 @@ async function applySession(event, session, dispatch) {
     (userId === _lastProcessedUserId && event === _lastProcessedEvent) ||
     redundantSignedIn
   ) {
-    console.log("[syncSupabaseSession] Skipping duplicate session application:", {
-      inFlight: _applySessionInFlight,
-      sameEvent: userId === _lastProcessedUserId && event === _lastProcessedEvent,
-      redundantSignedIn
-    });
     return;
   }
 
@@ -130,31 +115,16 @@ async function applySession(event, session, dispatch) {
   _lastProcessedEvent = event;
 
   try {
-    console.log("[syncSupabaseSession] Processing session for user:", userId);
-
     // ── 4. Always set token immediately so UI doesn't flash logged-out ──────
     dispatch(setToken(session.access_token));
-    console.log("[syncSupabaseSession] ✅ Token dispatched to Redux");
 
     // ── 5. Fetch profile (with timeout) ─────────────────────────────────────
-    console.log("[syncSupabaseSession] Fetching profile...");
     const profile = await fetchProfileWithTimeout(userId);
-
-    if (profile) {
-      console.log("[syncSupabaseSession] ✅ Profile fetched:", {
-        id: profile.id,
-        email: profile.email,
-        accountType: profile.account_type
-      });
-    } else {
-      console.warn("[syncSupabaseSession] ⚠️ Profile fetch returned null (timeout or error)");
-    }
 
     // ── 6. Build the app-level user object ───────────────────────────────────
     const appUser = buildAppUserFromSession(session, profile);
 
     if (!appUser) {
-      console.error("[syncSupabaseSession] ❌ buildAppUserFromSession returned null — signing out");
       nuclearClear();
       dispatch(setToken(null));
       dispatch(setUser(null));
@@ -162,21 +132,12 @@ async function applySession(event, session, dispatch) {
       return;
     }
 
-    console.log("[syncSupabaseSession] ✅ App user built:", {
-      id: appUser.id,
-      email: appUser.email,
-      accountType: appUser.accountType,
-      firstName: appUser.firstName
-    });
-
     // ── 7. Persist and dispatch ──────────────────────────────────────────────
     dispatch(setUser(appUser));
     persistClientSession(session.access_token, appUser);
     _lastAppliedAccessToken = session.access_token;
-    console.log("[syncSupabaseSession] ✅ Session applied successfully");
 
   } catch (err) {
-    console.error("[syncSupabaseSession] ❌ Error in applySession:", err);
   } finally {
     _applySessionInFlight = false;
   }
@@ -189,26 +150,16 @@ async function applySession(event, session, dispatch) {
  * Returns an unsubscribe function.
  */
 export function subscribeSupabaseAuthToStore(dispatch) {
-  console.log("[syncSupabaseSession] Initializing Supabase auth subscription...");
-
   let disposed = false;
   let listener = null;
 
   // ── Initial session load ─────────────────────────────────────────────────
   async function initializeAuth() {
     try {
-      console.log("[syncSupabaseSession] Getting initial session...");
       const { data: { session } } = await supabase.auth.getSession();
-
-      if (session) {
-        console.log("[syncSupabaseSession] ✅ Initial session found for user:", session.user.id);
-      } else {
-        console.log("[syncSupabaseSession] No initial session found");
-      }
 
       await applySession("INITIAL_SESSION", session, dispatch);
     } catch (err) {
-      console.error("[syncSupabaseSession] ❌ initializeAuth error:", err);
     } finally {
       if (!disposed) {
         dispatch(setAuthInitialized(true));
@@ -219,7 +170,6 @@ export function subscribeSupabaseAuthToStore(dispatch) {
   // Safety net if init hangs (covers getSession + profile fetch + edge cases).
   const safetyTimeout = setTimeout(() => {
     if (!disposed) {
-      console.warn("[syncSupabaseSession] ⚠️ Safety timeout — forcing authInitialized true");
       dispatch(setAuthInitialized(true));
     }
   }, 14000);
@@ -238,11 +188,8 @@ export function subscribeSupabaseAuthToStore(dispatch) {
 
     // Register only after init so `SIGNED_IN` cannot race ahead of INITIAL_SESSION
     // and trigger a duplicate profile fetch + timeout noise.
-    console.log("[syncSupabaseSession] Registering auth state change listener...");
 
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("[syncSupabaseSession] Auth state changed:", event);
-
       if (event === "INITIAL_SESSION") {
         if (!disposed) {
           dispatch(setAuthInitialized(true));
@@ -253,7 +200,6 @@ export function subscribeSupabaseAuthToStore(dispatch) {
       try {
         await applySession(event, session, dispatch);
       } catch (err) {
-        console.error("[syncSupabaseSession] ❌ applySession error:", err);
       } finally {
         if (!disposed) {
           dispatch(setAuthInitialized(true));
@@ -265,7 +211,6 @@ export function subscribeSupabaseAuthToStore(dispatch) {
   })();
 
   return () => {
-    console.log("[syncSupabaseSession] Unsubscribing from auth changes...");
     disposed = true;
     clearTimeout(safetyTimeout);
     listener?.subscription?.unsubscribe();
@@ -278,40 +223,30 @@ export function subscribeSupabaseAuthToStore(dispatch) {
  * Call after profile updates, role changes, etc.
  */
 export async function refreshAuthStateInStore(dispatch) {
-  console.log("[syncSupabaseSession] Refreshing auth state from Supabase...");
-
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) {
-    console.warn("[syncSupabaseSession] No active session to refresh");
     return;
   }
 
-  console.log("[syncSupabaseSession] Fetching fresh profile...");
   const profile = await fetchProfileWithTimeout(session.user.id);
   const appUser = buildAppUserFromSession(session, profile);
 
   if (!appUser) {
-    console.error("[syncSupabaseSession] Failed to build app user");
     return;
   }
 
   dispatch(setToken(session.access_token));
   dispatch(setUser(appUser));
   persistClientSession(session.access_token, appUser);
-  console.log("[syncSupabaseSession] ✅ Auth state refreshed");
 }
 
 /**
  * Full logout — clears Supabase session, Redux state, and local storage.
  */
 export async function performLogout(dispatch, navigate) {
-  console.log("[syncSupabaseSession] Performing logout...");
-
   try {
     await supabase.auth.signOut({ scope: "global" });
-    console.log("[syncSupabaseSession] ✅ Supabase signOut successful");
   } catch (err) {
-    console.warn("[syncSupabaseSession] ⚠️ Supabase signOut error (continuing):", err);
     // ignore signOut errors — we clear local state regardless
   }
 
@@ -322,10 +257,7 @@ export async function performLogout(dispatch, navigate) {
   _lastProcessedEvent = null;
   _lastAppliedAccessToken = null;
 
-  console.log("[syncSupabaseSession] ✅ Local state cleared");
-
   if (navigate) {
-    console.log("[syncSupabaseSession] Redirecting to login...");
     navigate("/login", { replace: true });
   }
 }

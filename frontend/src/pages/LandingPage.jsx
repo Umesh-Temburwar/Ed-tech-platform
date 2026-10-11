@@ -15,6 +15,10 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import CoursesSection from "../components/core/HomePage/CoursesSection";
+import Students from "./Students";
+import About from "./About";
+import Contact from "./Contact";
+
 
 export default function LandingPage() {
   const { user } = useSelector((state) => state.profile);
@@ -294,6 +298,10 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      <Students />
+      <About />
+      <Contact />
 
       {/* FOOTER */}
       <Footer />

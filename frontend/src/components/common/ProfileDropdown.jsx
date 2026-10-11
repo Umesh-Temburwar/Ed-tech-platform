@@ -65,7 +65,7 @@ const ProfileDropdown = ({ isOpen, onClose, user, handleLogout }) => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="absolute top-full right-0 w-68 min-w-[260px] bg-black/[0.6] border border-white/10 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden z-[110] mt-2"
+          className="absolute top-full right-0 w-68 min-w-[260px] bg-[#000814] border border-white/10 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden z-[110] mt-2"
         >
           {/* ── Header ─────────────────────────────────────────────── */}
           <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">

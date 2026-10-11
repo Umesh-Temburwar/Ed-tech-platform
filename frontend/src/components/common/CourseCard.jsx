@@ -31,16 +31,6 @@ export default function CourseCard({ course, onClick }) {
   // ── Final resolved thumbnail ──────────────────────────────────────────────
   const thumbnailUrl = youtubeThumbnail || uploadedThumbnail || DEFAULT_THUMBNAIL;
 
-  // ── Debug logging (dev only) ──────────────────────────────────────────────
-  if (process.env.NODE_ENV !== "production") {
-    console.log(
-      "[CourseCard] Course:", course.title || course.course_name,
-      "| DB thumbnail:", dbThumbnail,
-      "| YouTube URL:", youtubeUrl,
-      "| Final:", thumbnailUrl
-    );
-  }
-
   // ── onError fallback: maxresdefault → hqdefault → uploaded → hide ─────────
   function handleImgError(e) {
     const src = e.target.src;

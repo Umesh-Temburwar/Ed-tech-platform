@@ -4,8 +4,6 @@ import { getStoredAccessToken } from "../utils/supabaseAuthHelpers";
 const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BASE_URL || "http://localhost:4000/api/v1";
 const BASE_URL = API_URL.endsWith('/api/v1') ? API_URL : `${API_URL}/api/v1`;
 
-console.log("[apiConnector] Initializing with BASE_URL:", BASE_URL);
-
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -20,7 +18,6 @@ axiosInstance.interceptors.request.use(
     const token = getStoredAccessToken();
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
-      console.log("[apiConnector] ✅ Authorization header added for:", config.url);
     } else {
       console.warn("[apiConnector] ⚠️ No token available for:", config.url);
     }
@@ -35,11 +32,6 @@ axiosInstance.interceptors.request.use(
 // Response interceptor for better error handling
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log("[apiConnector] ✅ Response received:", {
-      url: response.config.url,
-      status: response.status,
-      hasData: !!response.data
-    });
     return response;
   },
   (error) => {
@@ -63,13 +55,6 @@ axiosInstance.interceptors.response.use(
 
 export const apiConnector = async (method, url, bodyData, headers, params) => {
   try {
-    console.log("[apiConnector] Making request:", {
-      method,
-      url,
-      hasBody: !!bodyData,
-      hasParams: !!params
-    });
-
     // If url is relative, it will use BASE_URL, otherwise it will use absolute url
     const response = await axiosInstance({
       method: method,
@@ -77,11 +62,6 @@ export const apiConnector = async (method, url, bodyData, headers, params) => {
       data: bodyData ? bodyData : undefined,
       headers: headers ? headers : undefined,
       params: params ? params : undefined,
-    });
-
-    console.log("[apiConnector] ✅ Request successful:", {
-      url,
-      status: response.status
     });
 
     return response;
