@@ -77,3 +77,13 @@ Icon?
 .pnp
 .pnp.js
 skills-lock.json
+
+# ============================
+# Ignored Folders
+# ============================
+SQL/
+sql/
+interview/
+docs/interview/
+docs/sql/
+

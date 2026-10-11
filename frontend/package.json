@@ -2,6 +2,9 @@
   "name": "edtech-platform-frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
     "@remix-run/router": "^1.23.2",

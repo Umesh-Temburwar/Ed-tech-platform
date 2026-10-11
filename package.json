@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "EdTech Platform - Full-Stack Monorepo (React Frontend + Node.js/Express Backend + Supabase)",
   "private": true,
+  "engines": {
+    "node": "24.x",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "frontend": "cd frontend && npm start",
     "backend": "cd backend && npm run dev",
