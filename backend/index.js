@@ -19,6 +19,7 @@ const cors = require("cors");
 const { cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
+const os = require("os");
 
 dotenv.config();
 const PORT = process.env.PORT || 4001;
@@ -64,7 +65,7 @@ app.use(cookieParser());
 app.use(
     fileUpload({
         useTempFiles: true,
-        tempFileDir: "/tmp",
+        tempFileDir: os.tmpdir(),
     })
 );
 
