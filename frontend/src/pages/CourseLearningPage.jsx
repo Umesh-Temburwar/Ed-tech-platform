@@ -188,7 +188,14 @@ export default function CourseLearningPage() {
   // ─── UI State ─────────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState("overview");
   const [notes, setNotes] = useState("");
-  const [savedNotes, setSavedNotes] = useState({});
+  const [savedNotes, setSavedNotes] = useState(() => {
+    try {
+      const stored = localStorage.getItem(`notes_${courseId}`);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const playerRef = useRef(null);
 
@@ -671,8 +678,14 @@ export default function CourseLearningPage() {
                   <button
                     onClick={() => {
                       if (!activeLesson) return;
-                      setSavedNotes((p) => ({ ...p, [activeLesson.id]: notes }));
-                      toast.success("Note saved locally!");
+                      const next = { ...savedNotes, [activeLesson.id]: notes };
+                      setSavedNotes(next);
+                      try {
+                        localStorage.setItem(`notes_${courseId}`, JSON.stringify(next));
+                        toast.success("Note saved locally!");
+                      } catch {
+                        toast.error("Could not save note to local storage");
+                      }
                     }}
                     className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-xs font-black uppercase rounded-xl transition-all"
                   >
