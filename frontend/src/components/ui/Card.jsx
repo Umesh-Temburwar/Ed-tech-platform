@@ -33,5 +33,11 @@ const CardFooter = React.memo(function CardFooter({ children, className = "", ..
   return <div className={`p-6 pt-0 border-t border-white/[0.06] ${className}`} {...props}>{children}</div>;
 });
 
+Card.Header = CardHeader;
+Card.Title = CardTitle;
+Card.Description = CardDescription;
+Card.Body = CardBody;
+Card.Footer = CardFooter;
+
 export { Card, CardHeader, CardTitle, CardDescription, CardBody, CardFooter };
 export default Card;
