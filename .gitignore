@@ -86,4 +86,8 @@ sql/
 interview/
 docs/interview/
 docs/sql/
-
+scratch/
+tmp/
+temp/
+.system_generated/
+DIAGNOSE_NOW.html
