@@ -13,7 +13,12 @@ import {
   FaCalendar,
   FaChartLine
 } from 'react-icons/fa';
-import { getRealTimeNotifications } from '../../services/operations/dashboardAPI';
+import {
+  getUserNotifications,
+  markNotificationAsRead as markAsReadApi,
+  markAllNotificationsAsRead as markAllAsReadApi,
+  deleteNotification as deleteNotificationApi,
+} from '../../services/operations/notificationAPI';
 
 const NotificationCenter = () => {
   const { user } = useSelector((state) => state.profile);
@@ -40,49 +45,46 @@ const NotificationCenter = () => {
   const loadUserNotifications = async () => {
     try {
       setLoading(true);
-      const data = await getRealTimeNotifications(token);
-      
-      if (data) {
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+      const res = await getUserNotifications(token);
+      if (res?.success && Array.isArray(res.data)) {
+        setNotifications(res.data);
+        setUnreadCount(res.data.filter((n) => !n.read && !n.is_read).length);
       }
     } catch (error) {
       console.error('Failed to load notifications:', error);
-      setNotifications([]);
-      setUnreadCount(0);
     } finally {
       setLoading(false);
     }
   };
 
-  const markAsRead = (id) => {
+  const markAsRead = async (id) => {
     setNotifications(prev => 
       prev.map(notification => 
         notification.id === id 
-          ? { ...notification, read: true }
+          ? { ...notification, read: true, is_read: true }
           : notification
       )
     );
     setUnreadCount(prev => Math.max(0, prev - 1));
-    // TODO: Add API call to mark as read on backend
+    await markAsReadApi(token, id);
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setNotifications(prev => 
-      prev.map(notification => ({ ...notification, read: true }))
+      prev.map(notification => ({ ...notification, read: true, is_read: true }))
     );
     setUnreadCount(0);
-    // TODO: Add API call to mark all as read on backend
+    await markAllAsReadApi(token);
   };
 
-  const deleteNotification = (id) => {
+  const deleteNotification = async (id) => {
     setNotifications(prev => {
       const filtered = prev.filter(n => n.id !== id);
-      const unreadFiltered = filtered.filter(n => !n.read);
+      const unreadFiltered = filtered.filter(n => !n.read && !n.is_read);
       setUnreadCount(unreadFiltered.length);
       return filtered;
     });
-    // TODO: Add API call to delete notification on backend
+    await deleteNotificationApi(token, id);
   };
 
   const getIcon = (type) => {
