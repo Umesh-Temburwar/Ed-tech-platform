@@ -15,7 +15,9 @@
     "kill-ports": "powershell -Command \"@(3000,4000) | ForEach-Object { $port=$_; netstat -ano | Select-String \\\":$port \\\" | ForEach-Object { $pid=($_ -split '\\\\s+')[-1]; if($pid -match '^\\\\d+$' -and $pid -ne 0){ Stop-Process -Id $pid -Force -EA SilentlyContinue; Write-Host \\\"Killed port $port (PID $pid)\\\" } } }\"",
     "fresh": "npm run kill-ports && npm run dev",
     "install:all": "cd frontend && npm install && cd ../backend && npm install",
-    "build": "cd frontend && npm run build"
+    "build": "cd frontend && npm run build",
+    "smoke-test": "node backend/scripts/smoke-test.js",
+    "test:backend": "cd backend && npm test"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
