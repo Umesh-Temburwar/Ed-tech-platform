@@ -361,6 +361,25 @@ export default function CourseLearningPage() {
   const goToPrevLesson = () => {
     if (prevLesson) selectLesson(prevLesson);
   };
+
+  // Keyboard navigation shortcuts (Alt+ArrowRight, Alt+ArrowLeft, Alt+M)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(e.target?.tagName)) return;
+      if (e.altKey && e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (nextLesson) selectLesson(nextLesson);
+      } else if (e.altKey && e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (prevLesson) selectLesson(prevLesson);
+      } else if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        if (activeLesson) toggleComplete(activeLesson.id);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [nextLesson, prevLesson, activeLesson, selectLesson]);
   const courseEmbedUrl = courseData?.youtube_embed_url || 
     (courseData?.youtube_video_id ? `https://www.youtube.com/embed/${courseData.youtube_video_id}?autoplay=1&rel=0&modestbranding=1` : null);
   const embedUrl = getLessonEmbedUrl(activeLesson) || (totalCount === 0 ? courseEmbedUrl : null);
