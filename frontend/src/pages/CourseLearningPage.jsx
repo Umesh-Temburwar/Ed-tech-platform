@@ -12,7 +12,8 @@ import { toast } from "react-hot-toast";
 import {
   FaPlay, FaCheckCircle, FaArrowLeft, FaChevronDown, FaChevronUp,
   FaLock, FaShareAlt, FaBookOpen, FaRegStickyNote, FaFolderOpen,
-  FaCommentDots, FaSpinner, FaYoutube, FaList, FaClock
+  FaCommentDots, FaSpinner, FaYoutube, FaList, FaClock,
+  FaChevronLeft, FaChevronRight
 } from "react-icons/fa";
 import { supabase } from "../config/supabaseClient";
 import { extractYouTubeVideoId, getYoutubeThumbnail } from "../utils/youtubeUtils";
@@ -349,6 +350,17 @@ export default function CourseLearningPage() {
   const totalCount = flatLessons.length;
   const completedCount = completedIds.size;
   const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const currentIndex = flatLessons.findIndex((l) => l.id === activeLesson?.id);
+  const prevLesson = currentIndex > 0 ? flatLessons[currentIndex - 1] : null;
+  const nextLesson = currentIndex >= 0 && currentIndex < flatLessons.length - 1 ? flatLessons[currentIndex + 1] : null;
+
+  const goToNextLesson = () => {
+    if (nextLesson) selectLesson(nextLesson);
+  };
+
+  const goToPrevLesson = () => {
+    if (prevLesson) selectLesson(prevLesson);
+  };
   const courseEmbedUrl = courseData?.youtube_embed_url || 
     (courseData?.youtube_video_id ? `https://www.youtube.com/embed/${courseData.youtube_video_id}?autoplay=1&rel=0&modestbranding=1` : null);
   const embedUrl = getLessonEmbedUrl(activeLesson) || (totalCount === 0 ? courseEmbedUrl : null);
@@ -526,17 +538,35 @@ export default function CourseLearningPage() {
                       </a>
                     )}
                   </div>
-                  <button
-                    onClick={() => toggleComplete(activeLesson.id)}
-                    className={`shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black border transition-all ${
-                      completedIds.has(activeLesson.id)
-                        ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:border-white/20"
-                    }`}
-                  >
-                    <FaCheckCircle />
-                    {completedIds.has(activeLesson.id) ? "Done ✓" : "Mark Done"}
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={goToPrevLesson}
+                      disabled={!prevLesson}
+                      className="p-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-slate-300"
+                      title={prevLesson ? `Previous: ${prevLesson.title}` : "First lesson"}
+                    >
+                      <FaChevronLeft className="text-xs" />
+                    </button>
+                    <button
+                      onClick={goToNextLesson}
+                      disabled={!nextLesson}
+                      className="p-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-slate-300"
+                      title={nextLesson ? `Next: ${nextLesson.title}` : "Last lesson"}
+                    >
+                      <FaChevronRight className="text-xs" />
+                    </button>
+                    <button
+                      onClick={() => toggleComplete(activeLesson.id)}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black border transition-all ${
+                        completedIds.has(activeLesson.id)
+                          ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400"
+                          : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:border-white/20"
+                      }`}
+                    >
+                      <FaCheckCircle />
+                      {completedIds.has(activeLesson.id) ? "Done ✓" : "Mark Done"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
