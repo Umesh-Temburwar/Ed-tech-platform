@@ -28,7 +28,6 @@
     "backend"
   ],
   "dependencies": {
-    "@pinecone-database/pinecone": "^6.1.4",
     "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
     "glob": "^11.1.0",

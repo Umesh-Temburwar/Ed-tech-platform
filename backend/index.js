@@ -22,7 +22,8 @@ const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
 const os = require("os");
 
-dotenv.config();
+const path = require("path");
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 const securityHeaders = require("./middleware/securityHeaders");
 const PORT = process.env.PORT || 4001;
 

@@ -115,7 +115,7 @@ export default function LearningPreferencesStep({ formData, onChange, onNext, on
               { key: 'notifications_enabled', label: 'Notifications Enabled' },
               { key: 'email_updates', label: 'Email Updates' },
               { key: 'dark_mode', label: 'Dark Mode' },
-              { key: 'AI_recommendations', label: 'AI Recommendations' },
+              { key: 'interest_recommendations', label: 'Interest & Category Recommendations' },
             ].map((pref) => (
               <div key={pref.key} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
                 <span className="text-sm font-medium text-white">{pref.label}</span>

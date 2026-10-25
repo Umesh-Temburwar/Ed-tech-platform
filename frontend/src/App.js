@@ -54,7 +54,6 @@ const InstructorReviews = React.lazy(() => import("./pages/dashboard/instructor/
 const InstructorResources = React.lazy(() => import("./pages/dashboard/instructor/Resources"));
 const InstructorCoupons = React.lazy(() => import("./pages/dashboard/instructor/Coupons"));
 const InstructorWebinars = React.lazy(() => import("./pages/dashboard/instructor/Webinars"));
-const InstructorAIAssistant = React.lazy(() => import("./pages/dashboard/instructor/AIAssistant"));
 const InstructorStudentProgress = React.lazy(() => import("./pages/dashboard/instructor/StudentProgress"));
 const InstructorAffiliate = React.lazy(() => import("./pages/dashboard/instructor/Affiliate"));
 const InstructorVerification = React.lazy(() => import("./pages/dashboard/instructor/Verification"));
@@ -70,7 +69,6 @@ const Offers = React.lazy(() => import("./pages/Offers"));
 
 const StudentAssignments = React.lazy(() => import("./pages/student-dashboard/Assignments"));
 const StudentAnalytics = React.lazy(() => import("./pages/student-dashboard/Analytics"));
-const StudentAIAssistant = React.lazy(() => import("./pages/student-dashboard/AIAssistant"));
 const StudentLeaderboard = React.lazy(() => import("./pages/student-dashboard/Leaderboard"));
 const StudentStudyGroups = React.lazy(() => import("./pages/student-dashboard/Dashboard"));
 const StudentResources = React.lazy(() => import("./pages/student-dashboard/Dashboard"));
@@ -269,7 +267,6 @@ function App() {
                         <Route path="dashboard/quizzes" element={<StudentQuiz />} />
                         <Route path="dashboard/assignments" element={<StudentAssignments />} />
                         <Route path="dashboard/analytics" element={<StudentAnalytics />} />
-                        <Route path="dashboard/ai-assistant" element={<StudentAIAssistant />} />
                         <Route path="dashboard/achievements" element={<StudentDashboardHome />} />
                         <Route path="dashboard/notes" element={<StudentDashboardHome />} />
                         <Route path="dashboard/live-classes" element={<LiveClasses />} />
@@ -328,7 +325,6 @@ function App() {
                         <Route path="dashboard/instructor/resources" element={<InstructorResources />} />
                         <Route path="dashboard/instructor/coupons" element={<InstructorCoupons />} />
                         <Route path="dashboard/instructor/webinars" element={<InstructorWebinars />} />
-                        <Route path="dashboard/instructor/ai-assistant" element={<InstructorAIAssistant />} />
                         <Route path="dashboard/instructor/student-progress" element={<InstructorStudentProgress />} />
                         <Route path="dashboard/instructor/affiliate" element={<InstructorAffiliate />} />
                         <Route path="dashboard/instructor/verification" element={<InstructorVerification />} />

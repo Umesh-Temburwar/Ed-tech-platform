@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { apiConnector } from "../../services/apiconnector"
 import { adminEndpoints } from "../../services/apis"
+import { supabase } from "../../config/supabaseClient"
+import toast from "react-hot-toast"
 
 export default function AdminCourses() {
   const [rows, setRows] = useState([])
@@ -10,24 +12,78 @@ export default function AdminCourses() {
 
   const load = async () => {
     setLoading(true)
-    const res = await apiConnector("GET", adminEndpoints.COURSES)
-    setRows(res.data.courses || [])
-    setLoading(false)
+    try {
+      const res = await apiConnector("GET", adminEndpoints.COURSES)
+      if (res?.data?.courses) {
+        setRows(res.data.courses)
+        return
+      }
+    } catch (err) {
+      console.warn("Backend API unavailable, falling back to Supabase client:", err.message)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("courses")
+        .select("id, title, status, instructor:instructor_id(first_name, last_name)")
+        .order("created_at", { ascending: false })
+
+      if (!error && data) {
+        setRows(data.map((c) => ({
+          id: c.id,
+          title: c.title,
+          status: c.status,
+          instructor: c.instructor ? `${c.instructor.first_name || ""} ${c.instructor.last_name || ""}`.trim() : "-"
+        })))
+      } else {
+        setRows([])
+      }
+    } catch (err) {
+      console.error("Error fetching courses from Supabase:", err)
+      setRows([])
+    } finally {
+      setLoading(false)
+    }
   }
 
-  useEffect(()=>{ load() },[])
+  useEffect(() => { load() }, [])
 
   const approve = async (id) => {
-    await apiConnector("PATCH", adminEndpoints.APPROVE_COURSE.replace(":id", id))
+    try {
+      await apiConnector("PATCH", adminEndpoints.APPROVE_COURSE.replace(":id", id))
+      toast.success("Course approved")
+    } catch {
+      const { error } = await supabase.from("courses").update({ status: "approved" }).eq("id", id)
+      if (error) toast.error("Failed to approve course")
+      else toast.success("Course approved")
+    }
     load()
   }
+
   const remove = async (id) => {
-    await apiConnector("DELETE", adminEndpoints.DELETE_COURSE.replace(":id", id))
+    if (!window.confirm("Are you sure you want to delete this course?")) return
+    try {
+      await apiConnector("DELETE", adminEndpoints.DELETE_COURSE.replace(":id", id))
+      toast.success("Course deleted")
+    } catch {
+      const { error } = await supabase.from("courses").delete().eq("id", id)
+      if (error) toast.error("Failed to delete course")
+      else toast.success("Course deleted")
+    }
     load()
   }
+
   const startEdit = (c) => { setEditing(c.id); setTitle(c.title) }
+
   const saveEdit = async (id) => {
-    await apiConnector("PATCH", adminEndpoints.EDIT_COURSE.replace(":id", id), { title })
+    try {
+      await apiConnector("PATCH", adminEndpoints.EDIT_COURSE.replace(":id", id), { title })
+      toast.success("Course updated")
+    } catch {
+      const { error } = await supabase.from("courses").update({ title }).eq("id", id)
+      if (error) toast.error("Failed to update course")
+      else toast.success("Course updated")
+    }
     setEditing(null)
     load()
   }

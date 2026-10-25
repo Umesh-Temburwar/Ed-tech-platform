@@ -72,9 +72,9 @@
       "icon": "FaBullhorn"
     },
     {
-      "title": "AI Content Suggestions",
-      "description": "Get automated recommendations for new topics or course improvements.",
-      "icon": "FaRobot"
+      "title": "Curriculum Optimization",
+      "description": "Structured analytics and recommendations for course organization and curriculum completeness.",
+      "icon": "FaBookOpen"
     },
     {
       "title": "Community Engagement",

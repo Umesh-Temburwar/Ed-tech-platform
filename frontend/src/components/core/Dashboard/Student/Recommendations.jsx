@@ -27,7 +27,7 @@ export default function Recommendations() {
 					</li>
 				))}
 			</ul>
-			<p className="text-xs text-richblack-400">Personalization is heuristic-based now; integrate ML later.</p>
+			<p className="text-xs text-richblack-400">Recommendations are tailored based on your active course milestones and topics.</p>
 		</div>
 	);
 }

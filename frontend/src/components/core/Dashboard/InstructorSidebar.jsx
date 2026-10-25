@@ -6,7 +6,7 @@ import Logo from "../../../components/navbar/Logo";
 import {
   LayoutDashboard, BookOpen, PlusCircle, ClipboardList, HelpCircle,
   FileText, Users, MessageSquare, Video, Globe, BarChart2, DollarSign,
-  Tag, Star, Bell, FolderOpen, Award, Bot, Share2, Settings,
+  Tag, Star, Bell, FolderOpen, Award, Share2, Settings,
   LogOut, ChevronRight, Menu, X, Shield, CalendarCheck, User
 } from "lucide-react";
 
@@ -28,7 +28,6 @@ const NAV_ITEMS = [
   { id: "messages",         label: "Messages",          icon: MessageSquare,   path: "/dashboard/instructor/messages" },
   { id: "community",        label: "Community",         icon: Users,           path: "/students" },
   { id: "discussion-management", label: "Discussion Management", icon: MessageSquare, path: "/dashboard/instructor/discussions" },
-  { id: "ai-tools",         label: "AI Tools",          icon: Bot,             path: "/dashboard/instructor/ai-assistant", highlight: true },
   { id: "revenue-earnings", label: "Revenue & Earnings", icon: DollarSign,     path: "/dashboard/instructor/earnings" },
   { id: "payouts",          label: "Payouts",           icon: DollarSign,      path: "/dashboard/instructor/payouts" },
   { id: "coupons-marketing", label: "Coupons & Marketing", icon: Tag,          path: "/dashboard/instructor/coupons" },

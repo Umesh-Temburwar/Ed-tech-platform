@@ -66,7 +66,7 @@ function Dashboard() {
                 <li>Collaboration Tools – Co-create courses with other instructors, share teaching resources, and split revenues.</li>
                 <li>Assignment & Test Analytics – See difficulty ratings, average scores, and question-level performance.</li>
                 <li>Marketing Tools – Email campaigns, coupon creation, and social media sharing for course promotion.</li>
-                <li>AI Content Suggestions – Get automated recommendations for new topics or course improvements.</li>
+                <li>Curriculum Optimization – Structured recommendations for course organization and curriculum completeness.</li>
                 <li>Community Engagement – Host instructor blogs, AMA (Ask Me Anything) sessions, and discussion groups.</li>
               </ul>
             </div>
