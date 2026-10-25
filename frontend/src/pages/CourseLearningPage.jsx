@@ -337,6 +337,13 @@ export default function CourseLearningPage() {
   const toggleSection = (id) =>
     setExpandedSections((p) => ({ ...p, [id]: !p[id] }));
 
+  // Auto-expand section containing the active lesson
+  useEffect(() => {
+    if (activeLesson?.section_id) {
+      setExpandedSections((prev) => ({ ...prev, [activeLesson.section_id]: true }));
+    }
+  }, [activeLesson?.id, activeLesson?.section_id]);
+
   const toggleComplete = (lessonId) => {
     setCompletedIds((prev) => {
       const next = new Set(prev);
