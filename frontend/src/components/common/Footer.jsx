@@ -46,11 +46,19 @@ const Footer = React.memo(() => {
                   );
                 })}
               </div>
-              <div className="flex gap-3 text-lg">
-                <FaFacebook />
-                <FaGoogle />
-                <FaTwitter />
-                <FaYoutube />
+              <div className="flex gap-4 text-lg text-richblack-400">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Facebook page" className="hover:text-blue-500 transition-colors">
+                  <FaFacebook />
+                </a>
+                <a href="https://google.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Google page" className="hover:text-red-400 transition-colors">
+                  <FaGoogle />
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Twitter page" className="hover:text-cyan-400 transition-colors">
+                  <FaTwitter />
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our YouTube channel" className="hover:text-red-500 transition-colors">
+                  <FaYoutube />
+                </a>
               </div>
               <div></div>
             </div>
