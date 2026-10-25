@@ -1,7 +1,10 @@
-// backend/routes/notifications.js
 const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabaseAdmin');
+const { auth } = require('../middleware/auth');
+
+// Apply auth middleware to all notification routes
+router.use(auth);
 
 // GET notifications for authenticated user
 router.get('/', async (req, res) => {
