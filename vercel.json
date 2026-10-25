@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd frontend && CI=false DISABLE_ESLINT_PLUGIN=true npm run build",
-  "outputDirectory": "frontend/build",
+  "buildCommand": "if [ -d \"frontend\" ]; then cd frontend && CI=false DISABLE_ESLINT_PLUGIN=true npm run build && cd .. && cp -r frontend/build ./build; else CI=false DISABLE_ESLINT_PLUGIN=true npm run build; fi",
+  "outputDirectory": "build",
   "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
     {
