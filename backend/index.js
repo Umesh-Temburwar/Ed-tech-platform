@@ -13,6 +13,7 @@ const cartRoutes = require("./routes/cart");
 const notificationRoutes = require("./routes/notifications");
 const createOrderRoutes = require("./routes/createOrder");
 const verifyPaymentRoutes = require("./routes/verifyPayment");
+const healthRoutes = require("./routes/health");
 
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -86,6 +87,8 @@ app.use("/api/v1/support", supportRoutes);
 app.use("/api/v1/wishlist", wishlistRoutes);
 app.use("/api/v1/cart", cartRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/health", healthRoutes);
+app.use("/api/v1/health", healthRoutes);
 
 // ─── Razorpay Standard Checkout routes (/api/create-order & /api/verify-payment) ───
 app.use("/api/create-order", createOrderRoutes);
