@@ -263,8 +263,9 @@ const Navbar = () => {
                   <Logo />
                 </Link>
                 <button
+                  aria-label="Close navigation menu"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white"
+                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors"
                 >
                   <FaTimes />
                 </button>
