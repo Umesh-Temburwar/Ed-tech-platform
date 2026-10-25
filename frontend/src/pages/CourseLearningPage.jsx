@@ -313,11 +313,13 @@ export default function CourseLearningPage() {
         setExpandedSections({ [curriculumTree[0].id]: true });
       }
 
-      // ── 8. Auto-select FIRST lesson ───────────────────────────────────────
+      // ── 8. Auto-select URL specified lesson or first lesson ───────────────
+      const searchLessonId = new URLSearchParams(window.location.search).get("lesson");
+      const matchedLesson = searchLessonId ? flat.find((l) => String(l.id) === String(searchLessonId)) : null;
       const firstWithVideo = flat.find((l) => getLessonEmbedUrl(l));
-      const firstLesson = firstWithVideo || flat[0] || null;
-      if (firstLesson) {
-        setActiveLesson(firstLesson);
+      const targetLesson = matchedLesson || firstWithVideo || flat[0] || null;
+      if (targetLesson) {
+        setActiveLesson(targetLesson);
       }
 
       // ── 9. Load progress ──────────────────────────────────────────────────
@@ -491,8 +493,12 @@ export default function CourseLearningPage() {
 
           <button
             onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              toast.success("Link copied!");
+              const url = new URL(window.location.href);
+              if (activeLesson?.id) {
+                url.searchParams.set("lesson", activeLesson.id);
+              }
+              navigator.clipboard.writeText(url.toString());
+              toast.success("Lesson link copied to clipboard!");
             }}
             className="hidden md:flex items-center gap-2 px-3 py-2 border border-white/5 bg-white/5 hover:bg-white/10 text-xs font-bold rounded-lg tracking-wider transition-colors"
           >
