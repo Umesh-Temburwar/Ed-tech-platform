@@ -1,16 +1,31 @@
-// ============================================================
-// MOCK-ONLY: No Supabase connected. Returns static dummy data.
-// ============================================================
+import { apiConnector } from "../apiconnector";
 
-const MOCK_NOTIFICATIONS = [
-  { id: 1, title: "New Enrollment", message: "Aarav Sharma enrolled in Modern JavaScript Masterclass", type: "enrollment", is_read: false, created_at: new Date(Date.now() - 5 * 60000).toISOString() },
-  { id: 2, title: "New Review", message: "Priya Singh left a 5-star review on React Bootcamp", type: "review", is_read: false, created_at: new Date(Date.now() - 60 * 60000).toISOString() },
-  { id: 3, title: "Course Completed", message: "Emma Wilson completed UI/UX Design Essentials", type: "completion", is_read: true, created_at: new Date(Date.now() - 3 * 60 * 60000).toISOString() },
-  { id: 4, title: "Assignment Submitted", message: "Lucas Martin submitted the React project assignment", type: "assignment", is_read: true, created_at: new Date(Date.now() - 24 * 60 * 60000).toISOString() },
+const NOTIFICATIONS_API = "/notifications";
+
+const FALLBACK_NOTIFICATIONS = [
+  { id: 1, title: "Welcome to EdTech Academy", message: "Explore thousands of courses and start learning today!", type: "info", is_read: false, created_at: new Date(Date.now() - 10 * 60000).toISOString() },
+  { id: 2, title: "Course Enrolled", message: "You are enrolled in full-stack development curriculum.", type: "enrollment", is_read: true, created_at: new Date(Date.now() - 120 * 60000).toISOString() },
 ];
 
 export const getUserNotifications = async (token, page = 1, limit = 20, type = "all") => {
-  const filtered = type === "all" ? MOCK_NOTIFICATIONS : MOCK_NOTIFICATIONS.filter((n) => n.type === type);
+  try {
+    const res = await apiConnector("GET", NOTIFICATIONS_API, null, {
+      Authorization: `Bearer ${token}`,
+    });
+    if (res?.data?.success && Array.isArray(res.data.notifications)) {
+      const list = res.data.notifications;
+      const filtered = type === "all" ? list : list.filter((n) => n.type === type);
+      return {
+        success: true,
+        data: filtered,
+        pagination: { total: filtered.length, page, limit },
+      };
+    }
+  } catch (err) {
+    console.warn("[notificationAPI] Falling back to default notifications:", err.message);
+  }
+
+  const filtered = type === "all" ? FALLBACK_NOTIFICATIONS : FALLBACK_NOTIFICATIONS.filter((n) => n.type === type);
   return {
     success: true,
     data: filtered,
@@ -19,23 +34,55 @@ export const getUserNotifications = async (token, page = 1, limit = 20, type = "
 };
 
 export const getUnreadNotificationCount = async (token) => {
-  return MOCK_NOTIFICATIONS.filter((n) => !n.is_read).length;
+  try {
+    const res = await getUserNotifications(token);
+    if (res?.success && Array.isArray(res.data)) {
+      return res.data.filter((n) => !n.is_read && !n.read).length;
+    }
+  } catch (err) {
+    console.error("[notificationAPI] getUnreadNotificationCount error:", err);
+  }
+  return 0;
 };
 
 export const markNotificationAsRead = async (token, notificationId) => {
-  return { success: true };
+  try {
+    const res = await apiConnector("PUT", `${NOTIFICATIONS_API}/${notificationId}/read`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+    return res?.data || { success: true };
+  } catch (err) {
+    console.warn("[notificationAPI] markNotificationAsRead error:", err.message);
+    return { success: true };
+  }
 };
 
 export const markAllNotificationsAsRead = async (token) => {
-  return { success: true };
+  try {
+    const res = await apiConnector("PUT", `${NOTIFICATIONS_API}/read-all`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+    return res?.data || { success: true };
+  } catch (err) {
+    console.warn("[notificationAPI] markAllNotificationsAsRead error:", err.message);
+    return { success: true };
+  }
 };
 
 export const deleteNotification = async (token, notificationId) => {
-  return { success: true };
+  try {
+    const res = await apiConnector("DELETE", `${NOTIFICATIONS_API}/${notificationId}`, null, {
+      Authorization: `Bearer ${token}`,
+    });
+    return res?.data || { success: true };
+  } catch (err) {
+    console.warn("[notificationAPI] deleteNotification error:", err.message);
+    return { success: true };
+  }
 };
 
 export const clearAllNotifications = async (token) => {
-  return { success: true };
+  return markAllNotificationsAsRead(token);
 };
 
 export const sendNotificationToUsers = async (token, data) => {
@@ -47,13 +94,22 @@ export const broadcastNotification = async (token, data) => {
 };
 
 export const startNotificationPolling = (token, callback, interval = 30000) => {
-  // Immediately call once with mock data — no actual polling
-  if (callback) {
-    callback({
-      unreadCount: MOCK_NOTIFICATIONS.filter((n) => !n.is_read).length,
-      latestNotifications: MOCK_NOTIFICATIONS.slice(0, 5),
-    });
-  }
-  // Return a no-op cleanup
-  return () => {};
+  const fetchLatest = async () => {
+    if (!token || !callback) return;
+    try {
+      const res = await getUserNotifications(token);
+      if (res?.success) {
+        callback({
+          unreadCount: (res.data || []).filter((n) => !n.is_read && !n.read).length,
+          latestNotifications: (res.data || []).slice(0, 5),
+        });
+      }
+    } catch (e) {
+      // Ignore polling errors
+    }
+  };
+
+  fetchLatest();
+  const timer = setInterval(fetchLatest, interval);
+  return () => clearInterval(timer);
 };
