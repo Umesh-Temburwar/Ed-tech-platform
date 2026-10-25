@@ -13,13 +13,18 @@ exports.updateProfile = async (req, res) => {
             });
         }
 
+        const cleanDob = dateOfBirth && String(dateOfBirth).trim() ? String(dateOfBirth).trim() : null;
+        const cleanContact = contactNumber ? String(contactNumber).trim() : null;
+        const cleanGender = gender ? String(gender).trim() : null;
+        const cleanAbout = about ? String(about).trim().substring(0, 1000) : "";
+
         const { data: profile, error } = await supabase
             .from('profiles')
             .update({
-                date_of_birth: dateOfBirth,
-                about,
-                gender,
-                contact_number: contactNumber,
+                date_of_birth: cleanDob,
+                about: cleanAbout,
+                gender: cleanGender,
+                contact_number: cleanContact,
                 updated_at: new Date().toISOString()
             })
             .eq('id', id)
