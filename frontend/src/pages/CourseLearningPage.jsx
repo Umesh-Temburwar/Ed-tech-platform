@@ -354,7 +354,18 @@ export default function CourseLearningPage() {
   const toggleComplete = (lessonId) => {
     setCompletedIds((prev) => {
       const next = new Set(prev);
-      next.has(lessonId) ? next.delete(lessonId) : next.add(lessonId);
+      const isFinishing = !next.has(lessonId);
+      if (isFinishing) {
+        next.add(lessonId);
+        if (next.size === totalCount && totalCount > 0) {
+          toast.success("🎉 Outstanding achievement! You completed all lessons!", {
+            duration: 5000,
+            icon: "🏆",
+          });
+        }
+      } else {
+        next.delete(lessonId);
+      }
       localStorage.setItem(`progress_${courseId}`, JSON.stringify([...next]));
       return next;
     });
