@@ -23,6 +23,7 @@ const dotenv = require("dotenv");
 const os = require("os");
 
 dotenv.config();
+const securityHeaders = require("./middleware/securityHeaders");
 const PORT = process.env.PORT || 4001;
 
 // ==========================================
@@ -37,6 +38,9 @@ app.use((req, res, next) => {
     console.log(`========================================`);
     next();
 });
+
+// Security Headers Middleware
+app.use(securityHeaders);
 
 // ==========================================
 // 2. CORS Middleware
