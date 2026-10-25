@@ -133,12 +133,38 @@ The backend runs on `http://localhost:4000` and exposes:
 
 | Route                  | Description           |
 |------------------------|-----------------------|
-| `GET /`                | Health check          |
+| `GET /api/health`      | Health & Diagnostics  |
 | `/api/v1/auth`         | Auth routes           |
 | `/api/v1/profile`      | Profile routes        |
-| `/api/v1/course`       | Course routes         |
-| `/api/v1/payment`      | Payment routes        |
-| `/api/v1/admin`        | Admin routes          |
+| `/api/v1/course`       | Course & Lesson routes|
+| `/api/v1/notifications`| Notifications API     |
+| `/api/v1/payment`      | Payment & Razorpay    |
+| `/api/v1/admin`        | Admin dashboard routes|
+| `/api/v1/support`      | Support tickets API   |
+
+---
+
+## 🧪 Testing & Verification
+
+```bash
+# Run backend smoke test
+npm run smoke-test
+
+# Check Supabase database connectivity & tables
+npm run test-db --prefix backend
+
+# Run backend test suite
+npm run test:backend
+```
+
+---
+
+## 📚 Documentation & Community
+
+- [API Reference Specification](docs/API_DOCUMENTATION.md)
+- [Database Fix Guide](docs/SCHEMA_MISMATCH_COMPLETE_FIX.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
 
 ---
 
