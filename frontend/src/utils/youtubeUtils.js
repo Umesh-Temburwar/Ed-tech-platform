@@ -10,11 +10,16 @@
  *     - onError fallback: switch to hqdefault.jpg (handled in <img onError>)
  */
 
-// Extract YouTube video ID from ANY valid YouTube URL format
+// Extract YouTube video ID from ANY valid YouTube URL format or direct 11-char ID
 export function extractYouTubeVideoId(url) {
   if (!url || typeof url !== 'string') return null;
   
   const cleanUrl = url.trim();
+
+  // If input is already an 11-character video ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(cleanUrl)) {
+    return cleanUrl;
+  }
   
   const patterns = [
     // youtube.com/watch?v=VIDEO_ID
@@ -40,6 +45,27 @@ export function extractYouTubeVideoId(url) {
   }
   
   return null;
+}
+
+// Extract timestamp offset in seconds from YouTube URL (e.g. t=120 or t=2m15s)
+export function extractYouTubeTimestamp(url) {
+  if (!url || typeof url !== 'string') return 0;
+  const match = url.match(/[?&]t=([0-9hms]+)/);
+  if (!match || !match[1]) return 0;
+
+  const raw = match[1];
+  if (/^\d+$/.test(raw)) return parseInt(raw, 10);
+
+  let totalSeconds = 0;
+  const hours = raw.match(/(\d+)h/);
+  const minutes = raw.match(/(\d+)m/);
+  const seconds = raw.match(/(\d+)s/);
+
+  if (hours) totalSeconds += parseInt(hours[1], 10) * 3600;
+  if (minutes) totalSeconds += parseInt(minutes[1], 10) * 60;
+  if (seconds) totalSeconds += parseInt(seconds[1], 10);
+
+  return totalSeconds;
 }
 
 // Alias — used by lessonService.js and EditCourse.jsx
