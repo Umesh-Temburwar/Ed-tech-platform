@@ -4,7 +4,7 @@
 //        video_url fallback, dynamic embed URL, debug console logs
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
@@ -76,7 +76,7 @@ function formatDuration(lesson) {
 }
 
 // ─── Lesson Thumbnail Card ───────────────────────────────────────────────────
-function LessonCard({ lesson, index, isActive, isDone, onSelect, onToggleDone }) {
+const LessonCard = memo(function LessonCard({ lesson, index, isActive, isDone, onSelect, onToggleDone }) {
   const thumb = getLessonThumbnail(lesson);
   const embedUrl = getLessonEmbedUrl(lesson);
   const hasVideo = !!embedUrl;
@@ -165,7 +165,7 @@ function LessonCard({ lesson, index, isActive, isDone, onSelect, onToggleDone })
       </div>
     </div>
   );
-}
+});
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function CourseLearningPage() {
