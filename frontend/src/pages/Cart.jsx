@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaShoppingCart, FaTrash, FaArrowLeft, FaArrowRight, FaCreditCard, FaGift, FaStar, FaClock, FaUsers, FaPlay, FaGraduationCap, FaCertificate, FaInfinity, FaMobile, FaHeadphones, FaShieldAlt, FaRocket, FaGem } from 'react-icons/fa';
+import { 
+  ShoppingCart, 
+  Trash2, 
+  ArrowLeft, 
+  ArrowRight, 
+  ShieldCheck, 
+  BookOpen, 
+  Clock, 
+  Star, 
+  CheckCircle2 
+} from 'lucide-react';
 import { removeFromCart } from '../slices/cartSlice';
 import { toast } from 'react-hot-toast';
 import Footer from '../components/common/Footer';
@@ -12,11 +22,6 @@ const Cart = () => {
   const { user } = useSelector((state) => state.profile);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
-  const [promoCode, setPromoCode] = useState('');
-  const [discount, setDiscount] = useState(0);
-  const [isPromoApplied, setIsPromoApplied] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   // Calculate totals
   const subtotal = cart.reduce((total, item) => {
@@ -26,27 +31,15 @@ const Cart = () => {
       : priceValue;
     return total + (price * (item.quantity || 1));
   }, 0);
-  const discountAmount = (subtotal * discount) / 100;
-  const total = subtotal - discountAmount;
+  const total = subtotal;
 
-  // Promo codes
-  const promoCodes = {
-    'WELCOME10': 10,
-    'STUDENT20': 20,
-    'SAVE15': 15,
-    'NEWUSER25': 25,
-    'LEARN50': 50
-  };
-
-  // Handle remove from cart
   const handleRemoveFromCart = (courseId) => {
     dispatch(removeFromCart(courseId));
-    // Toast is already shown by cartSlice reducer — no duplicate needed
   };
 
-  // Handle checkout
   const handleCheckout = () => {
     if (!user) {
+      toast.error('Please sign in to proceed with enrollment');
       navigate('/login');
       return;
     }
@@ -56,7 +49,6 @@ const Cart = () => {
       return;
     }
 
-    // Navigate to purchase page
     navigate('/course-purchase', {
       state: {
         cartItems: cart,
@@ -66,269 +58,192 @@ const Cart = () => {
     });
   };
 
-  // Continue shopping
   const handleContinueShopping = () => {
-    if (user?.accountType === "Instructor") {
-      navigate("/dashboard/instructor");
-    } else {
-      navigate('/all-courses');
-    }
+    navigate('/explore-courses');
   };
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-richblack-900 via-richblack-800 to-richblack-900">
-        {/* Empty Cart */}
-        <section className="py-20">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="text-8xl mb-8">🛒</div>
-              <h1 className="text-4xl font-bold text-white mb-6">Your Cart is Empty</h1>
-              <p className="text-xl text-richblack-300 mb-12 leading-relaxed">
-                Looks like you haven't added any courses to your cart yet. 
-                Explore our amazing collection of courses and start your learning journey!
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-                <Link
-                  to="/explore-courses"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white transition-all duration-300 px-8 py-4 rounded-xl font-semibold shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-1 flex items-center justify-center gap-3"
-                >
-                  <FaRocket />
-                  Explore Courses
-                </Link>
-              </div>
-            </motion.div>
+      <div className="min-h-screen bg-canvas text-text flex flex-col justify-between transition-colors duration-200">
+        <div className="max-w-4xl mx-auto px-4 py-24 text-center my-auto">
+          <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border flex items-center justify-center text-muted mx-auto mb-5 shadow-sm">
+            <ShoppingCart className="w-8 h-8" />
           </div>
-        </section>
+          <h1 className="text-2xl sm:text-3xl font-bold text-text tracking-tight mb-2">
+            Your Cart is Empty
+          </h1>
+          <p className="text-sm text-muted max-w-md mx-auto leading-relaxed mb-8">
+            You haven't selected any courses yet. Browse our comprehensive Computer Science curriculum to enroll.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link to="/explore-courses">
+              <button className="btn-primary py-2.5 px-6 text-xs font-semibold flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Browse Catalog
+              </button>
+            </Link>
+          </div>
+        </div>
         <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-richblack-900 via-richblack-800 to-richblack-900">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full border border-purple-500/30 mb-8">
-              <FaShoppingCart className="text-purple-400 mr-3" />
-              <span className="text-purple-300 font-semibold">🛒 Your Learning Cart</span>
-            </div>
-            
-            <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                Shopping Cart
-              </span>
+    <div className="min-h-screen bg-canvas text-text transition-colors duration-200 flex flex-col justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        {/* Header */}
+        <div className="mb-8 pb-5 border-b border-border flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <span className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-1">
+              Checkout & Enrollment
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-text tracking-tight">
+              Course Enrollment Cart
             </h1>
-            
-            <p className="text-xl text-richblack-300 mb-8">
-              {cart.length} {cart.length === 1 ? 'course' : 'courses'} in your cart
-            </p>
-          </motion.div>
+          </div>
+          <div className="text-xs text-muted">
+            <span className="font-semibold text-text">{cart.length}</span> {cart.length === 1 ? 'course' : 'courses'} selected
+          </div>
         </div>
-      </section>
 
-      {/* Cart Content */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Cart Items */}
-            <div className="lg:col-span-2">
-              <div className="bg-richblack-800 rounded-2xl p-6 border border-richblack-700">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <FaGraduationCap className="text-purple-400" />
-                    Course List
-                  </h2>
-                </div>
-                
-                <div className="space-y-6">
-                  <AnimatePresence>
-                    {cart.map((course, index) => (
-                      <motion.div
-                        key={course._id || course.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="bg-richblack-700 rounded-xl p-6 border border-richblack-600 hover:border-purple-500 transition-all duration-300"
-                      >
-                        <div className="flex flex-col md:flex-row gap-6">
-                          {/* Course Image */}
-                          <div className="w-full md:w-48 h-32 rounded-xl overflow-hidden flex-shrink-0">
-                            <img 
-                              src={course.thumbnail} 
-                              alt={course.courseName || course.title} 
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          
-                          {/* Course Info */}
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between mb-4">
-                              <div>
-                                <h3 className="text-xl font-bold text-white mb-2">{course.courseName || course.title}</h3>
-                                <p className="text-richblack-300 text-sm mb-3 line-clamp-2">
-                                  {course.courseDescription || course.description}
-                                </p>
-                                
-                                <div className="flex items-center gap-4 text-sm text-richblack-400 mb-3">
-                                  <span className="flex items-center gap-1">
-                                    <FaClock />
-                                    {course.duration || '8 weeks'}
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <FaPlay />
-                                    {course.lessons || 45} lessons
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <FaUsers />
-                                    {course.studentsEnroled?.length || course.students || 1200}+ students
-                                  </span>
-                                </div>
-                                
-                                <div className="flex items-center gap-2 mb-4">
-                                  <div className="flex text-yellow-400">
-                                    {[...Array(5)].map((_, i) => (
-                                      <FaStar key={i} className={i < Math.floor(course.rating || 4.6) ? 'text-yellow-400' : 'text-gray-600'} />
-                                    ))}
-                                  </div>
-                                  <span className="text-white font-semibold">{course.averageRating || course.rating || 4.6}</span>
-                                  <span className="text-richblack-400 text-sm">({course.ratingAndReviews?.length || 156} reviews)</span>
-                                </div>
-                              </div>
-                              
-                              <button
-                                onClick={() => handleRemoveFromCart(course._id || course.id)}
-                                className="text-red-400 hover:text-red-300 transition-colors p-2 hover:bg-red-500/10 rounded-lg"
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                            
-                            {/* Price and Quantity */}
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-2xl font-bold text-white">₹{(course.salePrice || course.price)?.toLocaleString()}</span>
-                                  {(course.originalPrice || course.oldPrice) && (
-                                    <span className="text-richblack-400 line-through text-sm">₹{(course.originalPrice || course.oldPrice).toLocaleString()}</span>
-                                  )}
-                                </div>
-                                
-                                {(course.originalPrice || course.oldPrice) && (
-                                  <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-bold">
-                                    {course.discount ? `${course.discount}% OFF` : `${Math.round((1 - (course.salePrice || course.price) / (course.originalPrice || course.oldPrice)) * 100)}% OFF`}
-                                  </span>
-                                )}
-                              </div>
-
-                            </div>
-                          </div>
+        {/* Content Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Items List */}
+          <div className="lg:col-span-8 space-y-4">
+            <AnimatePresence>
+              {cart.map((course) => (
+                <motion.div
+                  key={course._id || course.id}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="bg-surface border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between shadow-sm hover:border-border/80 transition-colors"
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="w-24 h-16 rounded-lg bg-surface-2 border border-border overflow-hidden shrink-0">
+                      {course.thumbnail ? (
+                        <img 
+                          src={course.thumbnail} 
+                          alt={course.courseName || course.title} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted">
+                          <BookOpen className="w-6 h-6 opacity-40" />
                         </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-text truncate">
+                        {course.courseName || course.title}
+                      </h3>
+                      <p className="text-xs text-muted line-clamp-1 mt-0.5">
+                        {course.courseDescription || course.description || 'Full comprehensive syllabus'}
+                      </p>
+                      <div className="flex items-center gap-3 text-[11px] text-muted mt-2">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-muted" />
+                          {course.duration || 'Self-Paced'}
+                        </span>
+                        <span className="flex items-center gap-1 text-warning">
+                          <Star className="w-3 h-3 fill-current" />
+                          {course.averageRating || course.rating || 4.8}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-border">
+                    <div className="text-right">
+                      <span className="text-base font-bold text-text">
+                        {course.price > 0 ? `₹${Number(course.price).toLocaleString()}` : <span className="text-success">FREE</span>}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveFromCart(course._id || course.id)}
+                      title="Remove course from cart"
+                      className="p-1.5 rounded-md text-muted hover:text-danger hover:bg-danger/10 border border-transparent hover:border-danger/20 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            <div className="pt-2">
+              <button
+                onClick={handleContinueShopping}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Continue Browsing Courses
+              </button>
+            </div>
+          </div>
+
+          {/* Order Summary Sidebar */}
+          <div className="lg:col-span-4">
+            <div className="bg-surface border border-border rounded-xl p-5 shadow-sm space-y-5 sticky top-24">
+              <h2 className="text-base font-semibold text-text border-b border-border pb-3">
+                Order Summary
+              </h2>
+
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between text-muted">
+                  <span>Selected Courses</span>
+                  <span className="font-medium text-text">{cart.length}</span>
+                </div>
+                <div className="flex justify-between text-muted">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-text">₹{subtotal.toLocaleString()}</span>
+                </div>
+                <div className="border-t border-border pt-3 flex justify-between items-baseline">
+                  <span className="text-sm font-semibold text-text">Total Tuition</span>
+                  <span className="text-xl font-bold text-text">₹{total.toLocaleString()}</span>
                 </div>
               </div>
-            </div>
-            
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-richblack-800 rounded-2xl p-6 border border-richblack-700 sticky top-6">
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <FaCreditCard className="text-purple-400" />
-                  Order Summary
-                </h2>
 
-                
-                {/* Price Breakdown */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-between text-richblack-300">
-                    <span>Subtotal</span>
-                    <span>₹{subtotal.toLocaleString()}</span>
-                  </div>
-                  
-                  
-                  <div className="border-t border-richblack-600 pt-4">
-                    <div className="flex items-center justify-between text-xl font-bold text-white">
-                      <span>Total</span>
-                      <span>₹{total.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Course Benefits */}
-                <div className="bg-richblack-700 rounded-xl p-4 mb-6">
-                  <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                    <FaGem className="text-yellow-400" />
-                    What's Included
-                  </h3>
-                  <div className="space-y-2 text-sm text-richblack-300">
-                    <div className="flex items-center gap-2">
-                      <FaInfinity className="text-green-400" />
-                      <span>Lifetime access</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaMobile className="text-blue-400" />
-                      <span>Mobile & desktop access</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaCertificate className="text-purple-400" />
-                      <span>Certificate of completion</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaHeadphones className="text-orange-400" />
-                      <span>24/7 support</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  <button
-                    onClick={handleCheckout}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-richblack-600 disabled:to-richblack-600 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 disabled:scale-100"
-                  >
-                      <>
-                        <FaArrowRight />
-                        Proceed to Checkout
-                      </>
-                  </button>
-                  
-                  <button
-                    onClick={handleContinueShopping}
-                    className="w-full border-2 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white transition-all duration-300 py-3 rounded-xl font-semibold flex items-center justify-center gap-3"
-                  >
-                    <FaArrowLeft />
-                    Continue Shopping
-                  </button>
-                </div>
-                
-                {/* Security Badge */}
-                <div className="mt-6 text-center">
-                  <div className="flex items-center justify-center gap-2 text-richblack-400 text-sm">
-                    <FaShieldAlt className="text-green-400" />
-                    <span>Secure checkout with 256-bit SSL encryption</span>
-                  </div>
-                </div>
+              {/* What's Included */}
+              <div className="p-3.5 rounded-lg bg-surface-2 border border-border space-y-2 text-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted block">
+                  Included with Enrollment
+                </span>
+                <p className="flex items-center gap-2 text-text">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
+                  Full Lifetime Lecture Archive Access
+                </p>
+                <p className="flex items-center gap-2 text-text">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
+                  Downloadable Study Notes & Practice Tests
+                </p>
+                <p className="flex items-center gap-2 text-text">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
+                  Verified Certificate of Completion
+                </p>
+              </div>
+
+              <div className="space-y-2.5 pt-2">
+                <button
+                  onClick={handleCheckout}
+                  className="w-full btn-primary py-3 text-xs font-semibold flex items-center justify-center gap-2"
+                >
+                  <span>Proceed to Enrollment</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted pt-2 border-t border-border">
+                <ShieldCheck className="w-3.5 h-3.5 text-success" />
+                <span>SSL Secured Checkout & Account Sync</span>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      
+      </div>
+
       <Footer />
     </div>
   );

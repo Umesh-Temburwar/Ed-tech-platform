@@ -38,13 +38,13 @@ const Badge = React.memo(function Badge({
     <span className={baseClasses} {...props}>
       {/* Dot indicator */}
       {dot && (
-        <span className={`w-2 h-2 rounded-full mr-2 ${
-          variant === 'primary' ? 'bg-yellow-400' :
-          variant === 'secondary' ? 'bg-blue-400' :
-          variant === 'success' ? 'bg-green-400' :
-          variant === 'warning' ? 'bg-orange-400' :
-          variant === 'error' ? 'bg-red-400' :
-          'bg-richblack-400'
+        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+          variant === 'primary' ? 'bg-accent' :
+          variant === 'secondary' ? 'bg-muted' :
+          variant === 'success' ? 'bg-success' :
+          variant === 'warning' ? 'bg-warning' :
+          variant === 'error' ? 'bg-danger' :
+          'bg-muted'
         }`} />
       )}
       

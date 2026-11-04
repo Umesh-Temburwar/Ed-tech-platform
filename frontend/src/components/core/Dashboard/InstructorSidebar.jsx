@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../../../components/navbar/Logo";
+import ThemeSwitcher from "../../common/ThemeSwitcher";
 import {
   LayoutDashboard, BookOpen, PlusCircle, ClipboardList, HelpCircle,
   FileText, Users, MessageSquare, Video, Globe, BarChart2, DollarSign,
@@ -61,26 +62,26 @@ export default function InstructorSidebar() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="p-5 border-b border-white/[0.08]">
+      <div className="p-5 border-b border-border">
         <Link to="/" className="flex items-center">
           <Logo />
         </Link>
-        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-2 ml-1">Instructor Portal</p>
+        <p className="text-[9px] text-muted font-bold uppercase tracking-widest mt-2 ml-1">Instructor Portal</p>
       </div>
 
       {/* User card */}
-      <div className="px-4 py-4 border-b border-white/[0.05]">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+      <div className="px-4 py-4 border-b border-border">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-2 border border-border">
           <img
             src={user?.image || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.firstName || "I"}&backgroundColor=6366f1`}
             alt="avatar"
-            className="w-8 h-8 rounded-full object-cover border border-white/20"
+            className="w-8 h-8 rounded-full object-cover border border-border"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{user?.full_name || user?.firstName || "Instructor"}</p>
-            <p className="text-[10px] text-slate-500 truncate">{user?.email || ""}</p>
+            <p className="text-xs font-bold text-text truncate">{user?.full_name || user?.firstName || "Instructor"}</p>
+            <p className="text-[10px] text-muted truncate">{user?.email || ""}</p>
           </div>
-          <div className="w-2 h-2 bg-emerald-400 rounded-full shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+          <div className="w-2 h-2 bg-success rounded-full shrink-0" />
         </div>
       </div>
 
@@ -124,15 +125,16 @@ export default function InstructorSidebar() {
         ))}
       </nav>
 
-      {/* Logout */}
-      <div className="p-3 border-t border-border">
+      {/* Logout & Theme */}
+      <div className="p-3 border-t border-border flex items-center justify-between gap-2">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-muted hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/20 transition-colors"
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium text-muted hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/20 transition-colors"
         >
           <LogOut className="w-4 h-4 transition-transform" />
           <span>Logout</span>
         </button>
+        <ThemeSwitcher size="sm" />
       </div>
     </div>
   );

@@ -20,6 +20,9 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminOpenRoute from "./components/core/auth/AdminOpenRoute";
 import { subscribeSupabaseAuthToStore } from "./services/syncSupabaseSession";
 import { motion, AnimatePresence } from "framer-motion";
+import ScrollToTop from "./components/common/ScrollToTop";
+import RouteTransitionBar from "./components/common/RouteTransitionBar";
+import BackToTopButton from "./components/common/BackToTopButton";
 
 const Login = React.lazy(() => import("./pages/Login"));
 const Signup = React.lazy(() => import("./pages/Signup"));
@@ -199,18 +202,36 @@ function App() {
     <ThemeProvider>
       <NotificationProvider>
         <div className="w-full min-h-screen bg-canvas text-text flex flex-col font-inter relative transition-colors duration-200">
+          <RouteTransitionBar />
+          <ScrollToTop />
           {showNavbar && <Navbar />}
 
-          <div className="content-wrapper relative z-0">
-            <div className="relative z-10">
+          <div className="content-wrapper relative z-0 flex-1 flex flex-col">
+            <div className="relative z-10 flex-1 flex flex-col">
               <Suspense fallback={<AppSkeleton />}>
-                <AnimatePresence mode="wait">
+                <AnimatePresence
+                  mode="wait"
+                  onExitComplete={() => {
+                    const html = document.documentElement;
+                    const prevBehavior = html ? html.style.scrollBehavior : "";
+                    if (html) html.style.scrollBehavior = "auto";
+                    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+                    if (html) html.scrollTop = 0;
+                    if (document.body) document.body.scrollTop = 0;
+                    const wrapper = document.querySelector(".content-wrapper");
+                    if (wrapper) wrapper.scrollTop = 0;
+                    requestAnimationFrame(() => {
+                      if (html) html.style.scrollBehavior = prevBehavior;
+                    });
+                  }}
+                >
                   <motion.div
                     key={location.pathname}
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex-1 flex flex-col"
                   >
                     <Routes location={location}>
                       <Route path="/" element={<LandingPage />} />
@@ -377,6 +398,8 @@ function App() {
               </Suspense>
             </div>
           </div>
+
+          <BackToTopButton />
         </div>
       </NotificationProvider>
     </ThemeProvider>

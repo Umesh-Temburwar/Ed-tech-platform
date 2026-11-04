@@ -55,9 +55,9 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-/* Add this to make main content area dimmer */
+/* Main content wrapper */
 .content-wrapper {
-  background-color: rgba(0, 0, 0, 0.5); /* 50% black overlay */
+  background-color: transparent;
   flex-grow: 1;
   position: relative;
   z-index: 1;

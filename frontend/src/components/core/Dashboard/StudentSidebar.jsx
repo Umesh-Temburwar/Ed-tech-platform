@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { NavLink, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../../../components/navbar/Logo";
+import ThemeSwitcher from "../../common/ThemeSwitcher";
 import { 
   FaHome, 
   FaBook, 
@@ -139,6 +140,17 @@ export default function StudentSidebar() {
               </div>
             ))}
           </nav>
+
+          {/* Footer Theme Bar */}
+          <div className="p-3 border-t border-border bg-surface-2/40 flex items-center justify-between">
+            <Link
+              to="/dashboard/theme"
+              className="text-[11px] font-semibold text-muted hover:text-text transition-colors flex items-center gap-1.5"
+            >
+              <span>Theme</span>
+            </Link>
+            <ThemeSwitcher size="sm" />
+          </div>
         </div>
       </motion.aside>
 

@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../navbar/Logo";
+import ThemeSwitcher from "../common/ThemeSwitcher";
 import {
   LayoutDashboard,
   Users,
@@ -133,18 +134,19 @@ function SidebarContent({ onClose }) {
         ))}
       </nav>
 
-      {/* ── Footer: logout ────────────────────────────────────────────────── */}
+      {/* ── Footer: logout & theme ────────────────────────────────────────── */}
       <div
-        className="p-3 border-t border-border shrink-0"
+        className="p-3 border-t border-border shrink-0 flex items-center justify-between gap-2"
         style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
       >
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-muted hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/20 transition-colors"
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium text-muted hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/20 transition-colors"
         >
           <LogOut className="w-4 h-4 shrink-0" />
           <span>Logout</span>
         </button>
+        <ThemeSwitcher size="sm" />
       </div>
     </div>
   );

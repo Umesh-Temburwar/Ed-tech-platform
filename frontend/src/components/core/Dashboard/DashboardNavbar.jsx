@@ -14,6 +14,7 @@ import {
 import { useNotifications } from '../../../context/NotificationContext';
 import NotificationDropdown from '../../../components/common/NotificationDropdown';
 import ProfileDropdown from '../../common/ProfileDropdown';
+import ThemeSwitcher from '../../common/ThemeSwitcher';
 import useOnClickOutside from '../../../hooks/useOnClickOutside';
 
 // All 5 nav links — shown for BOTH Student and Instructor dashboards
@@ -159,7 +160,9 @@ const DashboardNavbar = () => {
         </div>
 
         {/* ── RIGHT: Icons + Profile ────────────────────────────────── */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Theme Switcher */}
+          <ThemeSwitcher size="sm" />
 
           {/* Cart (Students only, when not empty) */}
           {user?.accountType === 'Student' && cart.length > 0 && (

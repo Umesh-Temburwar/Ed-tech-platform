@@ -24,6 +24,7 @@ import ProfileDropdown from './ProfileDropdown';
 import useOnClickOutside from '../../hooks/useOnClickOutside';
 import Logo from '../../components/navbar/Logo';
 import { fetchWishlist } from '../../services/operations/wishlistAPI';
+import ThemeSwitcher from './ThemeSwitcher';
 
 
 const Navbar = () => {
@@ -130,7 +131,10 @@ const Navbar = () => {
             ))}
           </ul>
 
-          <div className="flex items-center gap-5 ml-4 border-l border-border pl-6">
+          <div className="flex items-center gap-4 ml-4 border-l border-border pl-5">
+            {/* Theme Switcher Toggle */}
+            <ThemeSwitcher />
+
             {currentToken && currentUser ? (
               <div className="flex items-center gap-4">
                 {/* Cart Icon — hidden when empty */}
@@ -253,34 +257,38 @@ const Navbar = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="lg:hidden fixed inset-0 z-[110] bg-[#000814] p-8"
+            className="lg:hidden fixed inset-0 z-[110] bg-surface text-text p-6 flex flex-col justify-between overflow-y-auto"
           >
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-12">
+            <div>
+              <div className="flex justify-between items-center mb-8 pb-4 border-b border-border">
                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2">
                   <Logo />
                 </Link>
-                <button
-                  aria-label="Close navigation menu"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors"
-                >
-                  <FaTimes />
-                </button>
+                <div className="flex items-center gap-3">
+                  <ThemeSwitcher size="md" />
+                  <button
+                    aria-label="Close navigation menu"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-text hover:bg-surface-3 transition-colors"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
               </div>
 
-              <ul className="flex flex-col gap-6">
+              <ul className="flex flex-col gap-4">
                 {/* Mobile Cart — hidden when empty */}
                 {currentUser?.accountType === "Student" && cart.length > 0 && (
                   <li>
                     <Link
                       to="/cart"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-2 text-2xl font-bold transition-all relative ${isActive("/cart") ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
-                        }`}
+                      className={`flex items-center gap-2.5 text-lg font-semibold transition-colors ${
+                        isActive("/cart") ? 'text-accent' : 'text-muted hover:text-text'
+                      }`}
                     >
                       <FaShoppingCart /> Cart
-                      <span className="ml-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      <span className="ml-2 px-2 py-0.5 bg-danger text-white text-xs font-bold rounded-full">
                         {cart.length}
                       </span>
                     </Link>
@@ -292,11 +300,12 @@ const Navbar = () => {
                     <Link
                       to="/dashboard/wishlist"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-2 text-2xl font-bold transition-all relative ${isActive("/dashboard/wishlist") ? 'text-pink-400' : 'text-slate-400 hover:text-white'
-                        }`}
+                      className={`flex items-center gap-2.5 text-lg font-semibold transition-colors ${
+                        isActive("/dashboard/wishlist") ? 'text-hot' : 'text-muted hover:text-text'
+                      }`}
                     >
-                      <FaHeart className={isActive("/dashboard/wishlist") ? 'text-pink-400' : ''} /> Wishlist
-                      <span className="ml-2 w-6 h-6 bg-pink-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      <FaHeart /> Wishlist
+                      <span className="ml-2 px-2 py-0.5 bg-hot text-white text-xs font-bold rounded-full">
                         {wishlist.length}
                       </span>
                     </Link>
@@ -307,66 +316,62 @@ const Navbar = () => {
                     <Link
                       to={link.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`text-2xl font-bold transition-all ${isActive(link.path) ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
-                        }`}
+                      className={`block py-1 text-lg font-semibold transition-colors ${
+                        isActive(link.path) ? 'text-accent' : 'text-muted hover:text-text'
+                      }`}
                     >
                       {link.name}
                     </Link>
                   </li>
                 ))}
               </ul>
+            </div>
 
-              <div className="mt-auto pt-10 border-t border-white/10">
-                {currentToken && currentUser ? (
-                  <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden border border-cyan-500/30">
-                        <img
-                          src={currentUser?.image || `https://api.dicebear.com/5.x/initials/svg?seed=${currentUser?.firstName}`}
-                          alt="User"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-lg font-bold text-white">{currentUser?.firstName} {currentUser?.lastName}</p>
-                        <p className={`text-xs font-bold uppercase tracking-widest ${currentUser?.accountType?.toLowerCase() === 'instructor'
-                            ? 'text-violet-400'
-                            : currentUser?.accountType?.toLowerCase() === 'admin'
-                              ? 'text-amber-400'
-                              : 'text-cyan-400'
-                          }`}>
-                          {currentUser?.accountType === 'Instructor' ? 'Instructor Portal'
-                            : currentUser?.accountType === 'Admin' ? 'Admin Portal'
-                              : 'Student Portal'}
-                        </p>
-                      </div>
+            <div className="pt-6 border-t border-border mt-8">
+              {currentToken && currentUser ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-surface-2 border border-border">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-border shrink-0">
+                      <img
+                        src={currentUser?.image || `https://api.dicebear.com/5.x/initials/svg?seed=${currentUser?.firstName}`}
+                        alt="User"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full py-4 rounded-2xl bg-red-500/10 text-red-500 font-bold flex items-center justify-center gap-3 border border-red-500/20"
-                    >
-                      <FaSignOutAlt /> Logout
-                    </button>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-text truncate">{currentUser?.firstName} {currentUser?.lastName}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
+                        {currentUser?.accountType === 'Instructor' ? 'Instructor Portal'
+                          : currentUser?.accountType === 'Admin' ? 'Admin Portal'
+                            : 'Student Portal'}
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 rounded-2xl bg-white/5 text-white font-bold text-center border border-white/10"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      to="/signup"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="btn-primary w-full py-4 text-center"
-                    >
-                      Join Now
-                    </Link>
-                  </div>
-                )}
-              </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full py-2.5 rounded-lg bg-danger/10 text-danger hover:bg-danger/20 font-semibold text-xs flex items-center justify-center gap-2 border border-danger/20 transition-colors"
+                  >
+                    <FaSignOutAlt /> Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-2.5 rounded-lg bg-surface-2 text-text font-semibold text-xs text-center border border-border hover:bg-surface-3 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="btn-primary w-full py-2.5 text-center text-xs"
+                  >
+                    Join Now
+                  </Link>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

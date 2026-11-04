@@ -243,51 +243,55 @@ export const theme = {
   },
 };
 
-// Component Variants
+// Component Variants - Unified with System Tokens
 export const componentVariants = {
   // Button Variants
   button: {
     primary: {
-      base: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 focus:ring-purple-400 shadow-lg hover:shadow-xl transform hover:scale-105',
-      disabled: 'bg-richblack-600 text-richblack-400 cursor-not-allowed',
+      base: 'bg-hot text-white hover:bg-hot/90 border border-transparent shadow-sm font-semibold rounded-md',
+      disabled: 'bg-surface-2 text-muted border border-border cursor-not-allowed opacity-50',
     },
     secondary: {
-      base: 'bg-richblack-700 text-richblack-100 hover:bg-richblack-600 focus:ring-richblack-500',
-      disabled: 'bg-richblack-800 text-richblack-500 cursor-not-allowed',
+      base: 'bg-surface-2 text-text border border-border hover:bg-surface-3 font-medium rounded-md',
+      disabled: 'bg-surface-2 text-muted cursor-not-allowed opacity-50',
     },
     outline: {
-      base: 'border border-yellow-50 text-yellow-50 hover:bg-yellow-50 hover:text-richblack-900 focus:ring-yellow-500',
-      disabled: 'border-richblack-600 text-richblack-600 cursor-not-allowed',
+      base: 'border border-border text-text hover:bg-surface-2 font-medium rounded-md',
+      disabled: 'border-border text-muted cursor-not-allowed opacity-50',
     },
     ghost: {
-      base: 'text-richblack-100 hover:bg-richblack-700 focus:ring-richblack-500',
-      disabled: 'text-richblack-600 cursor-not-allowed',
+      base: 'text-muted hover:text-text hover:bg-surface-2 font-medium rounded-md',
+      disabled: 'text-muted cursor-not-allowed opacity-50',
+    },
+    accent: {
+      base: 'bg-accent text-white hover:bg-accent/90 border border-transparent shadow-sm font-semibold rounded-md',
+      disabled: 'bg-surface-2 text-muted border border-border cursor-not-allowed opacity-50',
     },
   },
   
   // Card Variants
   card: {
-    default: 'bg-richblack-800 border border-richblack-700 rounded-xl shadow-lg',
-    elevated: 'bg-richblack-800 border border-richblack-700 rounded-xl shadow-xl',
-    flat: 'bg-richblack-800 border border-richblack-700 rounded-lg',
-    gradient: 'bg-gradient-to-br from-richblack-800 to-richblack-900 border border-richblack-700 rounded-xl shadow-lg',
+    default: 'bg-surface border border-border rounded-xl shadow-sm',
+    elevated: 'bg-surface border border-border rounded-xl shadow-md',
+    flat: 'bg-surface border border-border rounded-lg',
+    subtle: 'bg-surface-2 border border-border rounded-xl',
   },
   
   // Input Variants
   input: {
-    default: 'bg-richblack-700 border border-richblack-600 text-richblack-100 rounded-lg focus:border-yellow-50 focus:ring-1 focus:ring-yellow-50',
-    error: 'bg-richblack-700 border border-red-500 text-richblack-100 rounded-lg focus:border-red-500 focus:ring-1 focus:ring-red-500',
-    success: 'bg-richblack-700 border border-green-500 text-richblack-100 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500',
+    default: 'bg-surface border border-border text-text placeholder:text-muted rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/15',
+    error: 'bg-surface border border-danger text-text placeholder:text-muted rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/15',
+    success: 'bg-surface border border-success text-text placeholder:text-muted rounded-lg focus:border-success focus:ring-2 focus:ring-success/15',
   },
   
   // Badge Variants
   badge: {
-    primary: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
-    secondary: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-    success: 'bg-green-500/10 text-green-400 border border-green-500/20',
-    warning: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
-    error: 'bg-red-500/10 text-red-400 border border-red-500/20',
-    neutral: 'bg-richblack-700 text-richblack-300 border border-richblack-600',
+    primary: 'bg-accent/10 text-accent border border-accent/20',
+    secondary: 'bg-surface-2 text-muted border border-border',
+    success: 'bg-success/10 text-success border border-success/20',
+    warning: 'bg-warning/10 text-warning border border-warning/20',
+    error: 'bg-danger/10 text-danger border border-danger/20',
+    neutral: 'bg-surface-2 text-text border border-border',
   },
 };
 

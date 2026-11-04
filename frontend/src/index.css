@@ -5,67 +5,67 @@
 @tailwind utilities;
 
 :root {
-  /* GitHub Primer Light */
-  --bg: #f6f8fa;
+  /* Linear / shadcn-ui Light (Slate) */
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-2: #f6f8fa;
-  --surface-3: #eaeef2;
-  --border: #d0d7de;
-  --border-subtle: #e1e4e8;
-  --text: #1f2328;
-  --text-subtle: #24292f;
-  --muted: #656d76;
-  --muted-subtle: #57606a;
-  --muted-dark: #8c959f;
-  --accent: #0969da;
-  --accent-hover: #0860ca;
-  --hot: #e5482a;
-  --hot-hover: #d13d20;
-  --success: #2da44e;
-  --warning: #9a6700;
-  --danger: #cf222e;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --text: #0f172a;
+  --text-subtle: #1e293b;
+  --muted: #64748b;
+  --muted-subtle: #94a3b8;
+  --muted-dark: #475569;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --hot: #ea580c;
+  --hot-hover: #c2410c;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
 
   /* Activity Progress Levels (Light) */
-  --act-l0: #ebedf0;
-  --act-l1: #9be9a8;
-  --act-l2: #40c463;
-  --act-l3: #30a14e;
-  --act-l4: #216e39;
+  --act-l0: #e2e8f0;
+  --act-l1: #bbf7d0;
+  --act-l2: #86efac;
+  --act-l3: #4ade80;
+  --act-l4: #16a34a;
 
-  --shadow-sm: 0 1px 0 rgba(27, 31, 36, 0.04);
-  --shadow-card: 0 1px 3px rgba(27, 31, 36, 0.08);
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
 }
 
 .dark {
-  /* GitHub Primer Dark */
-  --bg: #0d1117;
-  --surface: #161b22;
-  --surface-2: #21262d;
-  --surface-3: #2d333b;
-  --border: #30363d;
-  --border-subtle: #21262d;
-  --text: #e6edf3;
-  --text-subtle: #c9d1d9;
-  --muted: #8b949e;
-  --muted-subtle: #768390;
-  --muted-dark: #6e7681;
-  --accent: #58a6ff;
-  --accent-hover: #4090ea;
-  --hot: #ff6b4a;
-  --hot-hover: #f05a39;
-  --success: #3fb950;
-  --warning: #d29922;
-  --danger: #f85149;
+  /* Linear / Vercel Pro Dark (Zinc) */
+  --bg: #09090b;
+  --surface: #111113;
+  --surface-2: #18181b;
+  --surface-3: #27272a;
+  --border: #27272a;
+  --border-subtle: #1f1f23;
+  --text: #fafafa;
+  --text-subtle: #e4e4e7;
+  --muted: #a1a1aa;
+  --muted-subtle: #71717a;
+  --muted-dark: #52525b;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --hot: #f97316;
+  --hot-hover: #ea580c;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
   /* Activity Progress Levels (Dark) */
-  --act-l0: #161b22;
-  --act-l1: #0e4429;
-  --act-l2: #006d32;
-  --act-l3: #26a641;
-  --act-l4: #39d353;
+  --act-l0: #18181b;
+  --act-l1: #052e16;
+  --act-l2: #166534;
+  --act-l3: #15803d;
+  --act-l4: #22c55e;
 
-  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
 @layer base {

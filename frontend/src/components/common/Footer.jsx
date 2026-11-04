@@ -24,56 +24,56 @@ const Community = ["Forums", "Chapters", "Events"];
 
 const Footer = React.memo(() => {
   const companyLinks = useMemo(() => ["About", "Careers", "Affiliates"], []);
-  return (    <div className="bg-[#050713]">
-        <div className="flex flex-col lg:flex-row gap-8 items-center justify-between w-11/12 max-w-maxContent text-richblack-200 leading-6 mx-auto relative py-14">
-        <div className="border-b w-[100%] flex flex-col lg:flex-row pb-5 border-richblack-600">{/* Changed bg-richblack-800 to bg-richblack-900 */}
+  return (
+    <footer className="bg-surface border-t border-border text-muted transition-colors duration-200">
+      <div className="flex flex-col lg:flex-row gap-8 items-center justify-between w-11/12 max-w-maxContent leading-6 mx-auto relative py-12">
+        <div className="border-b w-full flex flex-col lg:flex-row pb-8 border-border">
           {/* Section 1 */}
-          <div className="lg:w-[50%] flex flex-wrap flex-row justify-between lg:border-r lg:border-richblack-600 pl-3 lg:pr-5 gap-3">
+          <div className="lg:w-[50%] flex flex-wrap flex-row justify-between lg:border-r lg:border-border pl-3 lg:pr-5 gap-3">
             <div className="w-[30%] flex flex-col gap-3 lg:w-[30%] mb-7 lg:pl-0">
               <Logo />
-              <h1 className="text-richblack-50 font-semibold text-[16px] mt-4">
+              <h4 className="text-text font-semibold text-sm mt-4">
                 Company
-              </h1>
+              </h4>
               <div className="flex flex-col gap-2">
                 {companyLinks.map((ele, i) => {
                   return (
                     <div
                       key={i}
-                      className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200"
+                      className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                     >
                       <Link to={ele.toLowerCase()}>{ele}</Link>
                     </div>
                   );
                 })}
               </div>
-              <div className="flex gap-4 text-lg text-richblack-400">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Facebook page" className="hover:text-blue-500 transition-colors">
+              <div className="flex gap-4 text-base text-muted mt-2">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Facebook page" className="hover:text-text transition-colors">
                   <FaFacebook />
                 </a>
-                <a href="https://google.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Google page" className="hover:text-red-400 transition-colors">
+                <a href="https://google.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Google page" className="hover:text-text transition-colors">
                   <FaGoogle />
                 </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Twitter page" className="hover:text-cyan-400 transition-colors">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our Twitter page" className="hover:text-text transition-colors">
                   <FaTwitter />
                 </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our YouTube channel" className="hover:text-red-500 transition-colors">
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Visit our YouTube channel" className="hover:text-text transition-colors">
                   <FaYoutube />
                 </a>
               </div>
-              <div></div>
             </div>
 
             <div className="w-[48%] lg:w-[30%] mb-7 lg:pl-0">
-              <h1 className="text-richblack-50 font-semibold text-[16px]">
+              <h4 className="text-text font-semibold text-sm">
                 Resources
-              </h1>
+              </h4>
 
               <div className="flex flex-col gap-2 mt-2">
                 {Resources.map((ele, index) => {
                   return (
                     <div
                       key={index}
-                      className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200"
+                      className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                     >
                       <Link to={ele.split(" ").join("-").toLowerCase()}>
                         {ele}
@@ -83,18 +83,18 @@ const Footer = React.memo(() => {
                 })}
               </div>
 
-              <h1 className="text-richblack-50 font-semibold text-[16px] mt-7">
+              <h4 className="text-text font-semibold text-sm mt-5">
                 Support
-              </h1>
-              <div className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200 mt-2">
+              </h4>
+              <div className="text-xs cursor-pointer hover:text-text transition-colors duration-150 mt-2">
                 <Link to={"/support/help-center"}>Help Center</Link>
               </div>
             </div>
 
             <div className="w-[48%] lg:w-[30%] mb-7 lg:pl-0">
-              <h1 className="text-richblack-50 font-semibold text-[16px]">
+              <h4 className="text-text font-semibold text-sm">
                 Plans
-              </h1>
+              </h4>
 
               <div className="flex flex-col gap-2 mt-2">
                 {Plans.map((ele, index) => {
@@ -136,15 +136,15 @@ const Footer = React.memo(() => {
             {FooterLink2.map((ele, i) => {
               return (
                 <div key={i} className="w-[48%] lg:w-[30%] mb-7 lg:pl-0">
-                  <h1 className="text-richblack-50 font-semibold text-[16px]">
+                  <h4 className="text-text font-semibold text-sm">
                     {ele.title}
-                  </h1>
+                  </h4>
                   <div className="flex flex-col gap-2 mt-2">
                     {ele.links.map((link, index) => {
                       return (
                         <div
                           key={index}
-                          className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200"
+                          className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                         >
                           <Link to={link.link}>{link.title}</Link>
                         </div>
@@ -158,10 +158,10 @@ const Footer = React.memo(() => {
         </div>
       </div>
 
-      <div className="flex flex-row items-center justify-between w-11/12 max-w-maxContent text-richblack-200 mx-auto pb-14 text-sm">
+      <div className="flex flex-row items-center justify-between w-11/12 max-w-maxContent text-muted mx-auto pb-10 text-xs">
         {/* Section 1 */}
-        <div className="flex justify-between lg:items-start items-center flex-col lg:flex-row gap-3 w-full">
-          <div className="flex flex-row">
+        <div className="flex justify-between lg:items-start items-center flex-col lg:flex-row gap-3 w-full border-t border-border pt-6">
+          <div className="flex flex-row flex-wrap">
             {BottomFooter.map((ele, i) => {
               return (
                 <div
@@ -169,8 +169,8 @@ const Footer = React.memo(() => {
                   className={` ${
                     BottomFooter.length - 1 === i
                       ? ""
-                      : "border-r border-richblack-600 cursor-pointer hover:text-white transition-all duration-200"
-                  } px-3 `}
+                      : "border-r border-border"
+                  } px-3 text-xs text-muted hover:text-text transition-colors duration-150 `}
                 >
                   <Link to={ele.split(" ").join("-").toLowerCase()}>
                     {ele}
@@ -180,10 +180,12 @@ const Footer = React.memo(() => {
             })}
           </div>
 
-          <div className="text-center font-medium">Made with ❤️ EduTech © {new Date().getFullYear()} Platform</div>
+          <div className="text-center font-medium text-xs text-muted">
+            EduTech Platform © {new Date().getFullYear()} — Computer Science & Engineering Academy
+          </div>
         </div>
       </div>
-    </div>
+    </footer>
   );
 });
 
