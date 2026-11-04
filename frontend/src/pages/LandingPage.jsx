@@ -2,14 +2,25 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   FaCode, FaRobot, FaCloud, FaUserTie, FaProjectDiagram, FaUserGraduate, FaBriefcase,
-  FaArrowRight, FaLaptopCode, FaDatabase, FaServer, FaBrain, FaLayerGroup, FaCheckCircle
+  FaArrowRight, FaLaptopCode, FaDatabase, FaServer, FaBrain, FaLayerGroup, FaCheckCircle,
+  FaTerminal, FaAward, FaBolt
 } from "react-icons/fa";
+import { 
+  SiGoogle, 
+  SiMicrosoft, 
+  SiAmazon, 
+  SiMeta, 
+  SiUber, 
+  SiNetflix, 
+  SiStripe 
+} from "react-icons/si";
 import { Link } from "react-router-dom";
 import Footer from "../components/common/Footer";
 import CoursesSection from "../components/core/HomePage/CoursesSection";
 import Students from "./Students";
 import About from "./About";
 import Contact from "./Contact";
+import signupImage from "../assets/Images/signup.webp";
 
 // 5 Curated Full HD Computer Science & Engineering (CSE) Education Images
 const cseEducationShowcase = [
@@ -60,6 +71,16 @@ const cseEducationShowcase = [
   }
 ];
 
+const alumniCompanies = [
+  { name: "Google", icon: SiGoogle, color: "text-[#EA4335] group-hover:text-[#4285F4]" },
+  { name: "Microsoft", icon: SiMicrosoft, color: "text-[#00A4EF] group-hover:text-[#0078D4]" },
+  { name: "Amazon", icon: SiAmazon, color: "text-[#FF9900] group-hover:text-[#FF9900]" },
+  { name: "Meta", icon: SiMeta, color: "text-[#0668E1] group-hover:text-[#0668E1]" },
+  { name: "Uber", icon: SiUber, color: "text-text group-hover:text-accent" },
+  { name: "Netflix", icon: SiNetflix, color: "text-[#E50914] group-hover:text-[#E50914]" },
+  { name: "Stripe", icon: SiStripe, color: "text-[#635BFF] group-hover:text-[#635BFF]" },
+];
+
 export default function LandingPage() {
   const [selectedShowcase, setSelectedShowcase] = useState(0);
 
@@ -90,98 +111,191 @@ export default function LandingPage() {
     <div className="min-h-screen bg-canvas text-text font-inter overflow-x-hidden transition-colors duration-200">
       
       {/* SECTION 1 – HERO SECTION */}
-      <section className="relative min-h-[85vh] flex items-center pt-16 pb-16 px-4 md:px-8 lg:px-16 overflow-hidden border-b border-border">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10 w-full">
-          {/* Left Column: Headline & Actions */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="lg:col-span-6 text-left"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-border text-muted text-xs font-semibold mb-6">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
-              Computer Science & Engineering Platform
-            </div>
-            
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] tracking-tight text-text">
-              Master Modern <br />
-              <span className="text-accent">
-                Computer Science
-              </span>
-            </h1>
-            
-            <p className="mt-5 text-sm sm:text-base text-muted max-w-xl leading-relaxed">
-              Accelerate your engineering journey with structured curriculum in Algorithms, Systems Architecture, Full-Stack Development, and Artificial Intelligence.
-            </p>
-            
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link to="/signup">
-                <button className="btn-primary py-3 px-6 text-sm">
-                  Start Learning Free
-                </button>
-              </Link>
-              <Link to="/explore-courses">
-                <button className="btn-secondary py-3 px-6 text-sm">
-                  Explore Courses
-                </button>
-              </Link>
-            </div>
-            
-            {/* Quick Metrics */}
-            <div className="mt-10 pt-6 border-t border-border grid grid-cols-3 gap-6 max-w-md">
-              <div>
-                <p className="text-xl sm:text-2xl font-bold text-text">50K+</p>
-                <p className="text-xs text-muted font-medium mt-0.5">Learners</p>
+      <section className="relative pt-12 pb-16 px-4 md:px-8 lg:px-16 overflow-hidden border-b border-border">
+        <div className="max-w-7xl mx-auto w-full flex flex-col space-y-14 relative z-10">
+          
+          {/* Top 2-Column Grid: Left Text | Right Circular Photo */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center w-full">
+            {/* Left Column: Headline & Actions */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="lg:col-span-6 text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-border text-muted text-xs font-semibold mb-6">
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                Computer Science & Engineering Platform
               </div>
-              <div>
-                <p className="text-xl sm:text-2xl font-bold text-text">70+</p>
-                <p className="text-xs text-muted font-medium mt-0.5">CSE Courses</p>
+              
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] tracking-tight text-text">
+                Master Modern <br />
+                <span className="text-accent">
+                  Computer Science
+                </span>
+              </h1>
+              
+              <p className="mt-5 text-sm sm:text-base text-muted max-w-xl leading-relaxed">
+                Accelerate your engineering journey with structured curriculum in Algorithms, Systems Architecture, Full-Stack Development, and Artificial Intelligence.
+              </p>
+              
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link to="/signup">
+                  <button className="btn-primary py-3 px-6 text-sm">
+                    Start Learning Free
+                  </button>
+                </Link>
+                <Link to="/explore-courses">
+                  <button className="btn-secondary py-3 px-6 text-sm">
+                    Explore Courses
+                  </button>
+                </Link>
               </div>
-              <div>
-                <p className="text-xl sm:text-2xl font-bold text-text">4.9/5</p>
-                <p className="text-xs text-muted font-medium mt-0.5">Rating</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right Column: Full HD CSE Hero Showcase Image */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="lg:col-span-6 relative flex justify-center"
-          >
-            <div className="relative w-full max-w-lg rounded-2xl overflow-hidden border border-border shadow-md bg-surface group">
-              <div className="aspect-[4/3] w-full relative overflow-hidden">
-                <img 
-                  src={cseEducationShowcase[0].image} 
-                  alt="Computer Science Students in High-Tech Lab" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="eager"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-              </div>
-
-              {/* Overlay Content */}
-              <div className="absolute bottom-0 inset-x-0 p-5 text-left text-white">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-semibold mb-1.5">
-                  <FaLaptopCode className="text-xs" /> CSE Collaborative Engineering
+              
+              {/* Quick Metrics */}
+              <div className="mt-10 pt-6 border-t border-border grid grid-cols-3 gap-6 max-w-md">
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-text">50K+</p>
+                  <p className="text-xs text-muted font-medium mt-0.5">Learners</p>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold">
-                  Real-world Software Development & Lab Work
-                </h3>
-                <p className="text-xs text-slate-200 mt-1 line-clamp-2">
-                  Modern, interactive learning environment equipped with industry-standard development workflows.
-                </p>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-text">70+</p>
+                  <p className="text-xs text-muted font-medium mt-0.5">CSE Courses</p>
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-text">4.9/5</p>
+                  <p className="text-xs text-muted font-medium mt-0.5">Rating</p>
+                </div>
               </div>
+            </motion.div>
 
-              {/* Floating Stat Badge */}
-              <div className="absolute top-3 right-3 px-3 py-1 rounded-lg bg-surface/90 backdrop-blur-md border border-border text-xs font-semibold text-text flex items-center gap-1.5 shadow-sm">
-                <FaCheckCircle className="text-success text-xs" /> 100% Practical Labs
-              </div>
+            {/* Right Column: Circular signup.webp with Animated Dot-Dot Orbit Circles & Floating Badges */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="lg:col-span-6 relative flex items-center justify-center lg:justify-end py-6"
+            >
+              {/* Ambient Radial Backlight */}
+              <div className="absolute w-[280px] sm:w-[380px] h-[280px] sm:h-[380px] rounded-full bg-accent/20 dark:bg-accent/15 blur-3xl pointer-events-none -z-10" />
+
+              {/* Floating Container */}
+              <motion.div
+                animate={{ y: [-7, 7, -7] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+                className="relative flex items-center justify-center"
+              >
+                {/* Outer Animated Dot-Dot Circle (Clockwise Rotation) */}
+                <div 
+                  className="absolute w-[310px] h-[310px] sm:w-[380px] sm:h-[380px] lg:w-[420px] lg:h-[420px] rounded-full border-2 border-dotted border-accent/60 dark:border-accent/40 pointer-events-none animate-spin"
+                  style={{ animationDuration: '32s' }}
+                >
+                  {/* Orbiting Satellite Glowing Dot 1 */}
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-accent shadow-[0_0_12px_var(--accent)] border-2 border-surface" />
+                  {/* Orbiting Satellite Glowing Dot 2 */}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 rounded-full bg-success shadow-[0_0_10px_var(--success)] border-2 border-surface" />
+                </div>
+
+                {/* Inner Animated Dashed Circle (Counter-Clockwise Rotation) */}
+                <div 
+                  className="absolute w-[275px] h-[275px] sm:w-[335px] sm:h-[335px] lg:w-[370px] lg:h-[370px] rounded-full border border-dashed border-border pointer-events-none animate-spin"
+                  style={{ animationDuration: '24s', animationDirection: 'reverse' }}
+                >
+                  {/* Orbiting Satellite Dot 3 */}
+                  <span className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-warning shadow-[0_0_8px_var(--warning)] border border-surface" />
+                </div>
+
+                {/* Central Circular signup.webp Frame */}
+                <div className="relative w-[230px] h-[230px] sm:w-[280px] sm:h-[280px] lg:w-[310px] lg:h-[310px] rounded-full p-2 bg-surface/90 backdrop-blur-md border-2 border-border shadow-2xl overflow-hidden group">
+                  <div className="w-full h-full rounded-full overflow-hidden relative">
+                    <img 
+                      src={signupImage} 
+                      alt="Computer Science Scholar" 
+                      className="w-full h-full object-cover rounded-full group-hover:scale-108 transition-transform duration-700 filter contrast-[1.03]"
+                      loading="eager"
+                    />
+                    {/* Inner Circular Edge Rim */}
+                    <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Floating Chip 1: Top Left - Active Tech Stack */}
+                <motion.div
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                  className="absolute -top-3 -left-3 sm:top-1 sm:-left-6 z-20 px-3 py-1.5 rounded-xl bg-surface/95 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 text-xs font-semibold text-text hover:border-accent/50 transition-colors whitespace-nowrap"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                  </span>
+                  <FaCode className="text-accent text-xs" />
+                  <span>Full-Stack & Systems</span>
+                </motion.div>
+
+                {/* Floating Chip 2: Top Right - GATE & FAANG Ready */}
+                <motion.div
+                  animate={{ y: [4, -4, 4] }}
+                  transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  className="absolute -top-3 -right-3 sm:top-3 sm:-right-4 z-20 px-3 py-1.5 rounded-full bg-surface/95 backdrop-blur-md border border-border shadow-lg flex items-center gap-1.5 text-xs font-semibold text-text hover:border-accent/50 transition-colors whitespace-nowrap"
+                >
+                  <FaCheckCircle className="text-success text-xs" />
+                  <span>GATE & FAANG Ready</span>
+                </motion.div>
+
+                {/* Floating Chip 3: Bottom Left - Scholars Count */}
+                <motion.div
+                  animate={{ y: [4, -4, 4] }}
+                  transition={{ duration: 4.0, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                  className="absolute -bottom-4 -left-3 sm:bottom-3 sm:-left-6 z-20 px-3 py-1.5 rounded-xl bg-surface/95 backdrop-blur-md border border-border shadow-xl flex items-center gap-2 text-xs text-text whitespace-nowrap"
+                >
+                  <div className="w-6 h-6 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
+                    <FaUserGraduate className="text-[11px]" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-text text-xs leading-tight">50,000+</div>
+                    <div className="text-[9px] text-muted leading-tight">Enrolled Scholars</div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Chip 4: Bottom Right - Practical Labs */}
+                <motion.div
+                  animate={{ y: [-5, 5, -5] }}
+                  transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}
+                  className="absolute -bottom-4 -right-3 sm:bottom-2 sm:-right-4 z-20 px-3.5 py-2 rounded-xl bg-surface/95 backdrop-blur-md border border-border shadow-xl flex items-center gap-2.5 text-left hover:border-accent/50 transition-colors whitespace-nowrap"
+                >
+                  <div className="w-7 h-7 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
+                    <FaRobot className="text-xs" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-text leading-tight">AI & Systems Lab</div>
+                    <div className="text-[10px] text-muted font-medium leading-tight">Interactive Sandboxes</div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Bottom Full-Width Strip: Alumni & Organization Trust Strip with Official Brand Logos */}
+          <div className="w-full pt-10 border-t border-border">
+            <p className="text-center text-xs font-semibold uppercase tracking-wider text-muted mb-5">
+              Scholars building software at leading engineering organizations
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-5xl mx-auto">
+              {alumniCompanies.map((c, i) => {
+                const Icon = c.icon;
+                return (
+                  <div 
+                    key={i}
+                    className="group px-4 py-2 rounded-xl bg-surface-2 border border-border hover:border-accent/40 shadow-sm flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-muted hover:text-text transition-all duration-200 cursor-default"
+                  >
+                    <Icon className={`w-4 h-4 transition-colors ${c.color}`} />
+                    <span>{c.name}</span>
+                  </div>
+                );
+              })}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
