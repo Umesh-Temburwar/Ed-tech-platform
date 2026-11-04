@@ -42,7 +42,7 @@ const Footer = React.memo(() => {
                       key={i}
                       className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                     >
-                      <Link to={ele.toLowerCase()}>{ele}</Link>
+                      <Link to={`/${ele.toLowerCase()}`}>{ele}</Link>
                     </div>
                   );
                 })}
@@ -75,7 +75,7 @@ const Footer = React.memo(() => {
                       key={index}
                       className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                     >
-                      <Link to={ele.split(" ").join("-").toLowerCase()}>
+                      <Link to={`/${ele.split(" ").join("-").toLowerCase()}`}>
                         {ele}
                       </Link>
                     </div>
@@ -101,27 +101,27 @@ const Footer = React.memo(() => {
                   return (
                     <div
                       key={index}
-                      className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200"
+                      className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                     >
-                      <Link to={ele.split(" ").join("-").toLowerCase()}>
+                      <Link to={`/${ele.split(" ").join("-").toLowerCase()}`}>
                         {ele}
                       </Link>
                     </div>
                   );
                 })}
               </div>
-              <h1 className="text-richblack-50 font-semibold text-[16px] mt-7">
+              <h4 className="text-text font-semibold text-sm mt-5">
                 Community
-              </h1>
+              </h4>
 
               <div className="flex flex-col gap-2 mt-2">
                 {Community.map((ele, index) => {
                   return (
                     <div
                       key={index}
-                      className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200"
+                      className="text-xs cursor-pointer hover:text-text transition-colors duration-150"
                     >
-                      <Link to={ele.split(" ").join("-").toLowerCase()}>
+                      <Link to={`/${ele.split(" ").join("-").toLowerCase()}`}>
                         {ele}
                       </Link>
                     </div>

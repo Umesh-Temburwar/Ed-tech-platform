@@ -91,6 +91,28 @@ const AI = React.lazy(() => import("./pages/subjects/AI"));
 
 const Python = React.lazy(() => import("./pages/languages/Python"));
 
+const SubjectHubPage = React.lazy(() => import("./pages/subjects/SubjectHubPage"));
+const LanguageHubPage = React.lazy(() => import("./pages/languages/LanguageHubPage"));
+const ChartSheetPage = React.lazy(() => import("./pages/resources/ChartSheetPage"));
+const CodeChallengesPage = React.lazy(() => import("./pages/resources/CodeChallengesPage"));
+const DocsPage = React.lazy(() => import("./pages/resources/DocsPage"));
+const ProjectsPage = React.lazy(() => import("./pages/resources/ProjectsPage"));
+const VideosPage = React.lazy(() => import("./pages/resources/VideosPage"));
+const WorkspacesPage = React.lazy(() => import("./pages/resources/WorkspacesPage"));
+const PaidMembershipsPage = React.lazy(() => import("./pages/plans/PaidMembershipsPage"));
+const ForStudentsPage = React.lazy(() => import("./pages/plans/ForStudentsPage"));
+const BusinessSolutionsPage = React.lazy(() => import("./pages/plans/BusinessSolutionsPage"));
+const ForumsPage = React.lazy(() => import("./pages/community/ForumsPage"));
+const ChaptersPage = React.lazy(() => import("./pages/community/ChaptersPage"));
+const EventsPage = React.lazy(() => import("./pages/community/EventsPage"));
+const CareerPathsPage = React.lazy(() => import("./pages/career/CareerPathsPage"));
+const CareerServicesPage = React.lazy(() => import("./pages/career/CareerServicesPage"));
+const InterviewPrepPage = React.lazy(() => import("./pages/career/InterviewPrepPage"));
+const ProfessionalCertPage = React.lazy(() => import("./pages/career/ProfessionalCertPage"));
+const AffiliatesPage = React.lazy(() => import("./pages/career/AffiliatesPage"));
+const BetaContentPage = React.lazy(() => import("./pages/career/BetaContentPage"));
+const FullCatalogPage = React.lazy(() => import("./pages/career/FullCatalogPage"));
+
 const PrivacyPolicy = React.lazy(() => import("./pages/legal/PrivacyPolicy"));
 const CookiePolicy = React.lazy(() => import("./pages/legal/CookiePolicy"));
 const TermsOfService = React.lazy(() => import("./pages/legal/TermsOfService"));
@@ -269,15 +291,75 @@ function App() {
                       <Route path="/403" element={<Forbidden403 />} />
 
                       <Route path="/careers" element={<Careers />} />
+                      <Route path="/affiliates" element={<AffiliatesPage />} />
 
+                      <Route path="/articles" element={<Articles />} />
                       <Route path="/resources/articles" element={<Articles />} />
+                      <Route path="/blog" element={<Blog />} />
                       <Route path="/resources/blog" element={<Blog />} />
+                      <Route path="/chart-sheet" element={<ChartSheetPage />} />
+                      <Route path="/code-challenges" element={<CodeChallengesPage />} />
+                      <Route path="/docs" element={<DocsPage />} />
+                      <Route path="/projects" element={<ProjectsPage />} />
+                      <Route path="/videos" element={<VideosPage />} />
+                      <Route path="/workspaces" element={<WorkspacesPage />} />
 
                       <Route path="/support/help-center" element={<HelpCenter />} />
 
-                      <Route path="/subjects/ai" element={<AI />} />
+                      <Route path="/paid-memberships" element={<PaidMembershipsPage />} />
+                      <Route path="/for-students" element={<ForStudentsPage />} />
+                      <Route path="/business-solutions" element={<BusinessSolutionsPage />} />
 
-                      <Route path="/languages/python" element={<Python />} />
+                      <Route path="/forums" element={<ForumsPage />} />
+                      <Route path="/chapters" element={<ChaptersPage />} />
+                      <Route path="/events" element={<EventsPage />} />
+
+                      <Route path="/al" element={<SubjectHubPage defaultSlug="al" />} />
+                      <Route path="/ai" element={<SubjectHubPage defaultSlug="al" />} />
+                      <Route path="/subjects/ai" element={<SubjectHubPage defaultSlug="al" />} />
+                      <Route path="/cloud-computing" element={<SubjectHubPage defaultSlug="cloud-computing" />} />
+                      <Route path="/code-foundations" element={<SubjectHubPage defaultSlug="code-foundations" />} />
+                      <Route path="/computer-science" element={<SubjectHubPage defaultSlug="computer-science" />} />
+                      <Route path="/cybersecurity" element={<SubjectHubPage defaultSlug="cybersecurity" />} />
+                      <Route path="/data-analytics" element={<SubjectHubPage defaultSlug="data-analytics" />} />
+                      <Route path="/data-science" element={<SubjectHubPage defaultSlug="data-science" />} />
+                      <Route path="/data-visualization" element={<SubjectHubPage defaultSlug="data-visualization" />} />
+                      <Route path="/developer-tools" element={<SubjectHubPage defaultSlug="developer-tools" />} />
+                      <Route path="/devops" element={<SubjectHubPage defaultSlug="devops" />} />
+                      <Route path="/game-development" element={<SubjectHubPage defaultSlug="game-development" />} />
+                      <Route path="/it" element={<SubjectHubPage defaultSlug="it" />} />
+                      <Route path="/machine-learning" element={<SubjectHubPage defaultSlug="machine-learning" />} />
+                      <Route path="/math" element={<SubjectHubPage defaultSlug="math" />} />
+                      <Route path="/mobile-development" element={<SubjectHubPage defaultSlug="mobile-development" />} />
+                      <Route path="/web-design" element={<SubjectHubPage defaultSlug="web-design" />} />
+                      <Route path="/web-development" element={<SubjectHubPage defaultSlug="web-development" />} />
+                      <Route path="/subject/:subjectSlug" element={<SubjectHubPage />} />
+
+                      <Route path="/bash" element={<LanguageHubPage defaultSlug="bash" />} />
+                      <Route path="/c++" element={<LanguageHubPage defaultSlug="c++" />} />
+                      <Route path="/cpp" element={<LanguageHubPage defaultSlug="c++" />} />
+                      <Route path="/csharp" element={<LanguageHubPage defaultSlug="csharp" />} />
+                      <Route path="/go" element={<LanguageHubPage defaultSlug="go" />} />
+                      <Route path="/html-css" element={<LanguageHubPage defaultSlug="html-css" />} />
+                      <Route path="/java" element={<LanguageHubPage defaultSlug="java" />} />
+                      <Route path="/javascript" element={<LanguageHubPage defaultSlug="javascript" />} />
+                      <Route path="/kotlin" element={<LanguageHubPage defaultSlug="kotlin" />} />
+                      <Route path="/php" element={<LanguageHubPage defaultSlug="php" />} />
+                      <Route path="/python" element={<LanguageHubPage defaultSlug="python" />} />
+                      <Route path="/languages/python" element={<LanguageHubPage defaultSlug="python" />} />
+                      <Route path="/r" element={<LanguageHubPage defaultSlug="r" />} />
+                      <Route path="/ruby" element={<LanguageHubPage defaultSlug="ruby" />} />
+                      <Route path="/sql" element={<LanguageHubPage defaultSlug="sql" />} />
+                      <Route path="/swift" element={<LanguageHubPage defaultSlug="swift" />} />
+                      <Route path="/language/:langSlug" element={<LanguageHubPage />} />
+
+                      <Route path="/career-paths" element={<CareerPathsPage />} />
+                      <Route path="/career-services" element={<CareerServicesPage />} />
+                      <Route path="/interview-prep" element={<InterviewPrepPage />} />
+                      <Route path="/professional-certification" element={<ProfessionalCertPage />} />
+                      <Route path="/hi" element={<FullCatalogPage />} />
+                      <Route path="/full-catalog" element={<FullCatalogPage />} />
+                      <Route path="/beta-content" element={<BetaContentPage />} />
 
                       <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/legal/cookie-policy" element={<CookiePolicy />} />
