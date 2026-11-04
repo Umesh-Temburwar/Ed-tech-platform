@@ -1,143 +1,91 @@
-/**
- * RoleSelector — Animated role selection cards
- *
- * Props:
- *  selectedRole  : "Student" | "Instructor" | null
- *  onSelect      : (role: "Student" | "Instructor") => void
- *  disabled      : boolean  (during OAuth loading)
- */
 import React from "react";
-import { motion } from "framer-motion";
+import { FaGraduationCap, FaChalkboardTeacher, FaCheck } from "react-icons/fa";
 
 const ROLES = [
   {
     id: "Student",
     label: "Student",
     subtitle: "Access courses & learning paths",
-    icon: "fa-user-graduate",
-    gradient: "from-[#00B4D8]/20 to-[#0077B6]/10",
-    border: "border-[#00B4D8]/40",
-    ring: "ring-[#00B4D8]/60",
-    glow: "#00B4D8",
-    badge: "Learn",
-    badgeColor: "bg-[#00B4D8]/20 text-[#00B4D8]",
+    icon: FaGraduationCap,
+    badge: "Learner",
     features: ["Access all courses", "Track progress", "Earn certificates"],
   },
   {
     id: "Instructor",
     label: "Instructor",
     subtitle: "Teach students & manage courses",
-    icon: "fa-chalkboard-teacher",
-    gradient: "from-violet-500/20 to-purple-600/10",
-    border: "border-violet-500/40",
-    ring: "ring-violet-500/60",
-    glow: "#8B5CF6",
-    badge: "Teach",
-    badgeColor: "bg-violet-500/20 text-violet-400",
+    icon: FaChalkboardTeacher,
+    badge: "Educator",
     features: ["Create courses", "Manage students", "View analytics"],
   },
 ];
 
-const cardVariants = {
-  idle: { scale: 1, y: 0 },
-  hover: { scale: 1.02, y: -4, transition: { duration: 0.2 } },
-  selected: {
-    scale: 1.02,
-    y: -4,
-    transition: { duration: 0.2, type: "spring", stiffness: 300 },
-  },
-  tap: { scale: 0.98 },
-};
-
-const checkVariants = {
-  hidden: { scale: 0, opacity: 0 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    transition: { type: "spring", stiffness: 400, damping: 15 },
-  },
-};
-
 const RoleSelector = ({ selectedRole, onSelect, disabled }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
       {ROLES.map((role) => {
         const isSelected = selectedRole === role.id;
+        const IconComponent = role.icon;
 
         return (
-          <motion.button
+          <button
             key={role.id}
             type="button"
             onClick={() => !disabled && onSelect(role.id)}
             disabled={disabled}
-            variants={cardVariants}
-            initial="idle"
-            animate={isSelected ? "selected" : "idle"}
-            whileHover={!disabled ? "hover" : undefined}
-            whileTap={!disabled ? "tap" : undefined}
             className={`
-              relative text-left p-5 rounded-2xl border-2 transition-all duration-300
-              bg-gradient-to-br ${role.gradient}
+              relative text-left p-4 rounded-lg border transition-all
               ${isSelected
-                ? `${role.border} ring-2 ${role.ring} shadow-lg`
-                : "border-white/10 hover:border-white/20"
+                ? "bg-surface border-accent ring-2 ring-accent/20 shadow-sm"
+                : "bg-surface-2 border-border hover:border-muted"
               }
-              ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}
-              group focus:outline-none
+              ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+              focus:outline-none
             `}
             aria-pressed={isSelected}
             aria-label={`Select ${role.label} role`}
           >
-            {/* Glow effect when selected */}
-            {isSelected && (
-              <motion.div
-                layoutId="role-glow"
-                className="absolute inset-0 rounded-2xl opacity-10 pointer-events-none"
-                style={{ background: `radial-gradient(circle at center, ${role.glow}, transparent 70%)` }}
-              />
-            )}
-
-            {/* Check badge */}
-            <motion.div
-              variants={checkVariants}
-              initial="hidden"
-              animate={isSelected ? "visible" : "hidden"}
-              className={`
-                absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center
-                bg-gradient-to-br ${role.gradient} border ${role.border}
-              `}
-            >
-              <i className="fas fa-check text-[10px] text-white" />
-            </motion.div>
-
-            {/* Role badge */}
-            <span className={`inline-block text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full mb-3 ${role.badgeColor}`}>
-              {role.badge}
-            </span>
+            {/* Top row: badge & check */}
+            <div className="flex items-center justify-between mb-3">
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                isSelected
+                  ? "bg-accent/10 text-accent border-accent/20"
+                  : "bg-surface text-muted border-border"
+              }`}>
+                {role.badge}
+              </span>
+              {isSelected && (
+                <div className="w-4 h-4 rounded-full bg-accent flex items-center justify-center text-white text-[9px]">
+                  <FaCheck />
+                </div>
+              )}
+            </div>
 
             {/* Icon + title */}
-            <div className="flex items-center gap-3 mb-2">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center border ${role.border} bg-white/5 transition-transform duration-200 group-hover:scale-110`}
-              >
-                <i className={`fas ${role.icon} text-base`} style={{ color: role.glow }} />
+            <div className="flex items-center gap-2.5 mb-2.5">
+              <div className={`w-8 h-8 rounded-md flex items-center justify-center border ${
+                isSelected
+                  ? "bg-accent/10 border-accent/30 text-accent"
+                  : "bg-surface border-border text-muted"
+              }`}>
+                <IconComponent className="text-sm" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-sm leading-tight">{role.label}</h3>
-                <p className="text-slate-500 text-[11px] leading-tight">{role.subtitle}</p>
+                <h3 className="font-semibold text-text text-sm leading-tight">{role.label}</h3>
+                <p className="text-muted text-[11px] leading-tight">{role.subtitle}</p>
               </div>
             </div>
 
             {/* Feature list */}
-            <ul className="mt-3 space-y-1.5">
+            <ul className="space-y-1 pt-1 border-t border-border/50">
               {role.features.map((f) => (
-                <li key={f} className="flex items-center gap-2 text-[11px] text-slate-400">
-                  <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: role.glow }} />
+                <li key={f} className="flex items-center gap-1.5 text-[11px] text-muted">
+                  <span className={`w-1 h-1 rounded-full ${isSelected ? "bg-accent" : "bg-muted"}`} />
                   {f}
                 </li>
               ))}
             </ul>
-          </motion.button>
+          </button>
         );
       })}
     </div>

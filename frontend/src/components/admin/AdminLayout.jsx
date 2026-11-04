@@ -19,7 +19,7 @@ export default function AdminLayout() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#000814] overflow-hidden safe-top safe-bottom">
+    <div className="flex h-screen bg-canvas text-text overflow-hidden safe-top safe-bottom">
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <AdminSidebar
         mobileOpen={mobileDrawerOpen}
@@ -34,7 +34,7 @@ export default function AdminLayout() {
         />
 
         {/* Page content with route transition */}
-        <main className="flex-1 overflow-y-auto bg-[#000814]">
+        <main className="flex-1 overflow-y-auto bg-canvas">
           <div className="container mx-auto px-3 sm:px-5 md:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1440px]">
             <AnimatePresence mode="wait">
               <motion.div

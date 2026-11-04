@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { FaLock, FaLockOpen, FaEye, FaEyeSlash, FaCheckCircle, FaArrowLeft, FaSyncAlt } from "react-icons/fa";
 import { supabase } from "../config/supabaseClient";
 
 function UpdatePassword() {
@@ -59,55 +60,53 @@ function UpdatePassword() {
     }
   };
 
-  const getPasswordStrength = (password) => {
-    if (!password) return { label: "", color: "bg-white/10", width: "0%" };
-    if (password.length < 6)
-      return { label: "Weak", color: "bg-red-500", width: "33%" };
-    if (password.length < 10)
-      return { label: "Medium", color: "bg-yellow-500", width: "66%" };
-    return { label: "Strong", color: "bg-cyan-500", width: "100%" };
+  const getPasswordStrength = (pw) => {
+    if (!pw) return { label: "", color: "bg-surface-3", width: "0%" };
+    if (pw.length < 6)
+      return { label: "Weak", color: "bg-danger", width: "33%" };
+    if (pw.length < 10)
+      return { label: "Medium", color: "bg-warning", width: "66%" };
+    return { label: "Strong", color: "bg-success", width: "100%" };
   };
 
   const strength = getPasswordStrength(password);
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center bg-[#000814] text-slate-400">
-        <div className="w-10 h-10 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+      <div className="min-h-screen pt-24 flex items-center justify-center bg-canvas text-muted">
+        <div className="w-8 h-8 border-2 border-border border-t-text rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-[#000814] px-4 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-cyan-900/20 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[120px]"></div>
-
+    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-canvas px-4">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md glass-dark p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative z-10 border border-white/5"
+        transition={{ duration: 0.25 }}
+        className="w-full max-w-md bg-surface p-6 sm:p-8 rounded-xl shadow-sm border border-border"
       >
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-cyan-500/10 text-[#00B4D8] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(0,180,216,0.1)]">
-            <i className="fas fa-lock-open text-2xl"></i>
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-surface-2 text-accent rounded-xl flex items-center justify-center mx-auto mb-4 border border-border">
+            <FaLockOpen className="text-lg" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl font-semibold text-text tracking-tight">
             Set New Password
           </h1>
-          <p className="mt-2 text-slate-400 text-sm font-medium">
-            Uses your Supabase recovery session from the reset email link.
+          <p className="mt-1 text-muted text-xs font-normal">
+            Uses your authenticated Supabase recovery session.
           </p>
         </div>
 
-        <form onSubmit={handleOnSubmit} className="space-y-6">
+        <form onSubmit={handleOnSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-text mb-1.5">
               New Password
             </label>
-            <div className="relative group">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#00B4D8] transition-colors">
-                <i className="fas fa-lock"></i>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs">
+                <FaLock />
               </span>
               <input
                 required
@@ -116,54 +115,38 @@ function UpdatePassword() {
                 value={password}
                 onChange={handleOnChange}
                 placeholder="••••••••"
-                className="input-field pl-12 pr-12"
+                className="input-field pl-8 pr-8"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text transition-colors"
               >
-                <i
-                  className={`fas ${
-                    showPassword ? "fa-eye-slash" : "fa-eye"
-                  }`}
-                ></i>
+                {showPassword ? <FaEyeSlash className="text-xs" /> : <FaEye className="text-xs" />}
               </button>
             </div>
-            <div className="mt-3">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  Strength
-                </span>
-                <span
-                  className={`text-[10px] font-bold uppercase ${
-                    strength.label === "Strong"
-                      ? "text-cyan-400"
-                      : strength.label === "Medium"
-                      ? "text-yellow-400"
-                      : "text-red-400"
-                  }`}
-                >
-                  {strength.label}
-                </span>
+            {password && (
+              <div className="mt-2">
+                <div className="h-1 w-full bg-surface-2 rounded-full overflow-hidden">
+                  <div
+                    style={{ width: strength.width }}
+                    className={`h-full ${strength.color} transition-all`}
+                  />
+                </div>
+                <p className="text-[10px] mt-0.5 text-muted font-medium">
+                  Strength: {strength.label}
+                </p>
               </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: strength.width }}
-                  className={`h-full ${strength.color} transition-all duration-500 shadow-[0_0_10px_rgba(0,180,216,0.3)]`}
-                />
-              </div>
-            </div>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-2">
-              Confirm Password
+            <label className="block text-xs font-medium text-text mb-1.5">
+              Confirm New Password
             </label>
-            <div className="relative group">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#00B4D8] transition-colors">
-                <i className="fas fa-check-circle"></i>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-xs">
+                <FaCheckCircle />
               </span>
               <input
                 required
@@ -172,7 +155,7 @@ function UpdatePassword() {
                 value={confirmPassword}
                 onChange={handleOnChange}
                 placeholder="••••••••"
-                className="input-field pl-12"
+                className="input-field pl-8"
               />
             </div>
           </div>
@@ -180,26 +163,26 @@ function UpdatePassword() {
           <button
             type="submit"
             disabled={busy || !password || password !== confirmPassword}
-            className="w-full btn-primary py-4 text-lg font-bold flex items-center justify-center gap-3 disabled:opacity-50 group"
+            className="w-full btn-primary py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {busy ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                Reset Password{" "}
-                <i className="fas fa-sync-alt text-sm group-hover:rotate-180 transition-transform duration-500"></i>
+                <span>Save New Password</span>
+                <FaSyncAlt className="text-xs" />
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 text-center">
+        <div className="mt-6 text-center">
           <Link
             to="/login"
-            className="flex items-center justify-center gap-2 text-slate-400 hover:text-[#00B4D8] font-bold text-sm transition-all group"
+            className="inline-flex items-center gap-1.5 text-muted hover:text-text font-medium text-xs transition-colors"
           >
-            <i className="fas fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>{" "}
-            Back to Login
+            <FaArrowLeft className="text-xs" />
+            <span>Back to sign in</span>
           </Link>
         </div>
       </motion.div>

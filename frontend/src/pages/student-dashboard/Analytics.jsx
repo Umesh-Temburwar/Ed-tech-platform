@@ -1,7 +1,10 @@
-import React from 'react';
-import { Clock, Award, TrendingUp, Calendar, Activity } from 'lucide-react';
-import { GlassCard, StatCard, TabBar } from '../../components/dashboard/Common';
-import { BarChart, Bar, AreaChart, Area, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { useState } from 'react';
+import { Clock, Award, TrendingUp, Calendar } from 'lucide-react';
+import { StatCard, TabBar } from '../../components/dashboard/Common';
+import {
+  BarChart, Bar, AreaChart, Area, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
 
 const WATCH_TIME_DATA = [
   { day: 'Mon', hours: 1.5 },
@@ -14,117 +17,155 @@ const WATCH_TIME_DATA = [
 ];
 
 const COMPLETION_DATA = [
-  { name: 'Completed', value: 68 },
-  { name: 'In Progress', value: 22 },
+  { name: 'Completed', value: 65 },
+  { name: 'In Progress', value: 25 },
   { name: 'Not Started', value: 10 }
 ];
 
 const QUIZ_SCORE_DATA = [
-  { week: 'Week 1', score: 75 },
-  { week: 'Week 2', score: 82 },
-  { week: 'Week 3', score: 78 },
-  { week: 'Week 4', score: 88 },
-  { week: 'Week 5', score: 92 }
+  { week: 'W1', score: 75 },
+  { week: 'W2', score: 82 },
+  { week: 'W3', score: 78 },
+  { week: 'W4', score: 88 },
+  { week: 'W5', score: 92 }
 ];
 
 const TIME_OF_DAY_DATA = [
-  { hour: '6AM', count: 10 },
-  { hour: '9AM', count: 30 },
-  { hour: '12PM', count: 45 },
-  { hour: '3PM', count: 60 },
-  { hour: '6PM', count: 80 },
-  { hour: '9PM', count: 70 },
-  { hour: '12AM', count: 25 }
+  { hour: '06:00', count: 10 },
+  { hour: '09:00', count: 30 },
+  { hour: '12:00', count: 45 },
+  { hour: '15:00', count: 60 },
+  { hour: '18:00', count: 80 },
+  { hour: '21:00', count: 70 },
+  { hour: '00:00', count: 25 }
 ];
 
-const COLORS = ['#6366f1', '#8b5cf6', '#ec4899'];
+const PIE_COLORS = ['#3fb950', '#58a6ff', '#8b949e'];
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-surface border border-border rounded-lg p-2.5 shadow-md text-xs">
+        <p className="font-semibold text-text">{label}</p>
+        <p className="text-muted mt-0.5">
+          {payload[0].name || 'Value'}: <span className="font-medium text-text">{payload[0].value}</span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const AnalyticsPage = () => {
+  const [range, setRange] = useState('Weekly');
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div>
-          <h2 className="text-3xl font-bold text-white">Learning Analytics</h2>
-          <p className="text-gray-400">Track your progress, watch time, and quiz scores</p>
+          <h2 className="text-xl font-semibold text-text">Study Analytics & Performance</h2>
+          <p className="text-xs text-muted mt-0.5">Track your curriculum watch time, quiz accuracy, and study frequency</p>
         </div>
-        <TabBar tabs={['Weekly', 'Monthly', 'Yearly']} active="Weekly" onChange={() => {}} />
+        <TabBar tabs={['Weekly', 'Monthly', 'Yearly']} active={range} onChange={setRange} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Clock} label="Total Watch Time" value="47h 30m" trend="+8h this week" color="indigo" />
-        <StatCard icon={Award} label="Courses Completed" value="2" trend="1 in progress" color="emerald" />
-        <StatCard icon={TrendingUp} label="Avg Quiz Score" value="87%" trend="+5% this month" color="violet" />
-        <StatCard icon={Calendar} label="Days Active" value="23" trend="28 day streak" color="orange" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={Clock} label="Total Study Time" value="47h 30m" trend="+8h this week" color="indigo" />
+        <StatCard icon={Award} label="Completed Modules" value="2" trend="1 in progress" color="emerald" />
+        <StatCard icon={TrendingUp} label="Average Quiz Score" value="87%" trend="+5% improvement" color="purple" />
+        <StatCard icon={Calendar} label="Active Study Days" value="23" trend="Consistent" color="amber" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <GlassCard className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6">Total Watch Time (Weekly)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={WATCH_TIME_DATA}>
-              <defs>
-                <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="day" stroke="#64748b" fontSize={12} />
-              <YAxis stroke="#64748b" fontSize={12} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff' }} />
-              <Area type="monotone" dataKey="hours" stroke="#6366f1" fillOpacity={1} fill="url(#colorHours)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </GlassCard>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Watch Time */}
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-sm font-semibold text-text">Weekly Study Hours</h3>
+            <span className="text-[11px] text-muted font-medium">Hours / Day</span>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={WATCH_TIME_DATA}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="day" stroke="var(--muted)" fontSize={11} tickLine={false} />
+                <YAxis stroke="var(--muted)" fontSize={11} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Area type="monotone" dataKey="hours" stroke="#58a6ff" fill="#58a6ff" fillOpacity={0.15} strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-        <GlassCard className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6">Course Completion</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={COMPLETION_DATA}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={90}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {COMPLETION_DATA.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff' }} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </GlassCard>
+        {/* Course Completion Distribution */}
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-sm font-semibold text-text">Curriculum Progress Ratio</h3>
+            <span className="text-[11px] text-muted font-medium">Breakdown (%)</span>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={COMPLETION_DATA}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={85}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {COMPLETION_DATA.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} stroke="var(--surface)" strokeWidth={2} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex justify-center gap-4 text-xs mt-2">
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-success" /> <span className="text-muted">Completed (65%)</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-accent" /> <span className="text-muted">In Progress (25%)</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-surface-3" /> <span className="text-muted">Not Started (10%)</span></div>
+          </div>
+        </div>
 
-        <GlassCard className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6">Quiz Score Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={QUIZ_SCORE_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="week" stroke="#64748b" fontSize={12} />
-              <YAxis stroke="#64748b" fontSize={12} domain={[0, 100]} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff' }} />
-              <Line type="monotone" dataKey="score" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 5 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </GlassCard>
+        {/* Quiz Scores */}
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-sm font-semibold text-text">Assessment Score Trajectory</h3>
+            <span className="text-[11px] text-muted font-medium">Score / 100</span>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={QUIZ_SCORE_DATA}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="week" stroke="var(--muted)" fontSize={11} tickLine={false} />
+                <YAxis stroke="var(--muted)" fontSize={11} domain={[50, 100]} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Line type="monotone" dataKey="score" stroke="#3fb950" strokeWidth={2} dot={{ fill: '#3fb950', r: 4 }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-        <GlassCard className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6">Most Active Learning Hours</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={TIME_OF_DAY_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="hour" stroke="#64748b" fontSize={12} />
-              <YAxis stroke="#64748b" fontSize={12} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff' }} />
-              <Bar dataKey="count" fill="#ec4899" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </GlassCard>
+        {/* Hourly Activity */}
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-sm font-semibold text-text">Peak Study Hours</h3>
+            <span className="text-[11px] text-muted font-medium">Activity Frequency</span>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={TIME_OF_DAY_DATA}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="hour" stroke="var(--muted)" fontSize={11} tickLine={false} />
+                <YAxis stroke="var(--muted)" fontSize={11} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="count" fill="#ff6b4a" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   );

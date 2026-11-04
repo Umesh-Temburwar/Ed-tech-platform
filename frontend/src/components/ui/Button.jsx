@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import React from "react";
 
 const Button = React.memo(function Button({ 
@@ -6,30 +5,31 @@ const Button = React.memo(function Button({
   variant = "primary", 
   size = "md",
   className = "",
+  disabled = false,
   ...props 
 }) {
   const variants = {
-    primary: "bg-gradient-to-br from-violet-600 to-cyan-500 text-white shadow-lg shadow-violet-500/30",
-    secondary: "bg-white/[0.04] border border-white/[0.08] text-white",
-    ghost: "bg-transparent border border-white/[0.06] text-white hover:bg-white/[0.04]",
-    danger: "bg-red-500/10 border border-red-500/30 text-red-400"
+    primary: "bg-hot text-white hover:bg-[#e5482a] border border-transparent shadow-sm",
+    secondary: "bg-surface-2 text-text border border-border hover:bg-surface",
+    ghost: "bg-transparent text-text hover:bg-surface-2 border border-transparent",
+    danger: "bg-danger text-white hover:bg-[#e03131] border border-transparent",
+    accent: "bg-accent text-white hover:opacity-90 border border-transparent",
   };
   
   const sizes = {
-    sm: "px-4 py-2 text-sm",
-    md: "px-6 py-3 text-sm",
-    lg: "px-8 py-4 text-base"
+    sm: "px-3 py-1.5 text-xs",
+    md: "px-4 py-2 text-xs",
+    lg: "px-5 py-2.5 text-sm"
   };
 
   return (
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
-      className={`rounded-xl font-semibold transition-all duration-200 ${variants[variant]} ${sizes[size]} ${className}`}
+    <button
+      disabled={disabled}
+      className={`inline-flex items-center justify-center rounded-md font-semibold transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant] || variants.primary} ${sizes[size] || sizes.md} ${className}`}
       {...props}
     >
       {children}
-    </motion.button>
+    </button>
   );
 });
 

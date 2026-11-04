@@ -86,21 +86,21 @@ const DashboardNavbar = () => {
     <nav
       role="navigation"
       aria-label="Dashboard navigation"
-      className="sticky top-0 z-[100] w-full bg-[#000814]/90 backdrop-blur-md border-b border-white/5"
+      className="sticky top-0 z-[100] w-full bg-surface/95 border-b border-border shadow-sm transition-colors duration-200"
     >
       <div className="container mx-auto px-6 h-16 flex items-center justify-between gap-4">
 
         {/* ── LEFT: Search ─────────────────────────────────────────── */}
         <div className="hidden md:flex items-center w-56 shrink-0 relative group">
           <form role="search" onSubmit={handleSearch} className="w-full relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors text-xs" />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent transition-colors text-xs" />
             <input
               type="text"
               aria-label="Search courses"
               placeholder="Search..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-9 pr-4 text-sm text-slate-300 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
+              className="w-full bg-surface-2 border border-border rounded-lg py-1.5 pl-8 pr-3 text-xs text-text placeholder-muted focus:outline-none focus:border-accent transition-all"
             />
           </form>
 
@@ -111,19 +111,19 @@ const DashboardNavbar = () => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
-                className="absolute top-full left-0 w-72 mt-2 bg-[#050d1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[110]"
+                className="absolute top-full left-0 w-72 mt-2 bg-surface border border-border rounded-xl shadow-lg overflow-hidden z-[110]"
               >
                 {searchResults.map((course) => (
                   <Link
                     key={course.id}
                     to={course.path}
                     onClick={() => { setSearchQuery(''); setSearchResults([]); }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 group/item"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-surface-2 transition-colors border-b border-border last:border-0 group/item"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover/item:bg-cyan-500 group-hover/item:text-white transition-all shrink-0">
+                    <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover/item:bg-accent group-hover/item:text-white transition-all shrink-0">
                       <FaGraduationCap className="text-xs" />
                     </div>
-                    <span className="text-sm text-slate-300 group-hover/item:text-white font-medium">{course.title}</span>
+                    <span className="text-sm text-text font-medium">{course.title}</span>
                   </Link>
                 ))}
               </motion.div>
@@ -140,15 +140,15 @@ const DashboardNavbar = () => {
                 key={item.id}
                 to={item.path}
                 aria-current={active ? 'page' : undefined}
-                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${active
-                    ? 'text-white'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                className={`relative px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${active
+                    ? 'text-text font-bold'
+                    : 'text-muted hover:text-text hover:bg-surface-2'
                   }`}
               >
                 {active && (
                   <motion.span
                     layoutId="dashboard-nav-active"
-                    className="absolute inset-0 bg-white/10 border border-white/15 rounded-lg -z-10"
+                    className="absolute inset-0 bg-surface-2 border border-border rounded-md -z-10"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -166,10 +166,10 @@ const DashboardNavbar = () => {
             <Link
               to="/cart"
               aria-label={`Cart with ${cart.length} items`}
-              className="relative w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all"
+              className="relative w-8 h-8 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-muted hover:text-text transition-colors"
             >
-              <FaShoppingCart className="text-sm" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+              <FaShoppingCart className="text-xs" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                 {cart.length}
               </span>
             </Link>
@@ -187,11 +187,11 @@ const DashboardNavbar = () => {
               aria-haspopup="true"
               aria-expanded={showNotifications}
               onClick={() => { setShowNotifications((v) => !v); setShowProfileMenu(false); }}
-              className="relative w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all"
+              className="relative w-8 h-8 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-muted hover:text-text transition-colors"
             >
-              <FaBell className="text-sm" />
+              <FaBell className="text-xs" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-hot text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                   {unreadCount}
                 </span>
               )}
@@ -215,9 +215,9 @@ const DashboardNavbar = () => {
               aria-haspopup="true"
               aria-expanded={showProfileMenu}
               onClick={() => { setShowProfileMenu((v) => !v); setShowNotifications(false); }}
-              className="flex items-center gap-2 px-2 py-1 rounded-full bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all"
+              className="flex items-center gap-2 px-2 py-1 rounded-full bg-surface-2 border border-border hover:border-accent transition-colors"
             >
-              <div className="w-7 h-7 rounded-full overflow-hidden border border-white/10">
+              <div className="w-6 h-6 rounded-full overflow-hidden border border-border">
                 <img
                   src={user?.image || `https://api.dicebear.com/5.x/initials/svg?seed=${user?.firstName}`}
                   alt="avatar"

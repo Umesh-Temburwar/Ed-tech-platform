@@ -1,73 +1,97 @@
 import React from 'react';
-import { 
-  BookOpen, Brain, Award, Clock
-} from 'lucide-react';
 
 export const StatCard = ({ icon: Icon, label, value, trend, color = "indigo" }) => {
-  const colors = {
-    indigo: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-    purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  const iconColors = {
+    indigo: "text-accent bg-surface-2 border-border",
+    purple: "text-accent bg-surface-2 border-border",
+    blue: "text-accent bg-surface-2 border-border",
+    emerald: "text-success bg-surface-2 border-border",
+    amber: "text-warning bg-surface-2 border-border",
+    red: "text-danger bg-surface-2 border-border",
   };
+
+  const isPositive = trend?.startsWith('+');
+  const isNeutral = !trend || trend === '0' || trend === '0%';
+
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 transition-all duration-200 hover:bg-white/10 hover:border-white/20 hover:-translate-y-0.5">
-      <div className="flex justify-between items-start mb-4">
-        <div className={`p-2.5 rounded-xl ${colors[color]} border`}>
-          <Icon className="w-5 h-5" />
+    <div className="bg-surface border border-border rounded-xl p-5 transition-colors shadow-sm hover:border-border/80">
+      <div className="flex justify-between items-start mb-3">
+        <div className={`w-9 h-9 rounded-lg border flex items-center justify-center ${iconColors[color] || iconColors.indigo}`}>
+          <Icon className="w-4 h-4" />
         </div>
-        <span className={`text-[10px] font-bold uppercase tracking-tighter ${trend?.startsWith('+') ? 'text-emerald-400' : 'text-gray-500'}`}>{trend}</span>
+        {trend && (
+          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${
+            isNeutral 
+              ? 'bg-surface-2 text-muted border-border'
+              : isPositive 
+              ? 'bg-success/10 text-success border-success/20' 
+              : 'bg-danger/10 text-danger border-danger/20'
+          }`}>
+            {trend}
+          </span>
+        )}
       </div>
-      <h3 className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{label}</h3>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
+      <h3 className="text-muted text-xs font-medium">{label}</h3>
+      <p className="text-2xl font-semibold text-text mt-0.5 tracking-tight">{value}</p>
     </div>
   );
 };
 
-export const ProgressBar = ({ pct, color = "from-indigo-600 to-purple-700", size = "h-1.5" }) => (
-  <div className={`w-full ${size} bg-white/5 rounded-full overflow-hidden`}>
-    <div className={`h-full bg-gradient-to-r ${color} transition-all duration-1000 ease-out`} style={{ width: `${pct}%` }} />
-  </div>
-);
+export const ProgressBar = ({ pct = 0, color = "bg-hot", size = "h-2" }) => {
+  const safePct = Math.min(100, Math.max(0, Number(pct) || 0));
+  // Map legacy gradients to solid semantic tokens
+  const fillClass = color.includes("indigo") || color.includes("purple") || color.includes("gradient")
+    ? "bg-hot"
+    : color;
 
-export const Avatar = ({ initials, color = "bg-indigo-500", size = "w-10 h-10" }) => (
-  <div className={`${size} rounded-2xl ${color} flex items-center justify-center font-bold text-white shadow-lg shadow-black/20 shrink-0`}>
+  return (
+    <div className={`w-full ${size} bg-surface-2 rounded-full overflow-hidden border border-border/40`}>
+      <div
+        className={`h-full ${fillClass} transition-all duration-300 ease-out`}
+        style={{ width: `${safePct}%` }}
+      />
+    </div>
+  );
+};
+
+export const Avatar = ({ initials, color = "bg-surface-2", size = "w-9 h-9" }) => (
+  <div className={`${size} rounded-lg ${color} border border-border flex items-center justify-center font-semibold text-text text-xs shrink-0`}>
     {initials}
   </div>
 );
 
 export const Badge = ({ text, color = "indigo" }) => {
   const colors = {
-    indigo: "text-indigo-400 bg-indigo-500/15 border-indigo-500/30",
-    emerald: "text-emerald-400 bg-emerald-500/15 border-emerald-500/30",
-    amber: "text-amber-400 bg-amber-500/15 border-amber-500/30",
-    red: "text-red-400 bg-red-500/15 border-red-500/30",
-    blue: "text-blue-400 bg-blue-500/15 border-blue-500/30",
-    gray: "text-gray-400 bg-gray-500/15 border-gray-500/30",
+    indigo: "text-accent bg-accent/10 border-accent/20",
+    emerald: "text-success bg-success/10 border-success/20",
+    amber: "text-warning bg-warning/10 border-warning/20",
+    red: "text-danger bg-danger/10 border-danger/20",
+    blue: "text-accent bg-accent/10 border-accent/20",
+    gray: "text-muted bg-surface-2 border-border",
+    purple: "text-accent bg-surface-2 border-border",
   };
   return (
-    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold uppercase tracking-wider ${colors[color]}`}>
+    <span className={`text-[11px] px-2.5 py-0.5 rounded-md border font-medium ${colors[color] || colors.indigo}`}>
       {text}
     </span>
   );
 };
 
 export const GlassCard = ({ children, className = "" }) => (
-  <div className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 transition-all duration-200 hover:bg-white/10 hover:border-white/20 ${className}`}>
+  <div className={`bg-surface border border-border rounded-xl p-5 shadow-sm transition-colors hover:border-border/80 ${className}`}>
     {children}
   </div>
 );
 
 export const EmptyState = ({ icon: Icon, title, subtitle, ctaText, onCta }) => (
-  <div className="py-20 flex flex-col items-center text-center animate-in fade-in duration-500">
-    <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6">
-      <Icon className="w-10 h-10 text-gray-600" />
+  <div className="py-16 px-4 flex flex-col items-center text-center bg-surface rounded-xl border border-dashed border-border my-2">
+    <div className="w-12 h-12 rounded-xl bg-surface-2 border border-border flex items-center justify-center mb-3 text-muted">
+      <Icon className="w-6 h-6" />
     </div>
-    <h3 className="text-xl font-bold text-white">{title}</h3>
-    <p className="text-gray-500 mt-2 max-w-xs">{subtitle}</p>
+    <h3 className="text-sm font-semibold text-text">{title}</h3>
+    <p className="text-xs text-muted mt-1 max-w-sm leading-relaxed">{subtitle}</p>
     {ctaText && (
-      <button onClick={onCta} className="mt-8 bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2 rounded-xl text-sm font-bold transition-all">
+      <button onClick={onCta} className="mt-4 btn-primary py-2 px-4 rounded-lg text-xs font-semibold">
         {ctaText}
       </button>
     )}
@@ -77,9 +101,9 @@ export const EmptyState = ({ icon: Icon, title, subtitle, ctaText, onCta }) => (
 export const Modal = ({ open, onClose, children }) => {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-200">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-2xl bg-gray-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-2xl bg-surface border border-border rounded-xl overflow-hidden shadow-xl">
         {children}
       </div>
     </div>
@@ -87,13 +111,15 @@ export const Modal = ({ open, onClose, children }) => {
 };
 
 export const TabBar = ({ tabs, active, onChange }) => (
-  <div className="flex gap-2 p-1 bg-white/5 border border-white/10 rounded-2xl overflow-x-auto w-fit">
+  <div className="flex gap-1 p-1 bg-surface-2 border border-border rounded-lg overflow-x-auto w-fit">
     {tabs.map((tab) => (
       <button
         key={tab}
         onClick={() => onChange(tab)}
-        className={`px-6 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-          active === tab ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-gray-500 hover:text-white'
+        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
+          active === tab
+            ? 'bg-surface text-text shadow-sm border border-border font-semibold'
+            : 'text-muted hover:text-text'
         }`}
       >
         {tab}

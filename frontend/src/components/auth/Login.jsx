@@ -61,16 +61,8 @@ export default function Login() {
   }, [email, password])
 
   return (
-    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-[#000814] px-4 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-cyan-900/20 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[120px]"></div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md glass-dark p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative z-10 border border-white/5"
-      >
+    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-canvas px-4">
+      <div className="w-full max-w-md bg-surface p-8 rounded-xl border border-border shadow-sm">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white tracking-tight">Welcome Back</h1>
           <p className="mt-2 text-slate-400 text-sm font-medium">Log in to your account to continue</p>

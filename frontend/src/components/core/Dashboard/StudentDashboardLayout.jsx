@@ -10,9 +10,9 @@ const StudentDashboardLayout = () => {
   const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-[#000814] safe-top safe-bottom overflow-hidden">
+    <div className="flex h-screen bg-canvas text-text safe-top safe-bottom overflow-hidden">
       {/* Sidebar - Fixed/Sticky on desktop */}
-      <div className="hidden lg:block h-full shrink-0">
+      <div className="hidden lg:block h-full shrink-0 border-r border-border bg-surface">
         <StudentSidebar />
       </div>
 
@@ -20,7 +20,7 @@ const StudentDashboardLayout = () => {
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <DashboardNavbar />
         
-        <main className="flex-1 overflow-y-auto custom-scrollbar bg-[#000814]">
+        <main className="flex-1 overflow-y-auto custom-scrollbar bg-canvas">
           <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             <AnimatePresence mode="wait">
               <motion.div

@@ -23,20 +23,73 @@ const {
 } = courseEndpoints
 
 export const getAllCourses = async () => {
-  const toastId = toast.loading("Loading...")
-  let result = []
+  let result = [];
   try {
-    const response = await apiConnector("GET", GET_ALL_COURSE_API)
-    if (!response?.data?.success) {
-      throw new Error("Could Not Fetch All Courses")
+    const { data, error } = await supabase
+      .from('courses')
+      .select(`
+        id,
+        title,
+        course_name,
+        description,
+        course_description,
+        short_description,
+        price,
+        discount_price,
+        discounted_price,
+        status,
+        is_published,
+        is_free,
+        final_thumbnail_url,
+        youtube_thumbnail_url,
+        custom_thumbnail_url,
+        thumbnail_url,
+        thumbnail,
+        computed_thumbnail,
+        preview_video_url,
+        youtube_video_url,
+        created_at,
+        average_rating,
+        rating,
+        total_students,
+        enrolled_students_count,
+        level,
+        duration,
+        total_duration,
+        instructor:instructor_id(
+          id,
+          first_name,
+          last_name,
+          avatar_url,
+          image
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      result = data.map((c) => ({
+        ...c,
+        _id: c.id,
+        courseName: c.title || c.course_name,
+        courseDescription: c.description || c.course_description || c.short_description,
+        thumbnail: c.final_thumbnail_url || c.youtube_thumbnail_url || c.custom_thumbnail_url || c.thumbnail_url || c.thumbnail || c.computed_thumbnail,
+      }));
+      return result;
     }
-    result = response?.data?.data
-  } catch (error) {
-    toast.error(error.message)
+  } catch (err) {
+    console.warn("Supabase course fetch fallback:", err);
   }
-  toast.dismiss(toastId)
-  return result
-}
+
+  try {
+    const response = await apiConnector("GET", GET_ALL_COURSE_API);
+    if (response?.data?.success) {
+      result = response?.data?.data || [];
+    }
+  } catch (error) {
+    console.warn("Express backend getAllCourses not available:", error.message);
+  }
+  return result;
+};
 
 export const fetchCourseDetails = async (courseId) => {
   const toastId = toast.loading("Loading...")

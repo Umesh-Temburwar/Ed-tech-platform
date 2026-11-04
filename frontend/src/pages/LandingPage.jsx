@@ -1,28 +1,67 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  FaCode, FaRobot, FaCloud, FaShieldAlt, FaChartBar, FaDocker, FaClock, FaSignal, 
-  FaUserTie, FaProjectDiagram, FaUserGraduate, FaBriefcase,
-  FaArrowRight, FaLaptopCode, FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaDatabase
+  FaCode, FaRobot, FaCloud, FaUserTie, FaProjectDiagram, FaUserGraduate, FaBriefcase,
+  FaArrowRight, FaLaptopCode, FaDatabase, FaServer, FaBrain, FaLayerGroup, FaCheckCircle
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Footer from "../components/common/Footer";
-import heroImg from "../assets/Images/signup.webp";
-import bannerVideo from "../assets/Images/banner.mp4";
-import posterImg from "../assets/Images/TimelineImage.png";
-
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
 import CoursesSection from "../components/core/HomePage/CoursesSection";
 import Students from "./Students";
 import About from "./About";
 import Contact from "./Contact";
 
+// 5 Curated Full HD Computer Science & Engineering (CSE) Education Images
+const cseEducationShowcase = [
+  {
+    id: 1,
+    title: "Software Systems & Engineering Lab",
+    subtitle: "Collaborative Full-Stack & System Design",
+    description: "Hands-on engineering workshops building high-throughput production systems, scalable APIs, and microservice architectures.",
+    tags: ["System Design", "Microservices", "Clean Architecture", "CI/CD"],
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80",
+    badge: "Core Engineering"
+  },
+  {
+    id: 2,
+    title: "Algorithms & Computational Complexity",
+    subtitle: "Data Structures & Advanced Problem Solving",
+    description: "Deep-dive analysis of asymptotic efficiency, tree & graph algorithms, dynamic programming, and computational geometry.",
+    tags: ["DSA Mastery", "Graph Theory", "Dynamic Programming", "Complexity"],
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1920&q=80",
+    badge: "Mathematical Foundations"
+  },
+  {
+    id: 3,
+    title: "Systems Architecture & OS Kernels",
+    subtitle: "Low-Level Computing & Memory Management",
+    description: "Understanding CPU pipelining, cache hierarchies, process scheduling, concurrency primitives, and kernel internals.",
+    tags: ["Operating Systems", "Computer Architecture", "Linux Internals", "C/Rust"],
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1920&q=80",
+    badge: "Hardware & Systems"
+  },
+  {
+    id: 4,
+    title: "Dedicated Problem Solving & Coding Labs",
+    subtitle: "Real-time Code Execution & Rigorous Debugging",
+    description: "Intensive hands-on labs with real-time test harnesses, memory leak detection, and algorithmic benchmarking.",
+    tags: ["Algorithms", "Unit Testing", "Debugging", "Code Quality"],
+    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1920&q=80",
+    badge: "Practical Mastery"
+  },
+  {
+    id: 5,
+    title: "Artificial Intelligence & Neural Computing",
+    subtitle: "Deep Learning, LLMs & Data Pipelines",
+    description: "Training neural networks, implementing transformer architectures, and building production-grade vector search and ML pipelines.",
+    tags: ["Machine Learning", "PyTorch", "Computer Vision", "NLP & LLMs"],
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1920&q=80",
+    badge: "AI & Data Science"
+  }
+];
 
 export default function LandingPage() {
-  const { user } = useSelector((state) => state.profile);
-  const navigate = useNavigate();
+  const [selectedShowcase, setSelectedShowcase] = useState(0);
 
   const features = [
     {
@@ -50,184 +89,244 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#000814] text-richblack-5 font-inter overflow-x-hidden selection:bg-blue-500 selection:text-white">
       
-      {/* SECTION 1 – HERO SECTION */}
-      <section className="relative min-h-screen flex items-center pt-24 pb-12 px-4 md:px-8 lg:px-20 overflow-hidden bg-gradient-to-b from-[#001d3d] via-[#000814] to-[#000814]">
-        {/* Background Video (home.mp4) */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-        >
-          <source src="/home.mp4" type="video/mp4" />
-          <source src={bannerVideo} type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#001d3d]/60 via-[#000814]/60 to-[#000814]/70 pointer-events-none"></div>
-        {/* Animated Background Orbs */}
-        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-[10%] left-[-5%] w-[500px] h-[500px] bg-indigo-600/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+      {/* SECTION 1 – HERO SECTION (Video Removed, Full HD CSE Lab Visual Added) */}
+      <section className="relative min-h-[90vh] flex items-center pt-24 pb-16 px-4 md:px-8 lg:px-20 overflow-hidden bg-gradient-to-b from-[#001d3d]/40 via-[#000814] to-[#000814]">
+        {/* Ambient Subtle Gradients */}
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-cyan-600/10 blur-[130px] rounded-full pointer-events-none" />
         
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10 w-full">
+          {/* Left Column: Headline & Actions */}
           <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="lg:col-span-6 text-left"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm font-semibold mb-8 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
-              Join 50,000+ Successful Learners
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-semibold mb-6">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              Computer Science & Engineering Platform
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight">
-              Master IT Skills <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">
-                That Matter
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.12] tracking-tight text-white">
+              Master Modern <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-300">
+                Computer Science
               </span>
             </h1>
             
-            <p className="mt-8 text-xl text-richblack-200 max-w-lg leading-relaxed font-medium">
-              Join 50,000+ learners and become job-ready with <span className="text-blue-400">AI-powered learning</span>. Build the future you deserve.
+            <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
+              Accelerate your engineering journey with structured curriculum in Algorithms, Systems Architecture, Full-Stack Development, and Artificial Intelligence.
             </p>
             
-            <div className="mt-12 flex flex-wrap gap-6">
+            <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/signup">
-                <button className="relative group px-10 py-4 rounded-2xl bg-blue-600 text-white font-bold text-lg transition-all hover:scale-105 shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:shadow-[0_0_50px_rgba(37,99,235,0.6)]">
-                  Start Learning
+                <button className="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base transition-all shadow-lg shadow-blue-600/30 hover:scale-[1.02] active:scale-[0.98]">
+                  Start Learning Free
                 </button>
               </Link>
               <Link to="/course-catalog">
-                <button className="px-10 py-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md font-bold text-lg hover:bg-white/10 transition-all">
+                <button className="px-8 py-3.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-semibold text-base transition-all">
                   Explore Courses
                 </button>
               </Link>
             </div>
             
-            {/* Trust Badges */}
-            <div className="mt-16 pt-8 border-t border-richblack-800 flex items-center gap-8">
-              <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <img key={i} className="w-10 h-10 rounded-full border-2 border-richblack-900" src={`https://i.pravatar.cc/100?u=${i}`} alt="User" />
-                ))}
+            {/* Quick Metrics */}
+            <div className="mt-12 pt-6 border-t border-white/10 grid grid-cols-3 gap-6 max-w-md">
+              <div>
+                <p className="text-2xl font-black text-white">50K+</p>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">Learners</p>
               </div>
-              <div className="text-sm">
-                <p className="text-richblack-5 font-bold">4.9/5 Rating</p>
-                <p className="text-richblack-400">from 10k+ reviews</p>
+              <div>
+                <p className="text-2xl font-black text-white">70+</p>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">CSE Courses</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-white">4.9/5</p>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">Rating</p>
               </div>
             </div>
           </motion.div>
 
+          {/* Right Column: Full HD CSE Hero Showcase Image */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-            className="relative flex justify-center items-center"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="lg:col-span-6 relative flex justify-center"
           >
-            {/* Background Decorative Circles */}
-            <div className="absolute w-[110%] aspect-square rounded-full bg-blue-500/10 blur-[100px] -z-10 animate-pulse"></div>
-            
-            {/* Green Circle with Dashed Border (Requested Design) */}
-            <div className="relative w-full max-w-[500px] aspect-square">
-              {/* Rotating Dashed Circle */}
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 rounded-full border-4 border-dashed border-emerald-400/30"
-              ></motion.div>
-              
-              {/* Inner Solid Circle */}
-              <div className="absolute inset-[10%] rounded-full bg-gradient-to-br from-emerald-500/20 to-blue-500/20 backdrop-blur-3xl border border-white/10 shadow-2xl overflow-hidden group">
+            <div className="relative w-full max-w-lg rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-white/[0.02] group">
+              <div className="aspect-[4/3] w-full relative overflow-hidden">
                 <img 
-                  src={heroImg} 
-                  alt="Confident professional with laptop in a modern library" 
-                  className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                  src={cseEducationShowcase[0].image} 
+                  alt="Computer Science Students in High-Tech Lab" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-[0.95]"
+                  loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#000814]/60 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#000814] via-[#000814]/30 to-transparent"></div>
               </div>
 
-              {/* Floating Stat Cards (Requested Design) */}
-              <motion.div 
-                initial={{ x: -20, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="absolute -left-12 top-[20%] p-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl z-20 flex items-center gap-4 border border-white/20"
-              >
-                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg">
-                  <FaUserGraduate />
+              {/* Overlay Content */}
+              <div className="absolute bottom-0 inset-x-0 p-6 text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-2">
+                  <FaLaptopCode className="text-xs" /> CSE Collaborative Engineering
                 </div>
-                <div>
-                  <p className="text-richblack-900 font-black text-lg">50K+</p>
-                  <p className="text-richblack-600 text-[10px] font-bold uppercase tracking-wider">Happy Learners</p>
-                </div>
-              </motion.div>
+                <h3 className="text-lg sm:text-xl font-bold text-white">
+                  Real-world Software Development & Lab Work
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 line-clamp-2">
+                  Modern, interactive learning environment equipped with industry-standard development workflows.
+                </p>
+              </div>
 
-              <motion.div 
-                initial={{ x: 20, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="absolute -right-12 bottom-[25%] p-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl z-20 flex items-center gap-4 border border-white/20"
-              >
-                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg">
-                  <FaLaptopCode />
-                </div>
-                <div>
-                  <p className="text-richblack-900 font-black text-lg">70+</p>
-                  <p className="text-richblack-600 text-[10px] font-bold uppercase tracking-wider">Pro Courses</p>
-                </div>
-              </motion.div>
-
-              {/* Small Floating Icons */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute top-0 right-1/4 p-3 bg-richblack-800/90 backdrop-blur-xl rounded-xl border border-white/10 shadow-xl z-20 text-yellow-400 text-xl"
-              >
-                <FaCode />
-              </motion.div>
-              
-              <motion.div 
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute bottom-10 left-10 p-3 bg-richblack-800/90 backdrop-blur-xl rounded-xl border border-white/10 shadow-xl z-20 text-purple-400 text-xl"
-              >
-                <FaRobot />
-              </motion.div>
-              <motion.div 
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity }}
-                className="absolute top-8 left-1/4 p-3 bg-richblack-800/90 backdrop-blur-xl rounded-xl border border-white/10 shadow-xl z-20 text-cyan-300 text-xl"
-              >
-                <FaCloud />
-              </motion.div>
-              <motion.div 
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 5, repeat: Infinity }}
-                className="absolute bottom-20 right-12 p-3 bg-richblack-800/90 backdrop-blur-xl rounded-xl border border-white/10 shadow-xl z-20 text-pink-300 text-xl"
-              >
-                <FaDatabase />
-              </motion.div>
+              {/* Floating Stat Badge */}
+              <div className="absolute top-4 right-4 px-3.5 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-xs font-bold text-white flex items-center gap-2 shadow-lg">
+                <FaCheckCircle className="text-emerald-400 text-sm" /> 100% Practical Labs
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
+      {/* SECTION 2 – 5 FULL HD CSE EDUCATION DISCIPLINE SHOWCASE */}
+      <section className="py-20 px-4 md:px-8 lg:px-20 bg-[#001224]/50 border-y border-white/5 relative">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="text-xs font-bold uppercase tracking-widest text-cyan-400 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+              Comprehensive Curriculum
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 tracking-tight">
+              5 Pillars of Computer Science & Engineering
+            </h2>
+            <p className="text-slate-400 text-base mt-3">
+              Explore the core computer science disciplines designed to prepare you for top-tier software engineering and research roles.
+            </p>
+          </div>
+
+          {/* Interactive Discipline Selector Tabs */}
+          <div className="flex flex-wrap justify-center gap-2.5 mb-10">
+            {cseEducationShowcase.map((item, idx) => (
+              <button
+                key={item.id}
+                onClick={() => setSelectedShowcase(idx)}
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                  selectedShowcase === idx
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                    : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5"
+                }`}
+              >
+                <span>{item.badge}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Active Discipline Spotlight Feature (Full HD Image + Detailed Overview) */}
+          <motion.div 
+            key={selectedShowcase}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 lg:p-10 mb-16 shadow-2xl"
+          >
+            <div className="lg:col-span-7 rounded-2xl overflow-hidden aspect-video border border-white/10 shadow-lg relative group">
+              <img 
+                src={cseEducationShowcase[selectedShowcase].image} 
+                alt={cseEducationShowcase[selectedShowcase].title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute top-4 left-4 px-3 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 text-xs font-bold text-cyan-300">
+                Full HD CSE Resource
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 text-left space-y-4">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
+                {cseEducationShowcase[selectedShowcase].badge}
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white">
+                {cseEducationShowcase[selectedShowcase].title}
+              </h3>
+              <p className="text-sm font-semibold text-slate-300">
+                {cseEducationShowcase[selectedShowcase].subtitle}
+              </p>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                {cseEducationShowcase[selectedShowcase].description}
+              </p>
+              
+              <div className="pt-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">Key Core Topics</p>
+                <div className="flex flex-wrap gap-2">
+                  {cseEducationShowcase[selectedShowcase].tags.map((tag, tIdx) => (
+                    <span key={tIdx} className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <Link to="/explore-courses">
+                  <button className="inline-flex items-center gap-2 text-sm font-bold text-cyan-400 hover:text-cyan-300 transition-colors">
+                    View Related Courses <FaArrowRight className="text-xs" />
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 5-Image Grid Showcase */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+            {cseEducationShowcase.map((item, idx) => (
+              <div 
+                key={item.id}
+                onClick={() => setSelectedShowcase(idx)}
+                className={`rounded-2xl overflow-hidden border cursor-pointer transition-all duration-300 text-left bg-white/[0.02] flex flex-col ${
+                  selectedShowcase === idx
+                    ? "border-blue-500 ring-2 ring-blue-500/20"
+                    : "border-white/10 hover:border-white/20 hover:bg-white/[0.04]"
+                }`}
+              >
+                <div className="aspect-[16/10] w-full overflow-hidden relative">
+                  <img 
+                    src={item.image} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    loading="lazy"
+                  />
+                  <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded bg-black/75 text-white backdrop-blur-sm">
+                    {item.badge}
+                  </span>
+                </div>
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white line-clamp-1">{item.title}</h4>
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">{item.subtitle}</p>
+                  </div>
+                  <span className="text-[11px] font-semibold text-blue-400 mt-3 inline-block">
+                    Explore track &rarr;
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* SECTION 3 – WHY CHOOSE US */}
-      <section className="py-32 bg-[#001d3d]/10 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
+      <section className="py-24 bg-transparent relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 text-center relative z-10">
           <motion.h2 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-bold mb-24 tracking-tight"
+            className="text-3xl md:text-5xl font-bold mb-16 tracking-tight text-white"
           >
             Why Choose Us?
           </motion.h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, idx) => (
               <motion.div 
                 key={idx}
@@ -235,65 +334,68 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
                 viewport={{ once: true }}
-                className="p-12 bg-richblack-800/40 backdrop-blur-2xl border border-white/5 rounded-[3.5rem] hover:bg-richblack-800/60 transition-all duration-500 text-left group hover:border-blue-500/20"
+                className="p-8 bg-white/[0.02] border border-white/10 rounded-2xl hover:bg-white/[0.04] transition-all duration-300 text-left group hover:border-blue-500/30"
               >
-                <div className="w-20 h-20 bg-richblack-900 rounded-[2rem] flex items-center justify-center text-4xl mb-10 group-hover:scale-110 transition-transform shadow-2xl border border-white/5 text-blue-400">
+                <div className="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-105 transition-transform border border-white/10 text-blue-400">
                   {feature.icon}
                 </div>
-                <h4 className="text-2xl font-bold mb-4 group-hover:text-blue-200 transition-colors">{feature.title}</h4>
-                <p className="text-richblack-400 text-lg leading-relaxed font-medium">{feature.desc}</p>
+                <h4 className="text-xl font-bold mb-3 text-white group-hover:text-blue-300 transition-colors">{feature.title}</h4>
+                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* NEW SECTION – COURSES SECTION */}
+      {/* SECTION 4 – COURSES CATALOG SECTION */}
       <CoursesSection />
 
-      {/* SECTION 4 – BOTTOM IMAGE SECTION */}
+      {/* SECTION 5 – CAREER TRANSFORMATION (Video Removed, Full HD CSE Lab Visual Added) */}
       <section className="py-16 px-4 md:px-8 lg:px-20 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto relative group">
+        <div className="max-w-6xl mx-auto relative group">
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-blue-600 via-indigo-600 to-indigo-800 rounded-[3rem] overflow-hidden flex flex-col lg:flex-row items-center lg:items-stretch relative min-h-[380px] shadow-[0_30px_60px_rgba(37,99,235,0.15)] border border-white/10"
+            className="bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 rounded-3xl overflow-hidden flex flex-col lg:flex-row items-center relative border border-white/15 shadow-2xl"
           >
-            {/* Left Media (Video) */}
-            <div className="order-1 lg:order-1 w-full lg:w-5/12 h-[280px] lg:h-auto relative overflow-hidden">
-              <video 
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                poster={posterImg}
-                aria-label="Learning showcase"
-                className="absolute inset-0 w-full h-full object-cover object-center brightness-[1.05]"
-              >
-                <source src={bannerVideo} type="video/mp4" />
-              </video>
-              <div className="absolute inset-0 bg-blue-900/10"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-indigo-700/30"></div>
+            {/* Left Media (Full HD CSE Photo replacing former Video) */}
+            <div className="w-full lg:w-5/12 h-[280px] lg:h-[380px] relative overflow-hidden">
+              <img 
+                src={cseEducationShowcase[4].image}
+                alt="Student Engaged in Advanced Computing & AI Engineering"
+                className="w-full h-full object-cover object-center brightness-[0.95] group-hover:scale-105 transition-transform duration-700"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-blue-900/20"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-900/60 hidden lg:block"></div>
             </div>
             
             {/* Right Text Content */}
-            <div className="order-2 w-full lg:w-7/12 p-8 lg:p-14 text-white z-10 relative flex flex-col justify-center">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-blue-100 text-xs font-bold mb-6 tracking-widest uppercase self-start">
+            <div className="w-full lg:w-7/12 p-8 lg:p-12 text-white z-10 relative flex flex-col justify-center text-left">
+              <div className="inline-block px-3.5 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs font-bold mb-5 tracking-widest uppercase self-start">
                 Career Transformation
               </div>
-              <h2 className="text-3xl md:text-5xl font-black leading-tight tracking-tighter text-white">
-                Start Your IT <br /> Career Today
+              <h2 className="text-2xl sm:text-4xl font-extrabold leading-tight tracking-tight text-white">
+                Start Your Computer Science Career Today
               </h2>
-              <p className="mt-4 text-base font-medium text-blue-100 leading-relaxed max-w-sm opacity-90">
-                Don't just dream about a career in tech. Build it with practical skills and real projects.
+              <p className="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed max-w-lg">
+                Build practical programming mastery with industry-grade labs, rigorous code reviews, and production capstone projects.
               </p>
-              <button className="mt-8 group flex items-center gap-4 bg-white text-blue-900 px-8 py-3.5 rounded-full font-black text-lg hover:scale-105 transition-all shadow-xl hover:shadow-white/20 self-start">
-                Apply Now 
-                <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
-              </button>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link to="/signup">
+                  <button className="flex items-center gap-3 bg-white text-slate-900 px-7 py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-slate-100 transition-all shadow-lg active:scale-95">
+                    Apply Now 
+                    <FaArrowRight className="text-xs" />
+                  </button>
+                </Link>
+                <Link to="/explore-courses">
+                  <button className="px-7 py-3 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold text-sm sm:text-base transition-all">
+                    Browse All Tracks
+                  </button>
+                </Link>
+              </div>
             </div>
           </motion.div>
         </div>

@@ -6,7 +6,7 @@ import { getCategories, createCourse, addSection, addLesson, publishCourse } fro
 import { uploadThumbnail } from "../../../services/uploadService";
 import { useCourseDraftAutosave } from "../../../hooks/useCourseDraftAutosave";
 import { markDraftPublished } from "../../../services/courseDraftService";
-import { FaCloudUploadAlt, FaYoutube, FaVideo } from "react-icons/fa";
+import { FaCloudUploadAlt, FaYoutube, FaVideo, FaPlus, FaTrash, FaCheck } from "react-icons/fa";
 import VideoPreview from "../../common/VideoPreview";
 
 // Simple tag input component
@@ -21,11 +21,11 @@ function TagInput({ value, onChange }) {
   }
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-2">
+      <div className="flex flex-wrap gap-1.5 mb-2">
         {value.map(tag => (
-          <span key={tag} className="px-2 py-1 rounded bg-richblack-700 text-[11px] text-richblack-25 flex items-center gap-1 border border-richblack-600">
+          <span key={tag} className="px-2 py-0.5 rounded bg-surface-2 text-xs text-text flex items-center gap-1 border border-border">
             {tag}
-            <button type="button" onClick={() => onChange(value.filter(t => t !== tag))} className="text-richblack-400 hover:text-yellow-50">×</button>
+            <button type="button" onClick={() => onChange(value.filter(t => t !== tag))} className="text-muted hover:text-text font-bold">×</button>
           </span>
         ))}
       </div>
@@ -34,10 +34,10 @@ function TagInput({ value, onChange }) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(e); } }}
-          placeholder="Add tag"
-          className="flex-1 px-3 py-2 text-sm rounded-md bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25 transition-all duration-200"
+          placeholder="Add tag and press Enter"
+          className="flex-1 px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors"
         />
-        <button type="button" onClick={addTag} className="px-4 py-2 text-xs font-semibold rounded-md bg-yellow-50 text-richblack-900 hover:bg-yellow-100 transition-all duration-200">Add</button>
+        <button type="button" onClick={addTag} className="px-3 py-2 text-xs font-semibold rounded-md bg-surface-2 border border-border text-text hover:bg-surface transition-colors">Add</button>
       </div>
     </div>
   );
@@ -78,7 +78,7 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
     prerequisites: "",
     description: "",
     coverImage: null,
-    videoType: "youtube", // 'youtube' or 'upload'
+    videoType: "youtube",
     videoUrl: "",
     videoFile: null,
     sections: [
@@ -90,7 +90,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
     duration: "",
     outcomes: [],
     requirements: [],
-    // Preview video fields
     preview_video_url: "",
     preview_video_id: null,
     preview_thumbnail: null,
@@ -117,10 +116,7 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
     let isMounted = true;
     (async () => {
       setCategoriesLoading(true);
-
-      // Fetch categories
       const categoriesData = await getCategories();
-
       if (isMounted) {
         if (!categoriesData.error) setCourseCategories(categoriesData.data);
         setCategoriesLoading(false);
@@ -151,7 +147,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
     }));
   }
 
-  /** UI only — must not shadow `addSection` from courseService (used in handlePublish). */
   function appendBlankSection() {
     setData(d => ({ ...d, sections: [...d.sections, { id: Date.now(), title: "New Section", lectures: [] }] }));
   }
@@ -163,7 +158,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
     }));
   }
 
-  // Helper functions for outcomes and requirements
   function addOutcome() {
     setData(d => ({ ...d, outcomes: [...d.outcomes, ""] }));
   }
@@ -207,7 +201,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
       preview_thumbnail: thumbnail,
       video_provider: isValid ? "youtube" : null,
     }));
-    // Auto-update thumbnail preview if not custom overridden
     if (!isCustomThumbnail) {
       setThumbnailPreview(thumbnail || null);
     }
@@ -238,13 +231,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
 
   function handlePrev() { if (step > 0) setStep(step - 1); }
 
-  function getYouTubeEmbedUrl(url) {
-    if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
-  }
-
   async function handlePublish() {
     const v = validateCurrentStep();
     if (v) { setError(v); toast.error(v); return; }
@@ -256,7 +242,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
       if (!instructorId) throw new Error("Not authenticated");
       await forceSave();
 
-      // 1. Create course as draft first (content added next; then we publish).
       const { data: course, error: courseErr } = await createCourse(instructorId, {
         title:               data.title,
         slug:                generateSlug(data.title),
@@ -267,7 +252,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
         learning_outcomes:   Array.isArray(data.outcomes) ? data.outcomes : [],
         requirements:        Array.isArray(data.requirements) ? data.requirements : [],
         is_free:             data.isFree,
-        // Preview video fields
         preview_video_url:   data.preview_video_url,
         preview_video_id:    data.preview_video_id,
         preview_thumbnail:   data.preview_thumbnail,
@@ -284,7 +268,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
         throw new Error("No course returned from createCourse");
       }
 
-      // 2. Upload thumbnail if file provided, otherwise if auto-fetched YouTube URL is used, save it!
       if (data.coverImage) {
         toast.loading("Uploading thumbnail...", { id: toastId });
         const { url, error: upErr } = await uploadThumbnail(instructorId, course.id, data.coverImage);
@@ -299,7 +282,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
         await updateCourse(course.id, { thumbnail: thumbnailPreview });
       }
 
-      // 3. Save sections + lessons
       toast.loading("Building curriculum...", { id: toastId });
       for (let si = 0; si < data.sections.length; si++) {
         const sec = data.sections[si];
@@ -316,7 +298,6 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
         }
       }
 
-      // 4. Publish — "Publish Course" must set status in DB (was always left as draft before).
       toast.loading("Publishing your course...", { id: toastId });
       const { error: publishErr } = await publishCourse(course.id);
       if (publishErr) {
@@ -342,23 +323,35 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-10">
+    <div className="space-y-6 max-w-5xl mx-auto pb-10">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4 bg-richblack-800 p-6 rounded-xl border border-richblack-700 shadow-lg">
+      <div className="flex items-center justify-between flex-wrap gap-4 bg-surface p-6 rounded-xl border border-border">
         <div>
-          <h1 className="text-3xl font-bold text-richblack-5">Add New Course</h1>
-          <p className="text-sm text-richblack-300 mt-1">Fill in the details to create your course.</p>
-          <p className="text-xs mt-2 text-richblack-400">
+          <h1 className="text-2xl font-bold text-text">Add New Course</h1>
+          <p className="text-xs text-muted mt-1">Configure curriculum, metadata, and pricing.</p>
+          <p className="text-xs mt-1.5 text-muted">
             {isHydrating && "Loading draft..."}
             {!isHydrating && saveState === "saving" && "Saving draft..."}
-            {!isHydrating && saveState === "saved" && `Saved${lastSavedAt ? ` · ${new Date(lastSavedAt).toLocaleString()}` : ""}`}
-            {!isHydrating && saveState === "error" && (saveError || "Failed to save draft. Please try again.")}
+            {!isHydrating && saveState === "saved" && `Autosaved${lastSavedAt ? ` · ${new Date(lastSavedAt).toLocaleTimeString()}` : ""}`}
+            {!isHydrating && saveState === "error" && (saveError || "Failed to save draft.")}
           </p>
         </div>
-        <div className="flex gap-3">
-          {step > 0 && <button onClick={handlePrev} className="px-5 py-2.5 text-sm rounded-lg bg-richblack-700 hover:bg-richblack-600 text-richblack-25 transition-all duration-200">Back</button>}
-          {step < STEPS.length - 1 && <button onClick={handleNext} className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-yellow-50 text-richblack-900 hover:bg-yellow-100 transition-all duration-200 shadow-md">Next</button>}
-          {step === STEPS.length - 1 && <button disabled={saving} onClick={handlePublish} className="px-6 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-yellow-50 to-yellow-200 text-richblack-900 disabled:opacity-50 hover:scale-105 transition-all duration-200 shadow-lg">{saving ? "Publishing..." : "Publish Course"}</button>}
+        <div className="flex gap-2">
+          {step > 0 && (
+            <button onClick={handlePrev} className="px-4 py-2 text-xs rounded-md bg-surface-2 hover:bg-surface border border-border text-text font-medium transition-colors">
+              Back
+            </button>
+          )}
+          {step < STEPS.length - 1 && (
+            <button onClick={handleNext} className="px-4 py-2 text-xs font-semibold rounded-md bg-accent text-white hover:opacity-90 transition-opacity">
+              Next Step
+            </button>
+          )}
+          {step === STEPS.length - 1 && (
+            <button disabled={saving} onClick={handlePublish} className="px-5 py-2 text-xs font-semibold rounded-md bg-hot text-white hover:bg-[#e5482a] disabled:opacity-50 transition-colors">
+              {saving ? "Publishing..." : "Publish Course"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -366,101 +359,145 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
       <div className="flex justify-between items-center px-4 max-w-2xl mx-auto">
         {STEPS.map((s, i) => (
           <React.Fragment key={s}>
-            <div className="flex flex-col items-center gap-2 relative">
-              <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all duration-300 ${i <= step ? "bg-yellow-50 text-richblack-900 border-yellow-50" : "bg-richblack-800 text-richblack-400 border-richblack-700"}`}>
-                {i < step ? "✓" : i + 1}
+            <div className="flex flex-col items-center gap-1.5 relative">
+              <div className={`w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold border transition-colors ${
+                i < step
+                  ? "bg-success text-white border-success"
+                  : i === step
+                    ? "bg-hot text-white border-hot"
+                    : "bg-surface-2 text-muted border-border"
+              }`}>
+                {i < step ? <FaCheck className="text-[10px]" /> : i + 1}
               </div>
-              <span className={`text-xs font-medium ${i <= step ? "text-richblack-5" : "text-richblack-500"}`}>{s}</span>
+              <span className={`text-xs font-medium ${i <= step ? "text-text" : "text-muted"}`}>{s}</span>
             </div>
-            {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 mx-4 -mt-6 transition-all duration-300 ${i < step ? "bg-yellow-50" : "bg-richblack-700"}`} />}
+            {i < STEPS.length - 1 && (
+              <div className={`flex-1 h-0.5 mx-3 -mt-5 transition-colors ${i < step ? "bg-success" : "bg-border"}`} />
+            )}
           </React.Fragment>
         ))}
       </div>
 
-      {error && <div className="mx-auto max-w-3xl px-4 py-3 rounded-lg bg-rose-600/10 border border-rose-500/50 text-rose-500 text-sm font-medium animate-shake">{error}</div>}
+      {error && (
+        <div className="px-4 py-3 rounded-lg bg-danger/10 border border-danger/30 text-danger text-xs font-medium">
+          {error}
+        </div>
+      )}
 
       {/* Step Content */}
-      <div className="bg-richblack-800 p-8 rounded-2xl border border-richblack-700 shadow-xl">
+      <div className="bg-surface p-6 rounded-xl border border-border">
         {step === 0 && (
-          <div className="grid gap-8 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-richblack-5">Course Title <span className="text-pink-200">*</span></label>
-                <input value={data.title || ""} onChange={e => update('title', e.target.value)} placeholder="e.g. Full Stack MERN Development" className="w-full px-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 focus:ring-1 focus:ring-yellow-50 outline-none text-richblack-25 transition-all duration-200" />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-5 lg:col-span-2">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-text">Course Title <span className="text-danger">*</span></label>
+                <input
+                  value={data.title || ""}
+                  onChange={e => update('title', e.target.value)}
+                  placeholder="e.g. Distributed Systems & Algorithms"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors"
+                />
               </div>
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-richblack-5">Description <span className="text-pink-200">*</span></label>
-                <textarea rows={6} value={data.description || ""} onChange={e => update('description', e.target.value)} placeholder="Provide a detailed description of the course content..." className="w-full resize-none px-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 focus:ring-1 focus:ring-yellow-50 outline-none text-richblack-25 transition-all duration-200" />
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-text">Course Description <span className="text-danger">*</span></label>
+                <textarea
+                  rows={5}
+                  value={data.description || ""}
+                  onChange={e => update('description', e.target.value)}
+                  placeholder="Provide a thorough overview of course objectives, prerequisites, and concepts taught..."
+                  className="w-full resize-none px-3.5 py-2.5 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors"
+                />
               </div>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-richblack-5">Category <span className="text-pink-200">*</span></label>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-text">Category <span className="text-danger">*</span></label>
                   <select
                     value={data.category || ""}
                     onChange={e => update('category', e.target.value)}
-                    className="w-full px-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text cursor-pointer"
                     disabled={categoriesLoading}
                   >
                     <option value="">
-                      {categoriesLoading
-                        ? "Loading categories..."
-                        : courseCategories.length === 0
-                          ? "No categories found"
-                          : "Select Category"}
+                      {categoriesLoading ? "Loading categories..." : "Select Category"}
                     </option>
                     {courseCategories.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-richblack-5">Level <span className="text-pink-200">*</span></label>
-                  <select value={data.level} onChange={e => update('level', e.target.value)} className="w-full px-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25 cursor-pointer">
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-text">Level <span className="text-danger">*</span></label>
+                  <select
+                    value={data.level}
+                    onChange={e => update('level', e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text cursor-pointer"
+                  >
                     <option>Beginner</option>
                     <option>Intermediate</option>
                     <option>Advanced</option>
                   </select>
                 </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <label className="block text-sm font-semibold text-richblack-5">Duration</label>
-                  <input value={data.duration || ""} onChange={e => update('duration', e.target.value)} placeholder="e.g. 3 Months" className="w-full px-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25" />
+
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="block text-xs font-semibold text-text">Estimated Duration</label>
+                  <input
+                    value={data.duration || ""}
+                    onChange={e => update('duration', e.target.value)}
+                    placeholder="e.g. 12 Weeks (40 Hours)"
+                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text"
+                  />
                 </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <label className="block text-sm font-semibold text-richblack-5">Tags</label>
+
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="block text-xs font-semibold text-text">Tags</label>
                   <TagInput value={data.tags} onChange={v => update('tags', v)} />
                 </div>
               </div>
 
               {/* Outcomes & Requirements */}
-              <div className="grid gap-8 md:grid-cols-2">
-                <div className="space-y-3">
+              <div className="grid gap-6 md:grid-cols-2 pt-2">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-richblack-5">What You'll Learn</label>
-                    <button type="button" onClick={addOutcome} className="text-[11px] font-bold text-yellow-50 hover:text-yellow-100 transition-all flex items-center gap-1">
-                      <span className="text-lg">+</span> Add
+                    <label className="block text-xs font-semibold text-text">What You'll Learn</label>
+                    <button type="button" onClick={addOutcome} className="text-xs font-medium text-accent hover:underline flex items-center gap-1">
+                      <FaPlus className="text-[10px]" /> Add
                     </button>
                   </div>
                   <div className="space-y-2">
                     {data.outcomes.map((outcome, idx) => (
                       <div key={idx} className="flex gap-2">
-                        <input value={outcome || ""} onChange={e => updateOutcome(idx, e.target.value)} placeholder="e.g. Build a full-stack application" className="flex-1 px-3 py-2 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25" />
-                        <button type="button" onClick={() => removeOutcome(idx)} className="px-2 py-2 text-sm rounded-lg bg-rose-600/20 text-rose-500 hover:bg-rose-600/30 transition-all">✕</button>
+                        <input
+                          value={outcome || ""}
+                          onChange={e => updateOutcome(idx, e.target.value)}
+                          placeholder="Outcome concept..."
+                          className="flex-1 px-3 py-1.5 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text"
+                        />
+                        <button type="button" onClick={() => removeOutcome(idx)} className="px-2 text-muted hover:text-danger text-xs">✕</button>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="space-y-3">
+
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-richblack-5">Requirements</label>
-                    <button type="button" onClick={addRequirement} className="text-[11px] font-bold text-yellow-50 hover:text-yellow-100 transition-all flex items-center gap-1">
-                      <span className="text-lg">+</span> Add
+                    <label className="block text-xs font-semibold text-text">Requirements</label>
+                    <button type="button" onClick={addRequirement} className="text-xs font-medium text-accent hover:underline flex items-center gap-1">
+                      <FaPlus className="text-[10px]" /> Add
                     </button>
                   </div>
                   <div className="space-y-2">
                     {data.requirements.map((req, idx) => (
                       <div key={idx} className="flex gap-2">
-                        <input value={req || ""} onChange={e => updateRequirement(idx, e.target.value)} placeholder="e.g. Basic knowledge of HTML/CSS" className="flex-1 px-3 py-2 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25" />
-                        <button type="button" onClick={() => removeRequirement(idx)} className="px-2 py-2 text-sm rounded-lg bg-rose-600/20 text-rose-500 hover:bg-rose-600/30 transition-all">✕</button>
+                        <input
+                          value={req || ""}
+                          onChange={e => updateRequirement(idx, e.target.value)}
+                          placeholder="Prerequisite..."
+                          className="flex-1 px-3 py-1.5 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text"
+                        />
+                        <button type="button" onClick={() => removeRequirement(idx)} className="px-2 text-muted hover:text-danger text-xs">✕</button>
                       </div>
                     ))}
                   </div>
@@ -468,122 +505,163 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
               </div>
             </div>
 
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-semibold text-richblack-5">Video Source <span className="text-pink-200">*</span></label>
-                  <div className="flex bg-richblack-900 p-1 rounded-lg border border-richblack-700">
-                    <button onClick={() => update('videoType', 'youtube')} className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${data.videoType === 'youtube' ? 'bg-yellow-50 text-richblack-900 shadow-sm' : 'text-richblack-400 hover:text-richblack-25'}`}>YOUTUBE</button>
-                    <button onClick={() => update('videoType', 'upload')} className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${data.videoType === 'upload' ? 'bg-yellow-50 text-richblack-900 shadow-sm' : 'text-richblack-400 hover:text-richblack-25'}`}>UPLOAD</button>
+            {/* Right: Media & Preview */}
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-text">Intro Preview Video</label>
+                <div className="flex gap-2 bg-surface-2 p-1 rounded-md border border-border">
+                  <button
+                    type="button"
+                    onClick={() => update('videoType', 'youtube')}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded flex items-center justify-center gap-1.5 transition-colors ${
+                      data.videoType === 'youtube' ? 'bg-surface text-text shadow-sm' : 'text-muted hover:text-text'
+                    }`}
+                  >
+                    <FaYoutube className="text-danger" /> YouTube
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => update('videoType', 'upload')}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded flex items-center justify-center gap-1.5 transition-colors ${
+                      data.videoType === 'upload' ? 'bg-surface text-text shadow-sm' : 'text-muted hover:text-text'
+                    }`}
+                  >
+                    <FaVideo className="text-muted" /> MP4 Upload
+                  </button>
+                </div>
+              </div>
+
+              {data.videoType === 'youtube' ? (
+                <div className="space-y-3">
+                  <VideoPreview
+                    url={data.preview_video_url}
+                    onChange={(url) => update('preview_video_url', url)}
+                    onVideoDataChange={handleVideoDataChange}
+                  />
+                  {thumbnailPreview && (
+                    <div className="space-y-1">
+                      <p className="text-[11px] text-muted font-medium">Auto-fetched Thumbnail</p>
+                      <div className="aspect-video rounded-md overflow-hidden border border-border bg-surface-2">
+                        <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <label className="block text-xs font-semibold text-text">Course Thumbnail <span className="text-danger">*</span></label>
+                    <div className="aspect-video rounded-md border border-dashed border-border bg-surface-2 flex flex-col items-center justify-center relative overflow-hidden">
+                      {thumbnailPreview ? (
+                        <img src={thumbnailPreview} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 text-muted">
+                          <FaCloudUploadAlt className="text-2xl" />
+                          <p className="text-[11px]">Upload cover image</p>
+                        </div>
+                      )}
+                      <input type="file" accept="image/*" onChange={e => update('coverImage', e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-xs font-semibold text-text">Video File <span className="text-danger">*</span></label>
+                    <div className="aspect-video rounded-md border border-dashed border-border bg-surface-2 flex flex-col items-center justify-center relative overflow-hidden">
+                      {videoPreview ? (
+                        <div className="text-center p-3">
+                          <FaVideo className="text-xl text-accent mx-auto mb-1" />
+                          <p className="text-xs text-text font-medium truncate max-w-[180px]">{data.videoFile?.name}</p>
+                          <p className="text-[10px] text-muted">{(data.videoFile?.size / (1024 * 1024)).toFixed(2)} MB</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 text-muted">
+                          <FaCloudUploadAlt className="text-2xl" />
+                          <p className="text-[11px]">Upload MP4 preview</p>
+                        </div>
+                      )}
+                      <input type="file" accept="video/mp4" onChange={e => update('videoFile', e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                    </div>
                   </div>
                 </div>
-
-                {data.videoType === 'youtube' ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 bg-richblack-900 border border-richblack-700 rounded-lg px-3 py-2.5">
-                      <FaYoutube className="text-rose-600 text-xl" />
-                      <input 
-                        value={data.preview_video_url || ""} 
-                        onChange={e => update('preview_video_url', e.target.value)} 
-                        placeholder="Paste YouTube preview link here" 
-                        className="bg-transparent outline-none text-sm text-richblack-25 w-full" 
-                      />
-                    </div>
-                    <VideoPreview 
-                      url={data.preview_video_url}
-                      onVideoChange={handleVideoDataChange}
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-8">
-                    <div className="space-y-4">
-                      <label className="block text-sm font-semibold text-richblack-5">Course Thumbnail <span className="text-pink-200">*</span></label>
-                      <div className="relative group">
-                        <div className={`aspect-video rounded-xl border-2 border-dashed border-richblack-600 bg-richblack-900 flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${!thumbnailPreview ? "hover:border-yellow-50" : ""}`}>
-                          {thumbnailPreview ? (
-                            <img src={thumbnailPreview} alt="Preview" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="flex flex-col items-center gap-2 text-richblack-400">
-                              <FaCloudUploadAlt className="text-4xl" />
-                              <p className="text-xs">Click to upload image</p>
-                            </div>
-                          )}
-                          <input type="file" accept="image/*" onChange={e => update('coverImage', e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
-                        </div>
-                        {thumbnailPreview && (
-                          <button
-                            onClick={() => {
-                              setThumbnailPreview(null);
-                              update('coverImage', null);
-                            }}
-                            className="absolute top-2 right-2 bg-pink-200 text-richblack-900 p-1.5 rounded-full text-xs font-bold hover:scale-110 transition-all"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="relative group">
-                      <div className={`aspect-video rounded-xl border-2 border-dashed border-richblack-600 bg-richblack-900 flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${!videoPreview ? "hover:border-yellow-50" : ""}`}>
-                        {videoPreview ? (
-                          <div className="flex flex-col items-center gap-2 p-4 text-center">
-                            <FaVideo className="text-3xl text-yellow-50" />
-                            <p className="text-xs text-richblack-25 font-medium truncate max-w-[200px]">{data.videoFile?.name}</p>
-                            <p className="text-[10px] text-richblack-400">File size: {(data.videoFile?.size / (1024 * 1024)).toFixed(2)} MB</p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2 text-richblack-400">
-                            <FaCloudUploadAlt className="text-4xl" />
-                            <p className="text-xs">Click to upload MP4 video</p>
-                          </div>
-                        )}
-                        <input type="file" accept="video/mp4" onChange={e => update('videoFile', e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
-                      </div>
-                      {videoPreview && (
-                        <button onClick={() => { setVideoPreview(null); update('videoFile', null) }} className="absolute top-2 right-2 bg-pink-200 text-richblack-900 p-1.5 rounded-full text-xs font-bold hover:scale-110 transition-all">✕</button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         )}
 
         {step === 1 && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between bg-richblack-900/50 p-4 rounded-xl border border-richblack-700">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
               <div>
-                <h2 className="text-xl font-bold text-richblack-5">Curriculum Builder</h2>
-                <p className="text-xs text-richblack-400 mt-0.5">Structure your course into sections and lectures.</p>
+                <h2 className="text-sm font-semibold text-text">Curriculum Modules</h2>
+                <p className="text-xs text-muted">Group lessons into sequential learning sections.</p>
               </div>
-              <button onClick={appendBlankSection} className="px-4 py-2 text-xs rounded-lg bg-yellow-50 text-richblack-900 font-bold hover:scale-105 transition-all shadow-md">+ Add Section</button>
+              <button
+                onClick={appendBlankSection}
+                className="px-3 py-1.5 text-xs rounded-md bg-surface-2 border border-border text-text font-medium hover:bg-surface transition-colors"
+              >
+                + Add Section
+              </button>
             </div>
-            <div className="space-y-6">
+
+            <div className="space-y-4">
               {data.sections.map((s, idx) => (
-                <div key={s.id} className="rounded-xl border border-richblack-700 bg-richblack-900/30 p-6 space-y-4 hover:border-richblack-600 transition-all">
-                  <div className="flex gap-4">
-                    <div className="bg-richblack-700 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-richblack-5 shrink-0">{idx + 1}</div>
-                    <input value={s.title || ""} onChange={e => updateSection(idx, { title: e.target.value })} className="w-full bg-transparent border-b border-richblack-700 focus:border-yellow-50 outline-none text-richblack-5 font-semibold py-1 transition-all" placeholder="Section Title" />
+                <div key={s.id} className="rounded-lg border border-border bg-surface-2 p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="w-6 h-6 rounded bg-surface border border-border flex items-center justify-center text-xs font-semibold text-text shrink-0">
+                      {idx + 1}
+                    </span>
+                    <input
+                      value={s.title || ""}
+                      onChange={e => updateSection(idx, { title: e.target.value })}
+                      className="flex-1 bg-surface border border-border rounded px-3 py-1.5 text-xs text-text font-medium outline-none focus:border-accent"
+                      placeholder="Section Title (e.g. Fundamentals of Memory Management)"
+                    />
                   </div>
-                  <div className="pl-12 space-y-3">
+
+                  <div className="pl-9 space-y-2">
                     {s.lectures.map((l, lIdx) => (
-                      <div key={l.id} className="flex items-center gap-3 rounded-lg bg-richblack-900 border border-richblack-700 px-4 py-3 group hover:border-richblack-500 transition-all">
-                        <div className="text-richblack-500 text-[10px] font-bold">{lIdx + 1}</div>
-                        <input value={l.title || ""} onChange={e => {
-                          setData(d => ({ ...d, sections: d.sections.map((sec, i) => i === idx ? { ...sec, lectures: sec.lectures.map(ll => ll.id === l.id ? { ...ll, title: e.target.value } : ll) } : sec) }));
-                        }} className="flex-1 bg-transparent outline-none text-sm text-richblack-25" placeholder="Lecture Title" />
-                        <div className="flex items-center gap-2">
-                          <input type="number" value={String(l.duration ?? "")} onChange={e => {
-                            const val = e.target.value === "" ? "" : Number(e.target.value);
-                            setData(d => ({ ...d, sections: d.sections.map((sec, i) => i === idx ? { ...sec, lectures: sec.lectures.map(ll => ll.id === l.id ? { ...ll, duration: val } : ll) } : sec) }));
-                          }} className="w-12 bg-richblack-800 rounded px-1 py-0.5 text-center text-[10px] text-richblack-25 outline-none" placeholder="Min" />
-                          <span className="text-[10px] text-richblack-500 font-bold uppercase">MIN</span>
+                      <div key={l.id} className="flex items-center gap-2 bg-surface border border-border rounded px-3 py-2">
+                        <span className="text-[10px] text-muted font-mono">{lIdx + 1}.</span>
+                        <input
+                          value={l.title || ""}
+                          onChange={e => {
+                            setData(d => ({
+                              ...d,
+                              sections: d.sections.map((sec, i) => i === idx ? {
+                                ...sec,
+                                lectures: sec.lectures.map(ll => ll.id === l.id ? { ...ll, title: e.target.value } : ll)
+                              } : sec)
+                            }));
+                          }}
+                          className="flex-1 bg-transparent outline-none text-xs text-text"
+                          placeholder="Lecture title"
+                        />
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="number"
+                            value={String(l.duration ?? "")}
+                            onChange={e => {
+                              const val = e.target.value === "" ? "" : Number(e.target.value);
+                              setData(d => ({
+                                ...d,
+                                sections: d.sections.map((sec, i) => i === idx ? {
+                                  ...sec,
+                                  lectures: sec.lectures.map(ll => ll.id === l.id ? { ...ll, duration: val } : ll)
+                                } : sec)
+                              }));
+                            }}
+                            className="w-12 bg-surface-2 border border-border rounded px-1.5 py-0.5 text-center text-xs text-text outline-none"
+                            placeholder="Min"
+                          />
+                          <span className="text-[10px] text-muted font-medium">min</span>
                         </div>
                       </div>
                     ))}
-                    <button onClick={() => addLecture(idx)} className="text-[11px] font-bold text-yellow-50 hover:text-yellow-100 transition-all flex items-center gap-1 mt-2">
-                      <span className="text-lg">+</span> Add Lecture
+                    <button
+                      onClick={() => addLecture(idx)}
+                      className="text-xs text-accent font-medium hover:underline flex items-center gap-1 pt-1"
+                    >
+                      <FaPlus className="text-[9px]" /> Add Lecture
                     </button>
                   </div>
                 </div>
@@ -593,98 +671,104 @@ export default function AddCourse({ setActiveSection, initialStep = 0 }) {
         )}
 
         {step === 2 && (
-          <div className="max-w-3xl mx-auto py-4">
-            <div className="grid gap-8 md:grid-cols-2">
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <label className="block text-sm font-semibold text-richblack-5">Course Pricing</label>
-                  <div className="flex items-center gap-6 p-4 rounded-xl bg-richblack-900 border border-richblack-700">
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <input type="radio" checked={data.isFree} onChange={() => update('isFree', true)} className="w-4 h-4 accent-yellow-50 cursor-pointer" />
-                      <span className={`text-sm font-medium transition-all ${data.isFree ? 'text-yellow-50' : 'text-richblack-400 group-hover:text-richblack-200'}`}>Free Course</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <input type="radio" checked={!data.isFree} onChange={() => update('isFree', false)} className="w-4 h-4 accent-yellow-50 cursor-pointer" />
-                      <span className={`text-sm font-medium transition-all ${!data.isFree ? 'text-yellow-50' : 'text-richblack-400 group-hover:text-richblack-200'}`}>Paid Course</span>
-                    </label>
-                  </div>
-                </div>
-
-                {!data.isFree && (
-                  <div className="space-y-3 animate-fadeIn">
-                    <label className="block text-sm font-semibold text-richblack-5">Price (₹) <span className="text-pink-200">*</span></label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-richblack-400 font-bold">₹</span>
-                      <input type="number" value={data.price ?? ""} onChange={e => update('price', e.target.value)} placeholder="e.g. 1999" className="w-full pl-10 pr-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25 font-bold" />
-                    </div>
-                  </div>
-                )}
+          <div className="max-w-2xl mx-auto py-2 space-y-6">
+            <div className="space-y-3">
+              <label className="block text-xs font-semibold text-text">Course Pricing Structure</label>
+              <div className="flex items-center gap-6 p-4 rounded-lg bg-surface-2 border border-border">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-text">
+                  <input
+                    type="radio"
+                    checked={data.isFree}
+                    onChange={() => update('isFree', true)}
+                    className="accent-hot cursor-pointer"
+                  />
+                  <span>Free Course</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-text">
+                  <input
+                    type="radio"
+                    checked={!data.isFree}
+                    onChange={() => update('isFree', false)}
+                    className="accent-hot cursor-pointer"
+                  />
+                  <span>Paid Course</span>
+                </label>
               </div>
+            </div>
 
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <label className="block text-sm font-semibold text-richblack-5">Visibility</label>
-                  <select value={data.visibility} onChange={e => update('visibility', e.target.value)} className="w-full px-4 py-3 text-sm rounded-lg bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-25 cursor-pointer">
-                    <option value="private">Private (Draft)</option>
-                    <option value="public">Public (Visible to All)</option>
-                  </select>
-                </div>
-                <div className="p-4 rounded-xl bg-yellow-50/5 border border-yellow-50/20 text-xs text-yellow-50/70 leading-relaxed">
-                  <p className="font-bold mb-2 flex items-center gap-2 text-yellow-50">ℹ️ PRICING TIP</p>
-                  <p>Keep your price competitive based on content depth and category. Free courses often get 5x more enrollments!</p>
+            {!data.isFree && (
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-text">Price in INR (₹) <span className="text-danger">*</span></label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted font-semibold text-xs">₹</span>
+                  <input
+                    type="number"
+                    value={data.price ?? ""}
+                    onChange={e => update('price', e.target.value)}
+                    placeholder="e.g. 1499"
+                    className="w-full pl-8 pr-4 py-2.5 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text font-medium"
+                  />
                 </div>
               </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-text">Publish Visibility</label>
+              <select
+                value={data.visibility}
+                onChange={e => update('visibility', e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text cursor-pointer"
+              >
+                <option value="private">Private (Only you can access)</option>
+                <option value="public">Public (Visible to students in catalog)</option>
+              </select>
             </div>
           </div>
         )}
 
         {step === 3 && (
-          <div className="space-y-8 max-w-3xl mx-auto">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-8 bg-yellow-50 rounded-full" />
-              <h2 className="text-2xl font-bold text-richblack-5">Review Details</h2>
+          <div className="space-y-6 max-w-3xl mx-auto">
+            <div className="pb-3 border-b border-border">
+              <h2 className="text-base font-bold text-text">Review Course Details</h2>
+              <p className="text-xs text-muted">Verify before publishing to the platform catalog.</p>
             </div>
 
-            <div className="grid gap-6">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="aspect-video rounded-xl overflow-hidden border border-richblack-700 shadow-2xl">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="aspect-video rounded-lg overflow-hidden border border-border bg-surface-2">
+                {thumbnailPreview ? (
                   <img src={thumbnailPreview} alt="Course Thumbnail" className="w-full h-full object-cover" />
-                </div>
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-richblack-5 line-clamp-2">{data.title}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-0.5 rounded bg-yellow-50/10 text-yellow-50 text-[10px] font-bold border border-yellow-50/20 uppercase">{data.level}</span>
-                    <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-200 text-[10px] font-bold border border-blue-500/20 uppercase">{courseCategories.find(c => c.id === data.category)?.name || 'Category'}</span>
-                  </div>
-                  <p className="text-2xl font-black text-richblack-5">{data.isFree ? "FREE" : `₹${data.price}`}</p>
-                  <p className="text-xs text-richblack-400 font-medium">Visibility: <span className={data.visibility === 'public' ? 'text-emerald-400' : 'text-yellow-400'}>{data.visibility.toUpperCase()}</span></p>
-                </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted text-xs">No thumbnail</div>
+                )}
               </div>
-
-              <div className="p-6 rounded-xl bg-richblack-900/50 border border-richblack-700 space-y-4">
-                <h4 className="text-sm font-bold text-richblack-5 uppercase tracking-wider">Course Summary</h4>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="text-center p-3 rounded-lg bg-richblack-800">
-                    <p className="text-xs text-richblack-500 font-bold uppercase mb-1">Sections</p>
-                    <p className="text-lg font-black text-richblack-5">{data.sections.length}</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-richblack-800">
-                    <p className="text-xs text-richblack-500 font-bold uppercase mb-1">Lectures</p>
-                    <p className="text-lg font-black text-richblack-5">{data.sections.reduce((a, s) => a + s.lectures.length, 0)}</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-richblack-800">
-                    <p className="text-xs text-richblack-500 font-bold uppercase mb-1">Duration</p>
-                    <p className="text-lg font-black text-richblack-5 truncate px-1">{data.duration || '—'}</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-richblack-800">
-                    <p className="text-xs text-richblack-500 font-bold uppercase mb-1">Video</p>
-                    <p className="text-lg font-black text-richblack-5 uppercase">{data.videoType}</p>
-                  </div>
+              <div className="space-y-2.5">
+                <h3 className="text-base font-bold text-text line-clamp-2">{data.title}</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="px-2 py-0.5 rounded bg-surface-2 text-muted text-[10px] font-medium border border-border uppercase">{data.level}</span>
+                  <span className="px-2 py-0.5 rounded bg-surface-2 text-muted text-[10px] font-medium border border-border uppercase">
+                    {courseCategories.find(c => c.id === data.category)?.name || 'General'}
+                  </span>
                 </div>
+                <p className="text-xl font-bold text-text">{data.isFree ? "Free" : `₹${data.price}`}</p>
+                <p className="text-xs text-muted">Visibility: <span className="font-medium text-text uppercase">{data.visibility}</span></p>
               </div>
+            </div>
 
-              <div className="p-4 rounded-lg border border-yellow-50/30 bg-yellow-50/5 text-center">
-                <p className="text-sm text-richblack-200">Ready to share your knowledge with the world? Click publish to launch your course!</p>
+            <div className="p-4 rounded-lg bg-surface-2 border border-border">
+              <h4 className="text-xs font-semibold text-text uppercase tracking-wider mb-3">Curriculum Structure</h4>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="p-2.5 rounded bg-surface border border-border">
+                  <p className="text-[10px] text-muted uppercase font-medium">Sections</p>
+                  <p className="text-sm font-bold text-text">{data.sections.length}</p>
+                </div>
+                <div className="p-2.5 rounded bg-surface border border-border">
+                  <p className="text-[10px] text-muted uppercase font-medium">Lectures</p>
+                  <p className="text-sm font-bold text-text">{data.sections.reduce((a, s) => a + s.lectures.length, 0)}</p>
+                </div>
+                <div className="p-2.5 rounded bg-surface border border-border">
+                  <p className="text-[10px] text-muted uppercase font-medium">Video Source</p>
+                  <p className="text-sm font-bold text-text uppercase">{data.videoType}</p>
+                </div>
               </div>
             </div>
           </div>
