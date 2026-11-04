@@ -3,16 +3,14 @@ import { motion } from "framer-motion";
 import { FaEye, FaEdit, FaTrash, FaUsers, FaStar, FaPlay } from "react-icons/fa";
 import { getYoutubeThumbnail } from "../../../utils/youtubeUtils";
 
-const STATUS = {
-  draft:     "bg-slate-500/10  text-slate-400  border border-slate-500/20",
-  published: "bg-emerald-500/10 text-emerald-300 border border-emerald-500/40",
-  pending:   "bg-yellow-500/10  text-yellow-300  border border-yellow-500/40",
-  rejected:  "bg-red-500/10  text-red-300  border border-red-500/40",
+const STATUS_BADGE = {
+  draft:     "bg-surface-2 text-muted border-border",
+  published: "bg-success/10 text-success border-success/30",
+  pending:   "bg-warning/10 text-warning border-warning/30",
+  rejected:  "bg-danger/10 text-danger border-danger/30",
 };
 
 const CourseRow = React.forwardRef(({ course, onView, onEdit, onDelete }, ref) => {
-  // Resolve thumbnail using correct DB column names
-  // Priority: DB pre-computed > YouTube generated > uploaded > null
   const dbThumbnail = course.final_thumbnail_url || course.youtube_thumbnail_url || null;
   const youtubeUrl =
     course.preview_video_url ||
@@ -32,90 +30,96 @@ const CourseRow = React.forwardRef(({ course, onView, onEdit, onDelete }, ref) =
     e.target.style.display = "none";
   }
 
+  const statusKey = (course.status || "draft").toLowerCase();
+
   return (
     <motion.tr
       ref={ref}
       layout
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      className="hover:bg-richblack-700/20 transition-all group border-b border-richblack-700/40 last:border-0"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="hover:bg-surface-2/60 transition-colors border-b border-border last:border-0"
     >
       {/* Course Info */}
-      <td className="py-5 px-6">
-        <div className="flex items-center gap-4">
-          <div className="w-20 aspect-video rounded-lg overflow-hidden bg-richblack-900 border border-richblack-700 shrink-0 flex items-center justify-center">
+      <td className="py-4 px-5">
+        <div className="flex items-center gap-3.5">
+          <div className="w-16 aspect-video rounded-md overflow-hidden bg-surface-2 border border-border shrink-0 flex items-center justify-center">
             {resolvedThumbnail ? (
               <img
                 src={resolvedThumbnail}
                 alt={course.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                className="w-full h-full object-cover"
                 onError={handleImgError}
                 loading="lazy"
               />
             ) : (
-              <FaPlay className="text-richblack-600 text-lg" />
+              <FaPlay className="text-muted text-xs" />
             )}
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-richblack-5 line-clamp-1 text-sm group-hover:text-yellow-50 transition-colors">{course.title}</p>
-            <p className="text-[10px] text-richblack-500 mt-0.5 uppercase font-bold tracking-wider">{course.level}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                <FaUsers className="text-blue-400" /> {course.studentsEnrolled?.length ?? 0}
+            <p className="font-semibold text-text truncate text-sm hover:text-accent transition-colors">
+              {course.title}
+            </p>
+            <div className="flex items-center gap-3 mt-1 text-xs text-muted">
+              {course.level && <span className="uppercase text-[10px] tracking-wider font-medium">{course.level}</span>}
+              <span className="flex items-center gap-1">
+                <FaUsers className="text-muted text-[10px]" /> {course.studentsEnrolled?.length ?? 0}
               </span>
-              <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                <FaStar className="text-yellow-400" /> {course.rating ?? "—"}
-              </span>
+              {course.rating && (
+                <span className="flex items-center gap-1">
+                  <FaStar className="text-warning text-[10px]" /> {course.rating}
+                </span>
+              )}
             </div>
           </div>
         </div>
       </td>
 
       {/* Category */}
-      <td className="py-5 px-6">
-        <span className="text-xs font-medium text-richblack-300">
+      <td className="py-4 px-5">
+        <span className="text-xs text-muted">
           {course.category?.name ?? course.category ?? "—"}
         </span>
       </td>
 
       {/* Status */}
-      <td className="py-5 px-6">
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black ${STATUS[course.status] ?? STATUS.draft}`}>
-          {course.status?.toUpperCase()}
+      <td className="py-4 px-5">
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${STATUS_BADGE[statusKey] ?? STATUS_BADGE.draft}`}>
+          {course.status ? course.status.charAt(0).toUpperCase() + course.status.slice(1) : "Draft"}
         </span>
       </td>
 
       {/* Price */}
-      <td className="py-5 px-6">
-        <p className="font-bold text-richblack-50 text-sm">
-          {Number(course.price) > 0 ? `₹${course.price}` : <span className="text-emerald-400">FREE</span>}
+      <td className="py-4 px-5">
+        <p className="font-semibold text-text text-sm">
+          {Number(course.price) > 0 ? `₹${course.price}` : <span className="text-success font-medium">Free</span>}
         </p>
       </td>
 
       {/* Actions */}
-      <td className="py-5 px-6">
-        <div className="flex items-center justify-center gap-2">
+      <td className="py-4 px-5 text-right">
+        <div className="flex items-center justify-end gap-1.5">
           <button
             onClick={() => onView(course)}
-            title="View Details"
-            className="p-2.5 rounded-xl bg-richblack-700 text-blue-300 hover:bg-blue-500 hover:text-white transition-all shadow-md hover:scale-110 active:scale-95"
+            title="Preview Course"
+            className="p-1.5 rounded border border-border text-muted hover:text-text hover:bg-surface-2 transition-colors"
           >
-            <FaEye className="text-sm" />
+            <FaEye className="text-xs" />
           </button>
           <button
             onClick={() => onEdit(course)}
             title="Edit Course"
-            className="p-2.5 rounded-xl bg-richblack-700 text-yellow-50 hover:bg-yellow-50 hover:text-richblack-900 transition-all shadow-md hover:scale-110 active:scale-95"
+            className="p-1.5 rounded border border-border text-muted hover:text-text hover:bg-surface-2 transition-colors"
           >
-            <FaEdit className="text-sm" />
+            <FaEdit className="text-xs" />
           </button>
           <button
             onClick={() => onDelete(course)}
             title="Delete Course"
-            className="p-2.5 rounded-xl bg-richblack-700 text-pink-300 hover:bg-red-500 hover:text-white transition-all shadow-md hover:scale-110 active:scale-95"
+            className="p-1.5 rounded border border-border text-muted hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-colors"
           >
-            <FaTrash className="text-sm" />
+            <FaTrash className="text-xs" />
           </button>
         </div>
       </td>
@@ -126,4 +130,3 @@ const CourseRow = React.forwardRef(({ course, onView, onEdit, onDelete }, ref) =
 CourseRow.displayName = "CourseRow";
 
 export default CourseRow;
-

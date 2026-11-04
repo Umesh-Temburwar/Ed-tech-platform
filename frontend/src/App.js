@@ -198,7 +198,7 @@ function App() {
   return (
     <ThemeProvider>
       <NotificationProvider>
-        <div className="w-screen min-h-screen bg-richblack-900 flex flex-col font-inter relative transition-colors duration-300 dark:bg-richblack-900 bg-grid-pattern bg-radial-glow overflow-x-hidden">
+        <div className="w-full min-h-screen bg-canvas text-text flex flex-col font-inter relative transition-colors duration-200">
           {showNavbar && <Navbar />}
 
           <div className="content-wrapper relative z-0">
@@ -223,6 +223,9 @@ function App() {
                       <Route path="students" element={<Students />} />
                       <Route path="explore-courses" element={<ExploreCourses />} />
                       <Route path="course-catalog" element={<ExploreCourses />} />
+                      <Route path="explore" element={<ExploreCourses />} />
+                      <Route path="courses" element={<ExploreCourses />} />
+                      <Route path="all-courses" element={<ExploreCourses />} />
 
                       <Route path="course-purchase" element={<CoursePurchase />} />
 

@@ -206,223 +206,184 @@ export default function AdminDashboard() {
       title: "Total Students",
       value: stats.students.toLocaleString(),
       icon: GraduationCap,
-      color: "text-cyan-400",
-      bg: "bg-cyan-500/10",
-      border: "border-cyan-500/20",
+      color: "text-accent",
     },
     {
       title: "Total Instructors",
       value: stats.instructors.toLocaleString(),
       icon: Users,
-      color: "text-violet-400",
-      bg: "bg-violet-500/10",
-      border: "border-violet-500/20",
+      color: "text-accent",
     },
     {
       title: "Active Courses",
       value: stats.courses.toLocaleString(),
       icon: BookOpen,
-      color: "text-amber-400",
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/20",
+      color: "text-warning",
     },
     {
       title: "Total Revenue",
       value: formatCurrency(stats.revenue),
       icon: DollarSign,
-      color: "text-emerald-400",
-      bg: "bg-emerald-500/10",
-      border: "border-emerald-500/20",
+      color: "text-success",
     },
   ];
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-          <Activity className="w-8 h-8 text-red-400" />
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <div className="w-12 h-12 rounded-xl bg-danger/10 border border-danger/20 flex items-center justify-center mb-3 text-danger">
+          <Activity className="w-6 h-6" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">Oops! Something went wrong</h2>
-        <p className="text-slate-400 mb-6">{error}</p>
+        <h2 className="text-base font-semibold text-text mb-1">Unable to Load Telemetry</h2>
+        <p className="text-muted text-xs mb-4">{error}</p>
         <button 
           onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors"
+          className="btn-secondary py-2 px-4 rounded-lg text-xs font-medium"
         >
-          Try Again
+          Retry Connection
         </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-10">
+    <div className="space-y-6 pb-10">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            Dashboard Overview
+          <h1 className="text-2xl font-semibold text-text tracking-tight">
+            System Administration
           </h1>
-          <p className="text-slate-400 mt-1 text-sm md:text-base">
-            Welcome back. Here's what's happening on your platform today.
+          <p className="text-muted text-xs mt-0.5">
+            Platform operations, user registry, and enrollment telemetry
           </p>
         </div>
         <Link
           to="/admin/reports"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold transition-colors shrink-0"
+          className="btn-primary py-2 px-4 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 self-start sm:self-auto"
         >
-          <TrendingUp className="w-4 h-4" />
-          Detailed Reports
+          <TrendingUp className="w-3.5 h-3.5" />
+          <span>Detailed Reports</span>
         </Link>
       </div>
 
       {/* ── Metric Cards ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, idx) => (
-          <motion.div
+          <div
             key={idx}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1, duration: 0.4 }}
-            className={`p-6 rounded-2xl glass-dark border relative overflow-hidden group ${stat.border}`}
+            className="p-5 rounded-xl bg-surface border border-border shadow-sm flex items-start justify-between hover:border-border/80 transition-colors"
           >
-            {/* Background Glow */}
-            <div
-              className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity ${stat.bg.replace('/10', '')}`}
-            />
-            
-            <div className="relative z-10 flex items-start justify-between">
-              <div>
-                <p className="text-slate-400 font-medium text-sm">
-                  {stat.title}
-                </p>
-                <div className="mt-2 flex items-baseline gap-2">
-                  <h3 className="text-2xl md:text-3xl font-extrabold text-white">
-                    {loading ? (
-                      <div className="h-8 w-20 bg-white/10 animate-pulse rounded" />
-                    ) : (
-                      stat.value
-                    )}
-                  </h3>
-                </div>
-              </div>
-              <div
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${stat.bg}`}
-              >
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            <div>
+              <p className="text-muted text-xs font-medium">
+                {stat.title}
+              </p>
+              <div className="mt-1">
+                <h3 className="text-2xl font-semibold text-text tracking-tight">
+                  {loading ? (
+                    <div className="h-7 w-20 bg-surface-2 animate-pulse rounded" />
+                  ) : (
+                    stat.value
+                  )}
+                </h3>
               </div>
             </div>
-          </motion.div>
+            <div className="w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center shrink-0 text-text">
+              <stat.icon className={`w-4 h-4 ${stat.color}`} />
+            </div>
+          </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Growth Chart ─────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.4 }}
-          className="lg:col-span-2 p-5 md:p-6 rounded-2xl glass-dark border border-white/5 flex flex-col min-h-[400px]"
-        >
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-white">Platform Growth</h2>
-            <p className="text-sm text-slate-400">New user signups over the last 30 days</p>
+        <div className="lg:col-span-2 p-5 rounded-xl bg-surface border border-border shadow-sm flex flex-col min-h-[380px]">
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold text-text">Platform User Growth</h2>
+            <p className="text-xs text-muted">New user registrations over the trailing 30 days</p>
           </div>
           
-          <div className="flex-1 w-full h-[300px]">
+          <div className="flex-1 w-full h-[280px]">
             {loading ? (
-              <div className="w-full h-full flex items-end gap-2">
+              <div className="w-full h-full flex items-end gap-1.5">
                 {[...Array(30)].map((_, i) => (
-                  <div key={i} className="flex-1 bg-white/5 animate-pulse rounded-t-sm" style={{ height: `${Math.max(10, Math.random() * 100)}%` }} />
+                  <div key={i} className="flex-1 bg-surface-2 animate-pulse rounded-t-sm" style={{ height: `${Math.max(10, Math.random() * 100)}%` }} />
                 ))}
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} vertical={false} />
                   <XAxis 
                     dataKey="date" 
-                    stroke="rgba(255,255,255,0.3)"
-                    tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
-                    tickMargin={10}
+                    stroke="var(--muted)"
+                    tick={{ fill: 'var(--muted)', fontSize: 11 }}
+                    tickMargin={8}
                     minTickGap={20}
+                    tickLine={false}
                   />
                   <YAxis 
-                    stroke="rgba(255,255,255,0.3)"
-                    tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
-                    tickMargin={10}
+                    stroke="var(--muted)"
+                    tick={{ fill: 'var(--muted)', fontSize: 11 }}
+                    tickMargin={8}
                     allowDecimals={false}
+                    tickLine={false}
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: 'rgba(0,8,20,0.9)', 
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px -5px rgba(0,0,0,0.5)'
+                      backgroundColor: 'var(--surface)', 
+                      borderColor: 'var(--border)',
+                      borderRadius: '8px',
+                      fontSize: '12px'
                     }}
-                    itemStyle={{ color: '#fff' }}
-                    labelStyle={{ color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}
+                    itemStyle={{ color: 'var(--text)' }}
+                    labelStyle={{ color: 'var(--muted)', marginBottom: '2px' }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="users" 
-                    name="New Users"
-                    stroke="#38bdf8" 
-                    strokeWidth={3}
-                    fillOpacity={1} 
-                    fill="url(#colorUsers)" 
-                    activeDot={{ r: 6, fill: '#38bdf8', stroke: '#000814', strokeWidth: 2 }}
+                    name="Registrations"
+                    stroke="#58a6ff" 
+                    strokeWidth={2}
+                    fillOpacity={0.15} 
+                    fill="#58a6ff" 
+                    activeDot={{ r: 5, fill: '#58a6ff' }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* ── Recent Activity ────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
-          className="p-5 md:p-6 rounded-2xl glass-dark border border-white/5 flex flex-col"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-white">Recent Activity</h2>
+        <div className="p-5 rounded-xl bg-surface border border-border shadow-sm flex flex-col">
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold text-text">Audit Activity Feed</h2>
+            <p className="text-xs text-muted">Recent account events and course enrollments</p>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
+          <div className="flex-1 overflow-y-auto space-y-3">
             {loading ? (
-              [...Array(5)].map((_, i) => (
-                <div key={i} className="flex gap-4 items-start">
-                  <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse shrink-0" />
-                  <div className="space-y-2 flex-1">
-                    <div className="h-4 bg-white/10 rounded w-3/4 animate-pulse" />
-                    <div className="h-3 bg-white/5 rounded w-1/4 animate-pulse" />
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="flex gap-3 items-start animate-pulse">
+                  <div className="w-8 h-8 rounded-lg bg-surface-2 shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <div className="h-3.5 bg-surface-2 rounded w-3/4" />
+                    <div className="h-3 bg-surface-2 rounded w-1/3" />
                   </div>
                 </div>
               ))
             ) : recentActivity.length > 0 ? (
-              recentActivity.map((activity, i) => (
-                <div key={activity.id} className="flex gap-4 items-start group">
-                  <div className="relative">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${activity.bg}`}>
-                      <activity.icon className={`w-4 h-4 ${activity.color}`} />
-                    </div>
-                    {/* Connection line */}
-                    {i !== recentActivity.length - 1 && (
-                      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[2px] h-full bg-white/5 group-hover:bg-white/10 transition-colors" />
-                    )}
+              recentActivity.map((activity) => (
+                <div key={activity.id} className="flex gap-3 items-start p-2 rounded-lg hover:bg-surface-2 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-surface-2 border border-border flex items-center justify-center shrink-0 text-text">
+                    <activity.icon className={`w-3.5 h-3.5 ${activity.color}`} />
                   </div>
-                  <div className="pb-4">
-                    <p className="text-sm text-slate-200 font-medium">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-text font-medium truncate">
                       {activity.message}
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-[10px] text-muted mt-0.5">
                       {new Date(activity.time).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -435,14 +396,12 @@ export default function AdminDashboard() {
               ))
             ) : (
               <div className="text-center py-10">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3">
-                  <Activity className="w-5 h-5 text-slate-500" />
-                </div>
-                <p className="text-sm text-slate-400">No recent activity</p>
+                <Activity className="w-6 h-6 text-muted mx-auto mb-2" />
+                <p className="text-xs text-muted">No recent administrative activity</p>
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

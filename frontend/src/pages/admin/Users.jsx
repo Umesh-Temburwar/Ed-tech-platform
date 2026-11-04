@@ -1,69 +1,120 @@
-import React, { useEffect, useState } from "react"
-import { apiConnector } from "../../services/apiconnector"
-import { adminEndpoints } from "../../services/apis"
+import React, { useEffect, useState } from "react";
+import { apiConnector } from "../../services/apiconnector";
+import { adminEndpoints } from "../../services/apis";
+import { Badge } from "../../components/dashboard/Common";
 
 export default function AdminUsers() {
-  const [role, setRole] = useState("all")
-  const [rows, setRows] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState("all");
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const load = async (r = role) => {
-    setLoading(true)
-    const res = await apiConnector("GET", `${adminEndpoints.USERS}?role=${r}`)
-    setRows(res.data.users || [])
-    setLoading(false)
-  }
+    setLoading(true);
+    try {
+      const res = await apiConnector("GET", `${adminEndpoints.USERS}?role=${r}`);
+      setRows(res.data.users || []);
+    } catch (e) {
+      console.error(e);
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load(); }, []);
 
   const toggleBan = async (id) => {
-    await apiConnector("PATCH", adminEndpoints.BAN_USER.replace(":id", id))
-    load()
-  }
+    await apiConnector("PATCH", adminEndpoints.BAN_USER.replace(":id", id));
+    load();
+  };
+
   const remove = async (id) => {
-    await apiConnector("DELETE", adminEndpoints.DELETE_USER.replace(":id", id))
-    load()
-  }
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      await apiConnector("DELETE", adminEndpoints.DELETE_USER.replace(":id", id));
+      load();
+    }
+  };
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Users</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-text tracking-tight">User Registry</h1>
+          <p className="text-xs text-muted mt-0.5">Manage student, faculty, and administrator platform accounts</p>
+        </div>
         <div className="flex items-center gap-3">
-          <select className="bg-white/10 border border-white/10 rounded-xl px-4 py-2" value={role} onChange={(e)=>{setRole(e.target.value);load(e.target.value)}}>
-            <option value="all">All</option>
-            <option value="student">Student</option>
-            <option value="instructor">Instructor</option>
-            <option value="admin">Admin</option>
+          <select 
+            className="input-field text-xs py-1.5" 
+            value={role} 
+            onChange={(e) => { setRole(e.target.value); load(e.target.value); }}
+          >
+            <option value="all">All Roles</option>
+            <option value="student">Students</option>
+            <option value="instructor">Instructors</option>
+            <option value="admin">Administrators</option>
           </select>
         </div>
       </div>
-      <div className="mt-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-white/10">
+
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <table className="w-full text-left text-xs">
+          <thead className="bg-surface-2 border-b border-border text-muted">
             <tr>
-              <th className="px-4 py-3 text-sm">Name</th>
-              <th className="px-4 py-3 text-sm">Email</th>
-              <th className="px-4 py-3 text-sm">Role</th>
-              <th className="px-4 py-3 text-sm">Status</th>
-              <th className="px-4 py-3 text-sm"></th>
+              <th className="px-4 py-3 font-semibold">User Name</th>
+              <th className="px-4 py-3 font-semibold">Email Address</th>
+              <th className="px-4 py-3 font-semibold">Role</th>
+              <th className="px-4 py-3 font-semibold">Status</th>
+              <th className="px-4 py-3 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-border">
             {loading ? (
-              <tr><td className="px-4 py-6 text-sm text-richblack-300" colSpan="5">Loading...</td></tr>
+              <tr>
+                <td className="px-4 py-8 text-center text-muted" colSpan="5">
+                  <div className="w-5 h-5 border-2 border-border border-t-text rounded-full animate-spin mx-auto mb-2" />
+                  Loading accounts...
+                </td>
+              </tr>
             ) : rows.length === 0 ? (
-              <tr><td className="px-4 py-6 text-sm text-richblack-300" colSpan="5">No users</td></tr>
-            ) : rows.map(u=>(
-              <tr key={u.id} className="border-t border-white/10">
-                <td className="px-4 py-3">{u.name || "-"}</td>
-                <td className="px-4 py-3">{u.email}</td>
-                <td className="px-4 py-3 capitalize">{u.role}</td>
-                <td className="px-4 py-3">{u.banned ? "Banned" : "Active"}</td>
+              <tr>
+                <td className="px-4 py-8 text-center text-muted" colSpan="5">
+                  No accounts found for selected role.
+                </td>
+              </tr>
+            ) : rows.map(u => (
+              <tr key={u.id} className="hover:bg-surface-2 transition-colors">
+                <td className="px-4 py-3 font-medium text-text">{u.name || "-"}</td>
+                <td className="px-4 py-3 text-muted">{u.email}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    <button onClick={()=>toggleBan(u.id)} className="px-3 py-2 rounded-lg bg-yellow-400 text-black text-sm">{u.banned ? "Unban" : "Ban"}</button>
-                    <button onClick={()=>remove(u.id)} className="px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-sm">Delete</button>
+                  <Badge 
+                    text={u.role || "user"} 
+                    color={u.role === "admin" ? "purple" : u.role === "instructor" ? "amber" : "indigo"} 
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium border ${
+                    u.banned 
+                      ? 'bg-danger/10 border-danger/20 text-danger' 
+                      : 'bg-success/10 border-success/20 text-success'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${u.banned ? 'bg-danger' : 'bg-success'}`} />
+                    <span>{u.banned ? "Suspended" : "Active"}</span>
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <button 
+                      onClick={() => toggleBan(u.id)} 
+                      className="btn-secondary py-1 px-2.5 rounded text-xs"
+                    >
+                      {u.banned ? "Reinstate" : "Suspend"}
+                    </button>
+                    <button 
+                      onClick={() => remove(u.id)} 
+                      className="px-2.5 py-1 rounded text-xs text-danger hover:bg-danger/10 border border-transparent hover:border-danger/20 transition-colors"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -72,5 +123,5 @@ export default function AdminUsers() {
         </table>
       </div>
     </div>
-  )
+  );
 }

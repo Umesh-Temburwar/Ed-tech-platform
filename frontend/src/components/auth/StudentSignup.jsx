@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { motion } from "framer-motion"
+import { FaEye, FaEyeSlash, FaGoogle, FaUserPlus } from "react-icons/fa"
 import { authService } from "../../services/auth"
 import { setUser } from "../../slices/profileSlice"
 import { supabase } from "../../config/supabaseClient"
@@ -35,7 +36,7 @@ export default function StudentSignup() {
           .select('*')
           .order('name')
         
-        if (!error) {
+        if (!error && data) {
           setDepartments(data)
         }
       } catch (err) {
@@ -103,7 +104,6 @@ export default function StudentSignup() {
     try {
       setLoading(true)
       await authService.signInWithGoogle("Student")
-      // Google redirect will handle the rest
     } catch (e) {
       toast.error(e.message || "Google signup failed")
     } finally {
@@ -112,57 +112,54 @@ export default function StudentSignup() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-[#000814] px-4 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-0 right-0 w-[40%] h-[40%] bg-cyan-900/20 rounded-full blur-[120px]"></div>
-
+    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-canvas px-4">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg glass-dark p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative z-10 border border-white/5"
+        transition={{ duration: 0.25 }}
+        className="w-full max-w-lg bg-surface p-6 sm:p-8 rounded-xl shadow-sm border border-border"
       >
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Student Signup</h1>
-          <p className="mt-2 text-slate-400 text-sm font-medium">Join our community of learners</p>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold text-text tracking-tight">Student Registration</h1>
+          <p className="mt-1 text-muted text-xs">Create your student profile and access coursework</p>
         </div>
 
-        <form onSubmit={submit} className="space-y-5">
-          <div className="grid md:grid-cols-2 gap-5">
+        <form onSubmit={submit} className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Full Name</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Full Name</label>
               <input
                 type="text"
                 name="name"
-                className={`input-field ${errors.name ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                placeholder="John Doe"
+                className={`input-field ${errors.name ? 'border-danger focus:border-danger' : ''}`}
+                placeholder="Ada Lovelace"
                 value={formData.name}
                 onChange={handleInputChange}
               />
-              {errors.name && <p className="mt-1 text-xs font-bold text-red-400">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-[11px] text-danger">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Email</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Email</label>
               <input
                 type="email"
                 name="email"
-                className={`input-field ${errors.email ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                placeholder="you@example.com"
+                className={`input-field ${errors.email ? 'border-danger focus:border-danger' : ''}`}
+                placeholder="ada@example.com"
                 value={formData.email}
                 onChange={handleInputChange}
               />
-              {errors.email && <p className="mt-1 text-xs font-bold text-red-400">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-[11px] text-danger">{errors.email}</p>}
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Password</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className={`input-field pr-10 ${errors.password ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                  className={`input-field pr-9 ${errors.password ? 'border-danger focus:border-danger' : ''}`}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
@@ -170,45 +167,45 @@ export default function StudentSignup() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text"
                 >
-                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
+                  {showPassword ? <FaEyeSlash className="text-xs" /> : <FaEye className="text-xs" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs font-bold text-red-400">{errors.password}</p>}
+              {errors.password && <p className="mt-1 text-[11px] text-danger">{errors.password}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Confirm</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Confirm Password</label>
               <input
                 type={showPassword ? "text" : "password"}
                 name="confirm"
-                className={`input-field ${errors.confirm ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                className={`input-field ${errors.confirm ? 'border-danger focus:border-danger' : ''}`}
                 placeholder="••••••••"
                 value={formData.confirm}
                 onChange={handleInputChange}
               />
-              {errors.confirm && <p className="mt-1 text-xs font-bold text-red-400">{errors.confirm}</p>}
+              {errors.confirm && <p className="mt-1 text-[11px] text-danger">{errors.confirm}</p>}
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Roll Number</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Roll Number</label>
               <input
                 type="text"
                 name="rollNumber"
-                className={`input-field ${errors.rollNumber ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                placeholder="2023CS001"
+                className={`input-field ${errors.rollNumber ? 'border-danger focus:border-danger' : ''}`}
+                placeholder="CS2026-001"
                 value={formData.rollNumber}
                 onChange={handleInputChange}
               />
-              {errors.rollNumber && <p className="mt-1 text-xs font-bold text-red-400">{errors.rollNumber}</p>}
+              {errors.rollNumber && <p className="mt-1 text-[11px] text-danger">{errors.rollNumber}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Semester</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Semester</label>
               <select
                 name="semester"
-                className={`input-field ${errors.semester ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                className={`input-field ${errors.semester ? 'border-danger focus:border-danger' : ''}`}
                 value={formData.semester}
                 onChange={handleInputChange}
               >
@@ -217,16 +214,16 @@ export default function StudentSignup() {
                   <option key={sem} value={sem}>Semester {sem}</option>
                 ))}
               </select>
-              {errors.semester && <p className="mt-1 text-xs font-bold text-red-400">{errors.semester}</p>}
+              {errors.semester && <p className="mt-1 text-[11px] text-danger">{errors.semester}</p>}
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Department</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Department</label>
               <select
                 name="departmentId"
-                className={`input-field ${errors.departmentId ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                className={`input-field ${errors.departmentId ? 'border-danger focus:border-danger' : ''}`}
                 value={formData.departmentId}
                 onChange={handleInputChange}
               >
@@ -235,15 +232,15 @@ export default function StudentSignup() {
                   <option key={dept.id} value={dept.id}>{dept.name} ({dept.code})</option>
                 ))}
               </select>
-              {errors.departmentId && <p className="mt-1 text-xs font-bold text-red-400">{errors.departmentId}</p>}
+              {errors.departmentId && <p className="mt-1 text-[11px] text-danger">{errors.departmentId}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Interests</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Primary Focus / Interests</label>
               <input
                 type="text"
                 name="interests"
                 className="input-field"
-                placeholder="React, UI/UX"
+                placeholder="Systems, AI, Algorithms"
                 value={formData.interests}
                 onChange={handleInputChange}
               />
@@ -253,26 +250,34 @@ export default function StudentSignup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary py-4 text-lg font-bold flex items-center justify-center gap-3 relative overflow-hidden mt-2 group"
+            className="w-full btn-primary py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
-              <>Sign Up <i className="fas fa-user-plus text-sm group-hover:translate-x-1 transition-transform"></i></>
+              <>
+                <span>Complete Student Registration</span>
+                <FaUserPlus className="text-xs" />
+              </>
             )}
           </button>
         </form>
 
-        <div className="mt-8">
-          <button onClick={googleSignup} className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-white/10 rounded-xl hover:bg-white/5 transition-all font-bold text-slate-300 text-sm">
-            <i className="fab fa-google text-red-500"></i> Continue with Google
+        <div className="mt-4 pt-4 border-t border-border">
+          <button 
+            type="button"
+            onClick={googleSignup} 
+            className="w-full btn-secondary flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold"
+          >
+            <FaGoogle className="text-danger" /> 
+            <span>Continue with Google</span>
           </button>
         </div>
 
-        <p className="mt-10 text-center text-slate-400 font-medium">
+        <p className="mt-6 text-center text-xs text-muted">
           Already have an account?{" "}
-          <Link to="/login" className="text-[#00B4D8] font-bold hover:underline transition-all duration-300">
-            Log In
+          <Link to="/login" className="text-accent font-semibold hover:underline">
+            Sign In
           </Link>
         </p>
       </motion.div>

@@ -3,11 +3,23 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../../config/supabaseClient";
 import { toast } from "react-hot-toast";
-import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Database, Shield, Terminal, ArrowLeft } from "lucide-react";
+import {
+  ShieldCheck,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Loader2,
+  Database,
+  Shield,
+  Terminal,
+  ArrowLeft,
+} from "lucide-react";
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("umeshtemburwar7709@gmail.com");
-  const [password, setPassword] = useState("IIT@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,12 +39,12 @@ export default function AdminLogin() {
     setError("");
 
     // Validation
-    if (!email || !/^\\S+@\\S+\\.\\S+$/.test(email)) {
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       setError("Please enter a valid email address.");
       return;
     }
-    if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters long.");
       return;
     }
 
@@ -53,9 +65,7 @@ export default function AdminLogin() {
       }
 
       setLoadingStep(2);
-      
-      // Simulate slight delay for UX text transitions
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 400));
 
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
@@ -87,7 +97,7 @@ export default function AdminLogin() {
       
       setTimeout(() => {
         navigate("/admin/dashboard");
-      }, 600);
+      }, 400);
 
     } catch (err) {
       console.error("[AdminLogin] error:", err);
@@ -98,171 +108,113 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#030712] font-inter overflow-hidden selection:bg-indigo-500/30">
-      
-      {/* LEFT PANEL - Branding & Graphics (Hidden on mobile) */}
-      <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 bg-gradient-to-br from-slate-950 via-indigo-950/40 to-slate-950 border-r border-white/5">
-        
-        {/* Abstract Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div 
-            animate={{ 
-              y: [0, -20, 0], 
-              opacity: [0.3, 0.5, 0.3],
-              scale: [1, 1.05, 1]
-            }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-600/10 blur-[120px]"
-          />
-          <motion.div 
-            animate={{ 
-              y: [0, 20, 0], 
-              opacity: [0.2, 0.4, 0.2],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-violet-600/10 blur-[120px]"
-          />
+    <div className="min-h-screen w-full flex bg-canvas text-text overflow-hidden">
+      {/* LEFT PANEL - Administrative Overview */}
+      <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 bg-surface border-r border-border">
+        {/* Logo area */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-accent">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="text-base font-semibold text-text tracking-tight block">EdTech Administration</span>
+            <span className="text-xs text-muted block">System Control Plane</span>
+          </div>
         </div>
 
-        {/* Logo area */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative z-10 flex items-center gap-3"
-        >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <ShieldCheck className="w-6 h-6 text-white" />
+        {/* Center content */}
+        <div className="max-w-md my-auto py-12">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-surface-2 border border-border text-xs font-medium text-muted mb-6">
+            <span className="w-2 h-2 rounded-full bg-success" />
+            <span>Secure Admin Environment</span>
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">CoreDev Academy</span>
-        </motion.div>
+          <h1 className="text-3xl font-semibold text-text tracking-tight leading-tight mb-4">
+            Manage your platform with precision.
+          </h1>
+          <p className="text-muted text-sm leading-relaxed mb-8">
+            Access user management, course catalog approvals, system telemetry, and platform configurations.
+          </p>
 
-        {/* Center illustration content */}
-        <div className="relative z-10 max-w-lg mt-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-6">
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-              Secure Admin Environment
+          <div className="space-y-3">
+            <div className="p-3.5 rounded-lg bg-surface-2 border border-border flex items-center gap-3">
+              <div className="p-2 rounded-md bg-surface border border-border text-success">
+                <Database className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-medium text-text">Database & System Health</div>
+                <div className="text-[11px] text-muted">All tables and authentication services operational</div>
+              </div>
             </div>
-            <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 leading-[1.1] mb-6">
-              Manage your platform with precision.
-            </h1>
-            <p className="text-slate-400 text-lg leading-relaxed">
-              Access comprehensive analytics, user management, and platform configurations through our secure administrative portal.
-            </p>
-          </motion.div>
 
-          {/* Floating cards animation */}
-          <div className="mt-16 relative h-48 w-full" style={{ perspective: "1000px" }}>
-             <motion.div 
-                initial={{ opacity: 0, x: -20, rotateY: -10 }}
-                animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="absolute left-0 top-0 w-64 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl"
-             >
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-emerald-500/20 text-emerald-400">
-                    <Database className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-slate-400">System Status</div>
-                    <div className="font-semibold text-white">All Systems Operational</div>
-                  </div>
-                </div>
-             </motion.div>
-
-             <motion.div 
-                initial={{ opacity: 0, x: 20, rotateY: 10 }}
-                animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="absolute right-4 top-20 w-64 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl"
-             >
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-indigo-500/20 text-indigo-400">
-                    <Terminal className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-slate-400">Active Sessions</div>
-                    <div className="font-semibold text-white">24 Administrators</div>
-                  </div>
-                </div>
-             </motion.div>
+            <div className="p-3.5 rounded-lg bg-surface-2 border border-border flex items-center gap-3">
+              <div className="p-2 rounded-md bg-surface border border-border text-accent">
+                <Terminal className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-medium text-text">Role-Based Access Control</div>
+                <div className="text-[11px] text-muted">Supabase Row-Level Security enforced</div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="relative z-10 text-sm text-slate-500 flex justify-between items-center"
-        >
-          <span>&copy; {new Date().getFullYear()} CoreDev Academy. All rights reserved.</span>
-        </motion.div>
+        <div className="text-xs text-muted">
+          <span>&copy; {new Date().getFullYear()} EdTech Platform · All rights reserved.</span>
+        </div>
       </div>
 
       {/* RIGHT PANEL - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
-        
-        {/* Mobile abstract shapes */}
-        <div className="absolute inset-0 lg:hidden pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-900/20 blur-[80px] rounded-full" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-900/20 blur-[80px] rounded-full" />
-        </div>
-
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, type: "spring", bounce: 0.3 }}
-          className="w-full max-w-[440px] relative z-10"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="w-full max-w-[420px]"
         >
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-               <ShieldCheck className="w-6 h-6 text-white" />
-             </div>
-             <span className="text-2xl font-bold text-white tracking-tight">CoreDev Academy</span>
+          <div className="lg:hidden flex items-center gap-3 mb-8">
+            <div className="w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-accent">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-base font-semibold text-text">Admin Portal</span>
+              <span className="text-xs text-muted block">System Control Plane</span>
+            </div>
           </div>
 
-          <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-white mb-2">Admin Portal</h2>
-            <p className="text-slate-400">Sign in to manage CoreDev Academy</p>
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-text mb-1">Administrator Sign In</h2>
+            <p className="text-muted text-xs">Enter your administrative credentials to continue</p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
-            
+          <div className="bg-surface border border-border rounded-xl p-6 sm:p-8 shadow-sm">
             <AnimatePresence mode="wait">
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: "auto" }}
-                  exit={{ opacity: 0, y: -10, height: 0 }}
-                  className="mb-6 overflow-hidden"
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  className="mb-4"
                 >
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                    <p className="text-sm font-medium text-red-300">{error}</p>
+                  <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 flex items-start gap-2.5">
+                    <Shield className="w-4 h-4 text-danger shrink-0 mt-0.5" />
+                    <p className="text-xs text-danger font-medium">{error}</p>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <form onSubmit={onSubmit} className="space-y-6" noValidate>
-              
+            <form onSubmit={onSubmit} className="space-y-4" noValidate>
               {/* Email Input */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+              <div>
+                <label htmlFor="email" className="block text-xs font-medium text-text mb-1.5">
                   Email Address
                 </label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-                    <Mail className="h-5 w-5" />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                    <Mail className="h-4 w-4" />
                   </div>
                   <input
                     id="email"
@@ -271,25 +223,25 @@ export default function AdminLogin() {
                     disabled={loading}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3 bg-slate-950/50 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all disabled:opacity-50 sm:text-sm"
-                    placeholder="admin@coredevacademy.com"
+                    className="input-field pl-9"
+                    placeholder="admin@example.com"
                   />
                 </div>
               </div>
 
               {/* Password Input */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="password" className="block text-xs font-medium text-text">
                     Password
                   </label>
-                  <Link to="/forgot-password" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                  <Link to="/forgot-password" className="text-xs text-accent hover:underline">
                     Forgot password?
                   </Link>
                 </div>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-                    <Lock className="h-5 w-5" />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                    <Lock className="h-4 w-4" />
                   </div>
                   <input
                     id="password"
@@ -298,15 +250,15 @@ export default function AdminLogin() {
                     disabled={loading}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-11 pr-12 py-3 bg-slate-950/50 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all disabled:opacity-50 sm:text-sm"
+                    className="input-field pl-9 pr-10"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 focus:outline-none"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-text"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
@@ -319,10 +271,10 @@ export default function AdminLogin() {
                   disabled={loading}
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-indigo-500 focus:ring-indigo-500/50 focus:ring-offset-slate-900"
+                  className="h-4 w-4 rounded border-border accent-hot cursor-pointer"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-400 cursor-pointer">
-                  Remember me for 30 days
+                <label htmlFor="remember-me" className="ml-2 text-xs text-muted cursor-pointer">
+                  Remember session on this device
                 </label>
               </div>
 
@@ -330,52 +282,31 @@ export default function AdminLogin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500 transition-all disabled:opacity-70 overflow-hidden"
+                className="w-full btn-primary py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {/* Button shine effect */}
-                <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent z-0" />
-                
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {loading ? (
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={loadingStep}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="flex items-center gap-2"
-                      >
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        {loadingTexts[loadingStep]}
-                      </motion.div>
-                    </AnimatePresence>
-                  ) : (
-                    <>
-                      Sign in to Admin Panel
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </span>
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{loadingTexts[loadingStep]}</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>Sign In to Admin Panel</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
           </div>
           
-          <div className="mt-8 flex justify-center lg:justify-start">
-            <Link to="/" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition-colors group">
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Return to Main Site
+          <div className="mt-6 text-center">
+            <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Return to platform homepage</span>
             </Link>
           </div>
         </motion.div>
       </div>
-
-      <style jsx="true">{`
-        @keyframes shimmer {
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
     </div>
   );
 }

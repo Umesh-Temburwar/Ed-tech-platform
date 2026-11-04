@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// EDIT COURSE — Full course editing + lesson management
-// ═══════════════════════════════════════════════════════════════════════════
-
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -19,16 +15,16 @@ function YoutubeUrlPreview({ url }) {
   const id = getYoutubeVideoId(url);
   if (!id) return null;
   return (
-    <div className="mt-2 flex items-center gap-2 p-2 bg-black/30 rounded-lg border border-red-500/20">
+    <div className="mt-2 flex items-center gap-2 p-2 bg-surface-2 rounded-lg border border-border">
       <img
         src={`https://img.youtube.com/vi/${id}/mqdefault.jpg`}
         alt="Preview"
-        className="w-16 aspect-video object-cover rounded"
+        className="w-16 aspect-video object-cover rounded border border-border"
         onError={(e) => (e.target.style.display = "none")}
       />
       <div>
-        <p className="text-[10px] text-emerald-400 font-bold">✓ Valid YouTube URL</p>
-        <p className="text-[10px] text-slate-500 font-mono">ID: {id}</p>
+        <p className="text-[11px] text-success font-medium">Valid YouTube URL</p>
+        <p className="text-[10px] text-muted font-mono">ID: {id}</p>
       </div>
     </div>
   );
@@ -91,7 +87,7 @@ export default function EditCourse() {
       const initialUrl = data.preview_video_url || data.youtube_video_url || "";
       setPreviewVideoUrl(initialUrl);
       setVideoSource(initialUrl ? "youtube" : "upload");
-      // Set thumbnail preview from DB
+      
       const thumb =
         data.final_thumbnail_url ||
         data.youtube_thumbnail_url ||
@@ -109,7 +105,6 @@ export default function EditCourse() {
     if (courseId) fetchCourse();
   }, [courseId, fetchCourse]);
 
-  // ─── Handle thumbnail file ────────────────────────────────────────────────
   function handleThumbnailChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -119,7 +114,6 @@ export default function EditCourse() {
     reader.readAsDataURL(file);
   }
 
-  // ─── Save Course ──────────────────────────────────────────────────────────
   async function handleSave() {
     if (!title.trim()) return toast.error("Course title is required");
     setSaving(true);
@@ -128,7 +122,6 @@ export default function EditCourse() {
       const videoId = getYoutubeVideoId(previewVideoUrl);
       const youtubeThumbnail = videoId ? getYoutubeThumbnail(previewVideoUrl) : null;
 
-      // If custom thumbnail file, upload to Supabase Storage
       let customThumbnailUrl = null;
       if (thumbnailFile) {
         const fileName = `${courseId}/${Date.now()}_${thumbnailFile.name}`;
@@ -168,7 +161,7 @@ export default function EditCourse() {
       } else if (videoSource === "youtube" && youtubeThumbnail) {
         patch.final_thumbnail_url = youtubeThumbnail;
         patch.thumbnail_source = "youtube";
-        patch.thumbnail_url = youtubeThumbnail; // Explicitly set it here as well
+        patch.thumbnail_url = youtubeThumbnail;
       }
 
       const { error: saveErr } = await supabase
@@ -178,7 +171,7 @@ export default function EditCourse() {
 
       if (saveErr) throw saveErr;
 
-      toast.success("Course saved!");
+      toast.success("Course changes saved successfully");
       await fetchCourse();
       setThumbnailFile(null);
     } catch (e) {
@@ -189,12 +182,10 @@ export default function EditCourse() {
     }
   }
 
-  // ─── Delete Course ────────────────────────────────────────────────────────
   async function handleDelete() {
-    if (!window.confirm("Permanently delete this course and all its content?")) return;
+    if (!window.confirm("Permanently delete this course and all its modules?")) return;
     setDeleting(true);
     try {
-      // Delete sections & lessons cascade
       const { data: sections } = await supabase
         .from("sections")
         .select("id")
@@ -214,7 +205,6 @@ export default function EditCourse() {
     }
   }
 
-  // ─── Preview URL change: also update thumbnail ────────────────────────────
   function handlePreviewUrlChange(url) {
     setPreviewVideoUrl(url);
     const videoId = getYoutubeVideoId(url);
@@ -223,36 +213,34 @@ export default function EditCourse() {
     }
   }
 
-  // ─── Stats ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center gap-2 justify-center py-16 text-slate-400 text-sm">
-        <FaSpinner className="animate-spin text-purple-500" /> Loading course...
+      <div className="flex items-center gap-2 justify-center py-16 text-muted text-xs">
+        <FaSpinner className="animate-spin text-accent" /> Loading course details...
       </div>
     );
   }
 
   if (error && !course) {
-    return <div className="p-6 text-rose-400 text-sm">{error}</div>;
+    return <div className="p-5 text-danger text-xs">{error}</div>;
   }
 
   if (!course) return null;
 
   return (
     <div className="space-y-6 pb-12">
-
-      {/* ── PAGE HEADER ─────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* ── Page Header ──────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-surface p-5 rounded-xl border border-border">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/dashboard/instructor/my-courses")}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-md bg-surface-2 border border-border text-muted hover:text-text hover:bg-surface transition-colors"
           >
-            <FaArrowLeft className="text-sm" />
+            <FaArrowLeft className="text-xs" />
           </button>
           <div>
-            <h1 className="text-xl font-black text-richblack-5">{course.title}</h1>
-            <p className="text-[10px] text-richblack-400 font-mono mt-0.5">ID: {courseId}</p>
+            <h1 className="text-xl font-bold text-text">{course.title}</h1>
+            <p className="text-[10px] text-muted font-mono mt-0.5">ID: {courseId}</p>
           </div>
         </div>
 
@@ -260,85 +248,78 @@ export default function EditCourse() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 text-xs font-black rounded-xl bg-yellow-50 text-richblack-900 hover:bg-yellow-100 disabled:opacity-50 transition-all shadow-md"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-md bg-hot text-white hover:bg-[#e5482a] disabled:opacity-50 transition-colors"
           >
-            {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
+            {saving ? <FaSpinner className="animate-spin text-xs" /> : <FaSave className="text-xs" />}
             {saving ? "Saving..." : "Save Changes"}
           </button>
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 disabled:opacity-50 transition-all"
+            className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-md bg-surface-2 text-muted hover:text-danger hover:border-danger/30 hover:bg-danger/10 border border-border disabled:opacity-50 transition-colors"
           >
-            {deleting ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+            {deleting ? <FaSpinner className="animate-spin text-xs" /> : <FaTrash className="text-xs" />}
             {deleting ? "Deleting..." : "Delete"}
           </button>
         </div>
       </div>
 
-      {/* ── ERROR BANNER ────────────────────────────────────────────────── */}
+      {/* ── Error Banner ─────────────────────────────────────────────────── */}
       {error && (
-        <div className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
+        <div className="px-4 py-2.5 rounded-lg bg-danger/10 border border-danger/30 text-danger text-xs font-medium">
           {error}
         </div>
       )}
 
-      {/* ── TAB NAV ─────────────────────────────────────────────────────── */}
-      <div className="flex gap-1 bg-richblack-800 p-1 rounded-xl border border-richblack-700 w-fit">
+      {/* ── Tab Nav ──────────────────────────────────────────────────────── */}
+      <div className="flex gap-1 bg-surface-2 p-1 rounded-lg border border-border w-fit">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === tab.id
-                ? "bg-yellow-50 text-richblack-900 shadow-md"
-                : "text-richblack-400 hover:text-richblack-50"
+                ? "bg-surface text-text shadow-sm"
+                : "text-muted hover:text-text"
             }`}
           >
-            <tab.icon className="text-sm" /> {tab.label}
+            <tab.icon className="text-xs" /> {tab.label}
           </button>
         ))}
       </div>
 
-      {/* ── TAB: DETAILS ────────────────────────────────────────────────── */}
+      {/* ── Tab: Details ─────────────────────────────────────────────────── */}
       {activeTab === "details" && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid gap-6 lg:grid-cols-3"
-        >
-          {/* Left: Edit Form */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* Title */}
-            <div>
-              <label className="text-[11px] uppercase tracking-wide text-richblack-400 font-bold block mb-1.5">
-                Course Title *
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Left Form */}
+          <div className="lg:col-span-2 space-y-4 bg-surface p-5 rounded-xl border border-border">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text block">
+                Course Title <span className="text-danger">*</span>
               </label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-xl bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-5 transition-colors"
+                className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors"
               />
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="text-[11px] uppercase tracking-wide text-richblack-400 font-bold block mb-1.5">
-                Description *
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text block">
+                Course Description <span className="text-danger">*</span>
               </label>
               <textarea
                 rows={5}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full resize-none px-3 py-2.5 text-sm rounded-xl bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-5 transition-colors"
+                className="w-full resize-none px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors"
               />
             </div>
 
-            {/* Price + Free toggle */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="text-[11px] uppercase tracking-wide text-richblack-400 font-bold block mb-1.5">
-                  Price (₹)
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-text block">
+                  Price (INR)
                 </label>
                 <input
                   type="number"
@@ -346,17 +327,17 @@ export default function EditCourse() {
                   onChange={(e) => setPrice(e.target.value)}
                   disabled={isFree}
                   min="0"
-                  className="w-full px-3 py-2.5 text-sm rounded-xl bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-5 disabled:opacity-50 transition-colors"
+                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text disabled:opacity-50 transition-colors"
                 />
               </div>
-              <div>
-                <label className="text-[11px] uppercase tracking-wide text-richblack-400 font-bold block mb-1.5">
-                  Status
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-text block">
+                  Publish Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm rounded-xl bg-richblack-900 border border-richblack-700 focus:border-yellow-50 outline-none text-richblack-5 transition-colors"
+                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors cursor-pointer"
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
@@ -365,146 +346,146 @@ export default function EditCourse() {
             </div>
 
             {/* Free course toggle */}
-            <label className="flex items-center gap-3 cursor-pointer select-none group">
-              <div
-                onClick={() => setIsFree((p) => !p)}
-                className={`w-10 h-5 rounded-full transition-all ${isFree ? "bg-yellow-400" : "bg-richblack-700"} relative`}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${isFree ? "translate-x-5" : ""}`} />
-              </div>
-              <span className="text-sm font-bold text-richblack-300 group-hover:text-richblack-50 transition-colors">
-                Free Course (no payment required)
-              </span>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isFree}
+                onChange={(e) => setIsFree(e.target.checked)}
+                className="accent-hot cursor-pointer"
+              />
+              <span className="text-xs text-text font-medium">Free course (no student payment required)</span>
             </label>
 
             {/* Video Source & URL */}
-            <div className="space-y-4">
+            <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
-                <label className="text-[11px] uppercase tracking-wide text-richblack-400 font-bold block">
-                  Video Source *
+                <label className="text-xs font-semibold text-text block">
+                  Trailer / Preview Source
                 </label>
-                <div className="flex bg-richblack-900 p-1 rounded-lg border border-richblack-700">
-                  <button onClick={() => setVideoSource('youtube')} className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${videoSource === 'youtube' ? 'bg-yellow-50 text-richblack-900 shadow-sm' : 'text-richblack-400 hover:text-richblack-25'}`}>YOUTUBE</button>
-                  <button onClick={() => setVideoSource('upload')} className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${videoSource === 'upload' ? 'bg-yellow-50 text-richblack-900 shadow-sm' : 'text-richblack-400 hover:text-richblack-25'}`}>UPLOAD</button>
+                <div className="flex bg-surface-2 p-1 rounded border border-border text-xs">
+                  <button
+                    onClick={() => setVideoSource('youtube')}
+                    className={`px-2.5 py-1 rounded transition-colors ${videoSource === 'youtube' ? 'bg-surface text-text shadow-sm' : 'text-muted hover:text-text'}`}
+                  >
+                    YouTube
+                  </button>
+                  <button
+                    onClick={() => setVideoSource('upload')}
+                    className={`px-2.5 py-1 rounded transition-colors ${videoSource === 'upload' ? 'bg-surface text-text shadow-sm' : 'text-muted hover:text-text'}`}
+                  >
+                    Direct Upload
+                  </button>
                 </div>
               </div>
 
               {videoSource === "youtube" ? (
                 <div>
                   <div className="relative">
-                    <FaYoutube className="absolute left-3 top-1/2 -translate-y-1/2 text-red-400 text-lg" />
+                    <FaYoutube className="absolute left-3 top-1/2 -translate-y-1/2 text-danger text-sm" />
                     <input
                       type="url"
                       value={previewVideoUrl}
                       onChange={(e) => handlePreviewUrlChange(e.target.value)}
-                      placeholder="https://youtube.com/watch?v=VIDEO_ID"
-                      className="w-full pl-10 pr-3 py-2.5 text-sm rounded-xl bg-richblack-900 border border-richblack-700 focus:border-red-400 outline-none text-richblack-5 transition-colors"
+                      placeholder="https://youtube.com/watch?v=..."
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-md bg-surface-2 border border-border focus:border-accent outline-none text-text transition-colors"
                     />
                   </div>
                   <YoutubeUrlPreview url={previewVideoUrl} />
-                  <p className="text-[10px] text-richblack-500 mt-1">
-                    This URL is used as the course trailer and to generate the course thumbnail automatically.
-                  </p>
                 </div>
               ) : (
-                <div className="p-4 bg-richblack-900 border border-richblack-700 rounded-xl text-center">
-                  <p className="text-xs text-richblack-400">Direct video upload is currently supported via Curriculum manager.</p>
+                <div className="p-3 bg-surface-2 border border-border rounded-lg text-center">
+                  <p className="text-xs text-muted">Direct video upload is configured in the Curriculum tab.</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right: Thumbnail + Status */}
-          <div className="space-y-5">
-            {/* Thumbnail Preview */}
-            {videoSource === "upload" && (
-              <div>
-                <label className="text-[11px] uppercase tracking-wide text-richblack-400 font-bold block mb-2">
-                  Course Thumbnail
-                </label>
-                <div className="aspect-video rounded-xl overflow-hidden bg-richblack-900 border border-richblack-700 relative">
-                  {thumbnailPreview ? (
-                    <img
-                      src={thumbnailPreview}
-                      alt="Thumbnail"
-                      className="w-full h-full object-cover"
-                      onError={(e) => (e.target.style.display = "none")}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-richblack-500">
-                      <FaYoutube className="text-4xl" />
-                      <p className="text-xs">No thumbnail yet</p>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-2">
-                  <label className="text-[10px] text-richblack-400 block mb-1">Upload Custom Thumbnail (optional)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleThumbnailChange}
-                    className="text-xs text-richblack-400 file:mr-3 file:px-3 file:py-1 file:rounded-lg file:bg-richblack-700 file:border-0 file:text-richblack-25 file:text-xs file:cursor-pointer"
+          {/* Right: Media & Status */}
+          <div className="space-y-4">
+            <div className="bg-surface p-5 rounded-xl border border-border space-y-3">
+              <label className="text-xs font-semibold text-text block">
+                Course Thumbnail
+              </label>
+              <div className="aspect-video rounded-md overflow-hidden bg-surface-2 border border-border relative">
+                {thumbnailPreview ? (
+                  <img
+                    src={thumbnailPreview}
+                    alt="Thumbnail"
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.target.style.display = "none")}
                   />
-                  {thumbnailFile && (
-                    <p className="text-[10px] text-emerald-400 mt-1">✓ {thumbnailFile.name}</p>
-                  )}
-                </div>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-muted">
+                    <FaBook className="text-2xl" />
+                    <p className="text-[11px]">No thumbnail</p>
+                  </div>
+                )}
               </div>
-            )}
+              <div>
+                <label className="text-[11px] text-muted block mb-1">Upload New Thumbnail</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailChange}
+                  className="text-xs text-muted file:mr-2 file:px-2.5 file:py-1 file:rounded file:bg-surface-2 file:border file:border-border file:text-text file:text-xs file:cursor-pointer"
+                />
+                {thumbnailFile && (
+                  <p className="text-[10px] text-success mt-1">✓ {thumbnailFile.name}</p>
+                )}
+              </div>
+            </div>
 
-            {/* Status card */}
-            <div className="p-4 rounded-xl bg-richblack-800 border border-richblack-700 space-y-3">
-              <p className="text-xs font-black uppercase tracking-wider text-richblack-400">Quick Status</p>
+            <div className="p-4 rounded-xl bg-surface border border-border space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted">Course Status</p>
               <div className="flex items-center gap-2">
                 {status === "published" ? (
                   <>
-                    <FaGlobe className="text-emerald-400 text-sm" />
-                    <span className="text-sm font-bold text-emerald-400">Published</span>
+                    <FaGlobe className="text-success text-xs" />
+                    <span className="text-xs font-semibold text-success">Published</span>
                   </>
                 ) : (
                   <>
-                    <FaLock className="text-yellow-400 text-sm" />
-                    <span className="text-sm font-bold text-yellow-400">Draft</span>
+                    <FaLock className="text-warning text-xs" />
+                    <span className="text-xs font-semibold text-warning">Draft</span>
                   </>
                 )}
               </div>
-              <p className="text-[10px] text-richblack-500">
-                Last updated: {course.updated_at ? new Date(course.updated_at).toLocaleString() : "—"}
+              <p className="text-[10px] text-muted">
+                Last modified: {course.updated_at ? new Date(course.updated_at).toLocaleString() : "—"}
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
 
-      {/* ── TAB: CURRICULUM ─────────────────────────────────────────────── */}
+      {/* ── Tab: Curriculum ──────────────────────────────────────────────── */}
       {activeTab === "curriculum" && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="bg-surface p-5 rounded-xl border border-border">
           <LessonManager courseId={courseId} />
-        </motion.div>
+        </div>
       )}
 
-      {/* ── TAB: STATS ──────────────────────────────────────────────────── */}
+      {/* ── Tab: Stats ───────────────────────────────────────────────────── */}
       {activeTab === "stats" && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3">
           {[
-            { label: "Status", value: status.toUpperCase(), color: status === "published" ? "text-emerald-400" : "text-yellow-400" },
-            { label: "Price", value: isFree ? "FREE" : `₹${price || 0}`, color: "text-white" },
-            { label: "Level", value: course.level || "—", color: "text-white" },
+            { label: "Status", value: status.toUpperCase() },
+            { label: "Price", value: isFree ? "FREE" : `₹${price || 0}` },
+            { label: "Level", value: course.level || "Beginner" },
           ].map((s) => (
-            <div key={s.label} className="p-5 rounded-xl bg-richblack-800 border border-richblack-700 text-center">
-              <p className="text-[10px] text-richblack-400 uppercase tracking-wider mb-2">{s.label}</p>
-              <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
+            <div key={s.label} className="p-4 rounded-xl bg-surface border border-border text-center">
+              <p className="text-[10px] text-muted uppercase tracking-wider mb-1">{s.label}</p>
+              <p className="text-lg font-bold text-text">{s.value}</p>
             </div>
           ))}
-          <div className="sm:col-span-3 p-4 rounded-xl bg-richblack-800 border border-richblack-700">
-            <p className="text-[10px] text-richblack-500 font-mono">Course ID: {courseId}</p>
-            <p className="text-[10px] text-richblack-500 font-mono mt-1">
+          <div className="sm:col-span-3 p-4 rounded-xl bg-surface border border-border">
+            <p className="text-[10px] text-muted font-mono">Course ID: {courseId}</p>
+            <p className="text-[10px] text-muted font-mono mt-0.5">
               Created: {course.created_at ? new Date(course.created_at).toLocaleString() : "—"}
             </p>
           </div>
-        </motion.div>
+        </div>
       )}
-
     </div>
   );
 }

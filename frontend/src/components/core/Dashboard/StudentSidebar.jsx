@@ -90,7 +90,7 @@ export default function StudentSidebar() {
       {/* Mobile Menu Toggle */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed right-6 z-[110] w-14 h-14 bg-cyan-500 text-white rounded-2xl shadow-2xl flex items-center justify-center text-xl border border-cyan-400/50"
+        className="lg:hidden fixed right-6 z-[110] w-12 h-12 bg-accent text-white rounded-xl shadow-lg flex items-center justify-center text-lg border border-border"
         style={{ bottom: 'max(24px, env(safe-area-inset-bottom))' }}
       >
         {isOpen ? <FaTimes /> : <FaBars />}
@@ -98,132 +98,49 @@ export default function StudentSidebar() {
 
       {/* Sidebar Container */}
       <motion.aside
-        initial={{ scale: 1.02, opacity: 0 }}
+        initial={{ opacity: 0 }}
         animate={{ 
-          width: isOpen ? "280px" : "0px",
-          x: isOpen ? 0 : -280,
-          scale: 1,
+          width: isOpen ? "260px" : "0px",
+          x: isOpen ? 0 : -260,
           opacity: 1
         }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`fixed lg:relative z-[100] h-full flex flex-col overflow-hidden transition-all duration-300 lg:translate-x-0 shrink-0 border-r border-white/10 relative`}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="fixed lg:relative z-[100] h-full flex flex-col overflow-hidden bg-surface border-r border-border shrink-0"
       >
-        {/* Background Image with Overlay and Blur */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-            alt="Sidebar Background" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-[6px]" />
-        </div>
-
-        {/* Content Wrapper (Ensures content is above BG) */}
-        <div className="relative z-10 flex flex-col h-full bg-black/40">
-          {/* Header/Logo with localized Background */}
-          <div className="relative p-8 border-b border-white/10 overflow-hidden group/header">
-            {/* Header specific background image */}
-            <div className="absolute inset-0 z-0 opacity-20 group-hover/header:opacity-40 transition-opacity duration-500">
-              <img 
-                src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Header BG" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black" />
-            </div>
-
-            <Link to="/" className="relative z-10 flex items-center">
+        {/* Content Wrapper */}
+        <div className="relative z-10 flex flex-col h-full bg-surface">
+          {/* Header/Logo */}
+          <div className="p-5 border-b border-border">
+            <Link to="/" className="flex items-center">
               <Logo />
             </Link>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Student Portal</p>
+            <p className="text-[10px] text-muted font-bold uppercase tracking-wider mt-1.5">Student Portal</p>
           </div>
 
-        {/* Navigation Links */}
-        <nav className="flex-1 px-4 py-2 pb-20 space-y-1 overflow-y-auto custom-scrollbar" style={{ paddingBottom: 'max(5rem, calc(env(safe-area-inset-bottom) + 1.25rem))' }}>
-          {sidebarLinks.map((link) => (
-            <div
-              key={link.id}
-              className="relative"
-              onMouseEnter={() => {
-                if (link.subItems && !isOpen) {
-                  setOpenDropdown(link.id);
-                }
-              }}
-              onMouseLeave={() => {
-                if (link.subItems) {
-                  setOpenDropdown(null);
-                }
-              }}
-            >
-              {link.subItems ? (
-                <button
-                  onClick={() => toggleDropdown(link.id)}
-                  className={`w-full group flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-300 ${
-                    openDropdown === link.id
-                      ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,180,216,0.1)]"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <link.icon className="text-lg" />
-                    <span className="text-sm font-bold tracking-wide whitespace-nowrap">{link.label}</span>
-                  </div>
-                  <FaChevronDown className={`text-[10px] transition-all duration-300 ${
-                    openDropdown === link.id ? "rotate-180 text-cyan-400" : "text-slate-500"
-                  }`} />
-                </button>
-              ) : (
+          {/* Navigation Links */}
+          <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto custom-scrollbar" style={{ paddingBottom: 'max(5rem, calc(env(safe-area-inset-bottom) + 1.25rem))' }}>
+            {sidebarLinks.map((link) => (
+              <div key={link.id} className="relative">
                 <NavLink
                   to={link.path}
-                  onClick={() => setOpenDropdown(null)}
-                  className={({ isActive }) => `w-full group flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-300 ${
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) => `w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-colors ${
                     isActive
-                      ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,180,216,0.1)]"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      ? "bg-surface-2 text-text font-semibold border border-border"
+                      : "text-muted hover:text-text hover:bg-surface-2"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <link.icon className="text-lg" />
-                    <span className="text-sm font-bold tracking-wide whitespace-nowrap">{link.label}</span>
+                  <div className="flex items-center gap-2.5">
+                    <link.icon className="text-sm opacity-80" />
+                    <span className="whitespace-nowrap">{link.label}</span>
                   </div>
-                  <FaChevronRight className={`text-[8px] transition-all opacity-0 group-hover:opacity-100 group-hover:translate-x-1`} />
+                  <FaChevronRight className="text-[8px] opacity-40" />
                 </NavLink>
-              )}
-
-              {/* Sub-items with Optimized Animation */}
-              <AnimatePresence initial={false}>
-                {link.subItems && openDropdown === link.id && (
-                  <motion.div
-                    key={link.id}
-                    variants={dropdownVariants}
-                    initial="closed"
-                    animate="open"
-                    exit="closed"
-                    style={{ transformOrigin: "top", willChange: "transform, opacity", transform: "translateZ(0)" }}
-                    className="overflow-hidden flex flex-col pl-11 space-y-1"
-                  >
-                    {link.subItems.map((sub) => (
-                      <NavLink
-                        key={sub.id}
-                        to={sub.path}
-                        className={({ isActive }) => `w-full text-left py-2 px-4 rounded-lg text-xs font-bold transition-all duration-300 border-l-2 ${
-                          isActive
-                            ? "text-cyan-400 border-cyan-500 bg-cyan-500/5"
-                            : "text-slate-500 border-transparent hover:text-slate-300 hover:border-slate-700"
-                        }`}
-                      >
-                        {sub.label}
-                      </NavLink>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-        </nav>
-
-      </div>
-    </motion.aside>
+              </div>
+            ))}
+          </nav>
+        </div>
+      </motion.aside>
 
       {/* Backdrop for mobile */}
       <AnimatePresence>
@@ -233,7 +150,7 @@ export default function StudentSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="lg:hidden fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
+            className="lg:hidden fixed inset-0 z-[90] bg-black/60"
           />
         )}
       </AnimatePresence>

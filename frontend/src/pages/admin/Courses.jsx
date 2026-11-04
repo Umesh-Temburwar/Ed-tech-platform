@@ -1,32 +1,33 @@
-import React, { useEffect, useState } from "react"
-import { apiConnector } from "../../services/apiconnector"
-import { adminEndpoints } from "../../services/apis"
-import { supabase } from "../../config/supabaseClient"
-import toast from "react-hot-toast"
+import React, { useEffect, useState } from "react";
+import { apiConnector } from "../../services/apiconnector";
+import { adminEndpoints } from "../../services/apis";
+import { supabase } from "../../config/supabaseClient";
+import toast from "react-hot-toast";
+import { Badge } from "../../components/dashboard/Common";
 
 export default function AdminCourses() {
-  const [rows, setRows] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(null)
-  const [title, setTitle] = useState("")
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(null);
+  const [title, setTitle] = useState("");
 
   const load = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await apiConnector("GET", adminEndpoints.COURSES)
+      const res = await apiConnector("GET", adminEndpoints.COURSES);
       if (res?.data?.courses) {
-        setRows(res.data.courses)
-        return
+        setRows(res.data.courses);
+        return;
       }
     } catch (err) {
-      console.warn("Backend API unavailable, falling back to Supabase client:", err.message)
+      console.warn("Backend API unavailable, falling back to Supabase client:", err.message);
     }
 
     try {
       const { data, error } = await supabase
         .from("courses")
         .select("id, title, status, instructor:instructor_id(first_name, last_name)")
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
 
       if (!error && data) {
         setRows(data.map((c) => ({
@@ -34,96 +35,142 @@ export default function AdminCourses() {
           title: c.title,
           status: c.status,
           instructor: c.instructor ? `${c.instructor.first_name || ""} ${c.instructor.last_name || ""}`.trim() : "-"
-        })))
+        })));
       } else {
-        setRows([])
+        setRows([]);
       }
     } catch (err) {
-      console.error("Error fetching courses from Supabase:", err)
-      setRows([])
+      console.error("Error fetching courses from Supabase:", err);
+      setRows([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load(); }, []);
 
   const approve = async (id) => {
     try {
-      await apiConnector("PATCH", adminEndpoints.APPROVE_COURSE.replace(":id", id))
-      toast.success("Course approved")
+      await apiConnector("PATCH", adminEndpoints.APPROVE_COURSE.replace(":id", id));
+      toast.success("Course approved");
     } catch {
-      const { error } = await supabase.from("courses").update({ status: "approved" }).eq("id", id)
-      if (error) toast.error("Failed to approve course")
-      else toast.success("Course approved")
+      const { error } = await supabase.from("courses").update({ status: "approved" }).eq("id", id);
+      if (error) toast.error("Failed to approve course");
+      else toast.success("Course approved");
     }
-    load()
-  }
+    load();
+  };
 
   const remove = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this course?")) return
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
     try {
-      await apiConnector("DELETE", adminEndpoints.DELETE_COURSE.replace(":id", id))
-      toast.success("Course deleted")
+      await apiConnector("DELETE", adminEndpoints.DELETE_COURSE.replace(":id", id));
+      toast.success("Course deleted");
     } catch {
-      const { error } = await supabase.from("courses").delete().eq("id", id)
-      if (error) toast.error("Failed to delete course")
-      else toast.success("Course deleted")
+      const { error } = await supabase.from("courses").delete().eq("id", id);
+      if (error) toast.error("Failed to delete course");
+      else toast.success("Course deleted");
     }
-    load()
-  }
+    load();
+  };
 
-  const startEdit = (c) => { setEditing(c.id); setTitle(c.title) }
+  const startEdit = (c) => { setEditing(c.id); setTitle(c.title); };
 
   const saveEdit = async (id) => {
     try {
-      await apiConnector("PATCH", adminEndpoints.EDIT_COURSE.replace(":id", id), { title })
-      toast.success("Course updated")
+      await apiConnector("PATCH", adminEndpoints.EDIT_COURSE.replace(":id", id), { title });
+      toast.success("Course updated");
     } catch {
-      const { error } = await supabase.from("courses").update({ title }).eq("id", id)
-      if (error) toast.error("Failed to update course")
-      else toast.success("Course updated")
+      const { error } = await supabase.from("courses").update({ title }).eq("id", id);
+      if (error) toast.error("Failed to update course");
+      else toast.success("Course updated");
     }
-    setEditing(null)
-    load()
-  }
+    setEditing(null);
+    load();
+  };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Courses</h1>
-      <div className="mt-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-white/10">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold text-text tracking-tight">Course Catalog Approvals</h1>
+        <p className="text-xs text-muted mt-0.5">Review, moderate, and publish faculty course submissions</p>
+      </div>
+
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <table className="w-full text-left text-xs">
+          <thead className="bg-surface-2 border-b border-border text-muted">
             <tr>
-              <th className="px-4 py-3 text-sm">Title</th>
-              <th className="px-4 py-3 text-sm">Instructor</th>
-              <th className="px-4 py-3 text-sm">Status</th>
-              <th className="px-4 py-3 text-sm"></th>
+              <th className="px-4 py-3 font-semibold">Course Title</th>
+              <th className="px-4 py-3 font-semibold">Lead Instructor</th>
+              <th className="px-4 py-3 font-semibold">Status</th>
+              <th className="px-4 py-3 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-border">
             {loading ? (
-              <tr><td className="px-4 py-6 text-sm text-richblack-300" colSpan="4">Loading...</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td className="px-4 py-6 text-sm text-richblack-300" colSpan="4">No courses</td></tr>
-            ) : rows.map(c=>(
-              <tr key={c.id} className="border-t border-white/10">
-                <td className="px-4 py-3">
-                  {editing===c.id ? (
-                    <input className="bg-white/10 border border-white/10 rounded-lg px-3 py-1" value={title} onChange={(e)=>setTitle(e.target.value)} />
-                  ) : c.title}
+              <tr>
+                <td className="px-4 py-8 text-center text-muted" colSpan="4">
+                  <div className="w-5 h-5 border-2 border-border border-t-text rounded-full animate-spin mx-auto mb-2" />
+                  Loading courses...
                 </td>
-                <td className="px-4 py-3">{c.instructor || "-"}</td>
-                <td className="px-4 py-3 capitalize">{c.status}</td>
+              </tr>
+            ) : rows.length === 0 ? (
+              <tr>
+                <td className="px-4 py-8 text-center text-muted" colSpan="4">
+                  No courses in catalog.
+                </td>
+              </tr>
+            ) : rows.map(c => (
+              <tr key={c.id} className="hover:bg-surface-2 transition-colors">
+                <td className="px-4 py-3 font-medium text-text">
+                  {editing === c.id ? (
+                    <input 
+                      className="input-field py-1 text-xs" 
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)} 
+                    />
+                  ) : (
+                    c.title
+                  )}
+                </td>
+                <td className="px-4 py-3 text-muted">{c.instructor || "-"}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    {c.status!=="approved" && <button onClick={()=>approve(c.id)} className="px-3 py-2 rounded-lg bg-yellow-400 text-black text-sm">Approve</button>}
-                    {editing===c.id ? (
-                      <button onClick={()=>saveEdit(c.id)} className="px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-sm">Save</button>
-                    ) : (
-                      <button onClick={()=>startEdit(c)} className="px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-sm">Edit</button>
+                  <Badge 
+                    text={c.status || "draft"} 
+                    color={c.status === "approved" || c.status === "published" ? "emerald" : "amber"} 
+                  />
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    {c.status !== "approved" && (
+                      <button 
+                        onClick={() => approve(c.id)} 
+                        className="btn-primary py-1 px-2.5 rounded text-xs font-semibold"
+                      >
+                        Approve
+                      </button>
                     )}
-                    <button onClick={()=>remove(c.id)} className="px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-sm">Delete</button>
+                    {editing === c.id ? (
+                      <button 
+                        onClick={() => saveEdit(c.id)} 
+                        className="btn-secondary py-1 px-2.5 rounded text-xs"
+                      >
+                        Save
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => startEdit(c)} 
+                        className="btn-secondary py-1 px-2.5 rounded text-xs"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => remove(c.id)} 
+                      className="px-2.5 py-1 rounded text-xs text-danger hover:bg-danger/10 border border-transparent hover:border-danger/20 transition-colors"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -132,5 +179,5 @@ export default function AdminCourses() {
         </table>
       </div>
     </div>
-  )
+  );
 }

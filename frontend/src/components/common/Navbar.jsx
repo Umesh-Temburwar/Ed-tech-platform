@@ -99,11 +99,8 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav role="navigation" aria-label="Main navigation" className={`fixed w-full z-[100] transition-all duration-500 ${isScrolled
-        ? 'bg-[#000814]/80 backdrop-blur-md py-3 border-b border-white/10 shadow-2xl shadow-cyan-500/10'
-        : 'bg-transparent py-5'
-      }`}>
-      <div className="flex justify-between items-center px-6">
+    <nav role="navigation" aria-label="Main navigation" className="sticky top-0 z-[100] w-full bg-surface/95 border-b border-border shadow-sm transition-colors duration-200 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 h-16">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <Logo />
@@ -111,20 +108,21 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-8">
-          <ul role="menubar" className="flex items-center gap-8">
+          <ul role="menubar" className="flex items-center gap-6">
             {currentLinks.map((link) => (
               <li key={link.name} role="none">
                 <Link
                   role="menuitem"
                   to={link.path}
-                  className={`relative py-2 text-sm font-bold tracking-wide transition-all duration-300 hover:text-cyan-400 ${isActive(link.path) ? 'text-cyan-400' : 'text-slate-300'
-                    }`}
+                  className={`relative py-2 text-sm font-semibold tracking-wide transition-colors ${
+                    isActive(link.path) ? 'text-accent' : 'text-muted hover:text-text'
+                  }`}
                 >
                   {link.name}
                   {isActive(link.path) && (
                     <motion.span
                       layoutId="nav-underline"
-                      className="absolute bottom-0 left-0 w-full h-[2px] bg-cyan-400 shadow-[0_0_8px_rgba(0,180,216,0.6)]"
+                      className="absolute bottom-0 left-0 w-full h-[2px] bg-accent"
                     />
                   )}
                 </Link>
@@ -132,14 +130,14 @@ const Navbar = () => {
             ))}
           </ul>
 
-          <div className="flex items-center gap-6 ml-4 border-l border-white/10 pl-10">
+          <div className="flex items-center gap-5 ml-4 border-l border-border pl-6">
             {currentToken && currentUser ? (
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-4">
                 {/* Cart Icon — hidden when empty */}
                 {currentUser?.accountType === "Student" && cart.length > 0 && (
-                  <Link to="/cart" className="relative w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all group">
-                    <FaShoppingCart className="text-lg" />
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <Link to="/cart" className="relative w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-muted hover:text-text transition-colors">
+                    <FaShoppingCart className="text-base" />
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                       {cart.length}
                     </span>
                   </Link>
@@ -147,9 +145,9 @@ const Navbar = () => {
 
                 {/* Wishlist Icon — hidden when empty */}
                 {currentUser?.accountType === "Student" && wishlist?.length > 0 && (
-                  <Link to="/dashboard/wishlist" className="relative w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all group">
-                    <FaHeart className="text-lg group-hover:text-pink-500 transition-colors" />
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <Link to="/dashboard/wishlist" className="relative w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-muted hover:text-text transition-colors">
+                    <FaHeart className="text-base" />
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-hot text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                       {wishlist.length}
                     </span>
                   </Link>
@@ -168,11 +166,11 @@ const Navbar = () => {
                       setShowNotifications(!showNotifications);
                       setIsProfileOpen(false);
                     }}
-                    className="relative w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all group"
+                    className="relative w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center text-muted hover:text-text transition-colors"
                   >
-                    <FaBell className="text-lg group-hover:animate-swing" />
+                    <FaBell className="text-base" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-cyan-500 text-white text-xs rounded-full flex items-center justify-center">{unreadCount}</span>
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-hot text-white text-[10px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>
                     )}
                   </button>
 
@@ -198,16 +196,16 @@ const Navbar = () => {
                       setIsProfileOpen(!isProfileOpen);
                       setShowNotifications(false);
                     }}
-                    className="flex items-center gap-3 p-1.5 rounded-full bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all group"
+                    className="flex items-center gap-2 p-1 rounded-full bg-surface-2 border border-border hover:border-accent transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.05)]">
+                    <div className="w-7 h-7 rounded-full overflow-hidden border border-border">
                       <img
                         src={currentUser?.image || `https://api.dicebear.com/5.x/initials/svg?seed=${currentUser?.firstName}`}
                         alt="User"
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <FaChevronDown className={`text-[10px] text-slate-400 transition-transform duration-300 mr-2 group-hover:text-white ${isProfileOpen ? 'rotate-180' : ''}`} />
+                    <FaChevronDown className={`text-[10px] text-muted transition-transform duration-200 mr-1 ${isProfileOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   <ProfileDropdown
@@ -219,11 +217,11 @@ const Navbar = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <Link to="/login" className="text-sm font-bold text-slate-300 hover:text-white transition-colors">
+              <div className="flex items-center gap-3">
+                <Link to="/login" className="text-sm font-semibold text-muted hover:text-text transition-colors px-3 py-1.5">
                   Sign In
                 </Link>
-                <Link to="/signup" className="btn-primary py-2.5 px-8 text-sm shadow-lg shadow-cyan-500/20">
+                <Link to="/signup" className="btn-primary py-2 px-5 text-sm">
                   Join Now
                 </Link>
               </div>
@@ -236,7 +234,7 @@ const Navbar = () => {
           aria-label="Toggle main menu"
           aria-expanded={isMobileMenuOpen}
           aria-controls="mobile-menu"
-          className="lg:hidden text-white text-2xl"
+          className="lg:hidden text-text text-xl p-2 rounded-lg bg-surface-2 border border-border"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <FaTimes /> : <FaBars />}

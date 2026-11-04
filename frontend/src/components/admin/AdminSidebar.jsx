@@ -49,7 +49,7 @@ function SidebarContent({ onClose }) {
   return (
     <div className="flex flex-col h-full">
       {/* ── Brand header ──────────────────────────────────────────────────── */}
-      <div className="p-5 border-b border-white/[0.07] flex items-center justify-between shrink-0">
+      <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
         <Link to="/" className="flex items-center min-w-0">
           <Logo />
         </Link>
@@ -57,7 +57,7 @@ function SidebarContent({ onClose }) {
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-colors ml-2 shrink-0"
+            className="lg:hidden w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-muted hover:text-text transition-colors ml-2 shrink-0 border border-border"
             aria-label="Close sidebar"
           >
             <X className="w-4 h-4" />
@@ -66,8 +66,8 @@ function SidebarContent({ onClose }) {
       </div>
 
       {/* ── Admin identity card ───────────────────────────────────────────── */}
-      <div className="px-4 py-4 border-b border-white/[0.05] shrink-0">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+      <div className="px-3 py-3 border-b border-border shrink-0">
+        <div className="flex items-center gap-2.5 p-2 rounded-lg bg-surface-2 border border-border">
           <div className="relative shrink-0">
             <img
               src={
@@ -75,17 +75,15 @@ function SidebarContent({ onClose }) {
                 `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}&backgroundColor=b45309`
               }
               alt="Admin avatar"
-              className="w-9 h-9 rounded-full object-cover border border-amber-500/30"
+              className="w-8 h-8 rounded-full object-cover border border-border"
             />
-            {/* Online dot */}
-            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#080c14] shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{displayName}</p>
+            <p className="text-xs font-semibold text-text truncate">{displayName}</p>
             <div className="flex items-center gap-1 mt-0.5">
-              <Shield className="w-2.5 h-2.5 text-amber-400" />
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                Administrator
+              <Shield className="w-2.5 h-2.5 text-warning" />
+              <span className="text-[10px] font-bold text-warning uppercase tracking-wider">
+                Admin
               </span>
             </div>
           </div>
@@ -94,7 +92,7 @@ function SidebarContent({ onClose }) {
 
       {/* ── Navigation ────────────────────────────────────────────────────── */}
       <nav
-        className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5"
+        className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5"
         aria-label="Admin navigation"
         style={{ paddingBottom: "max(4rem, calc(env(safe-area-inset-bottom) + 1rem))" }}
       >
@@ -105,29 +103,29 @@ function SidebarContent({ onClose }) {
             end={item.id === "dashboard"}
             onClick={onClose}
             className={({ isActive }) =>
-              `group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 ${
+              `group flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                 isActive
-                  ? "bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-white border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.08)]"
-                  : "text-slate-400 hover:bg-white/[0.06] hover:text-white border border-transparent"
+                  ? "bg-surface-2 text-text font-semibold border border-border"
+                  : "text-muted hover:bg-surface-2 hover:text-text border border-transparent"
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <item.icon
                     className={`w-4 h-4 shrink-0 transition-colors ${
                       isActive
-                        ? "text-amber-400"
-                        : "text-slate-500 group-hover:text-slate-300"
+                        ? "text-accent"
+                        : "text-muted group-hover:text-text"
                     }`}
                   />
-                  <span className="text-[13px] font-semibold whitespace-nowrap">
+                  <span className="text-xs font-medium whitespace-nowrap">
                     {item.label}
                   </span>
                 </div>
                 {isActive && (
-                  <ChevronRight className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" />
                 )}
               </>
             )}
@@ -137,15 +135,15 @@ function SidebarContent({ onClose }) {
 
       {/* ── Footer: logout ────────────────────────────────────────────────── */}
       <div
-        className="p-3 border-t border-white/[0.06] shrink-0"
+        className="p-3 border-t border-border shrink-0"
         style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
       >
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium text-muted hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/20 transition-colors"
         >
-          <LogOut className="w-4 h-4 group-hover:translate-x-0.5 transition-transform shrink-0" />
-          <span className="text-[13px] font-semibold">Logout</span>
+          <LogOut className="w-4 h-4 shrink-0" />
+          <span>Logout</span>
         </button>
       </div>
     </div>
@@ -157,7 +155,7 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }) {
   return (
     <>
       {/* ── Desktop sidebar (fixed left, always visible at lg+) ────────── */}
-      <aside className="hidden lg:flex flex-col w-[240px] shrink-0 h-full bg-[#080c14]/95 backdrop-blur-xl border-r border-white/[0.07] overflow-hidden">
+      <aside className="hidden lg:flex flex-col w-[240px] shrink-0 h-full bg-surface border-r border-border overflow-hidden">
         <SidebarContent />
       </aside>
 
@@ -173,7 +171,7 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={onMobileClose}
-              className="lg:hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 z-[100] bg-black/60"
               aria-hidden="true"
             />
 
@@ -184,7 +182,7 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }) {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-[110] w-[240px] bg-[#080c14]/98 backdrop-blur-xl border-r border-white/[0.07] overflow-hidden"
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-[110] w-[240px] bg-surface border-r border-border overflow-hidden"
               aria-label="Admin mobile navigation"
             >
               <SidebarContent onClose={onMobileClose} />

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { motion } from 'framer-motion';
 import { 
   Star, Users, Clock, Play, Heart, Share2, CheckCircle, 
-  BookOpen, Award, MessageSquare, Calendar, Download, ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, BookOpen, Lock, ArrowLeft
 } from 'lucide-react';
 import Footer from '../components/common/Footer';
 import { supabase } from '../config/supabaseClient';
@@ -15,22 +14,16 @@ import { extractYouTubeVideoId } from '../utils/youtubeUtils';
 import { addToWishlist, removeFromWishlist } from '../services/operations/wishlistAPI';
 import { addToCart } from '../slices/cartSlice';
 
-const bgPattern = {
-  backgroundImage: `url("data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-};
-
 function CourseVideoPlayer({ courseData, isEnrolled, navigate, handleEnrollment }) {
   const isFree = courseData.is_free || Number(courseData.price) === 0;
 
-  // Priority: explicit youtube_video_id → derive from preview_video_url
   const videoId =
     courseData.youtube_video_id ||
     extractYouTubeVideoId(courseData.preview_video_url || '') ||
     null;
 
-  // Thumbnail priority: youtube > custom > uploaded > static
   const thumbnail =
-    (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null) ||
+    (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null) ||
     courseData.youtube_thumbnail_url ||
     courseData.final_thumbnail_url ||
     courseData.thumbnail_url ||
@@ -38,13 +31,6 @@ function CourseVideoPlayer({ courseData, isEnrolled, navigate, handleEnrollment 
     null;
 
   const canWatch = isFree || isEnrolled;
-
-  // Handler for img error — fallback from maxresdefault to hqdefault
-  const handleThumbError = (e) => {
-    if (e.target.src.includes('maxresdefault')) {
-      e.target.src = e.target.src.replace('maxresdefault', 'hqdefault');
-    }
-  };
 
   const handleClick = () => {
     if (isEnrolled) {
@@ -57,33 +43,37 @@ function CourseVideoPlayer({ courseData, isEnrolled, navigate, handleEnrollment 
   return (
     <div 
       onClick={handleClick}
-      className="relative aspect-video w-full bg-[#111625] overflow-hidden group cursor-pointer border border-richblack-700"
+      className="relative aspect-video w-full bg-surface-2 overflow-hidden group cursor-pointer border-b border-border"
     >
-      {thumbnail
-        ? <img src={thumbnail} alt={courseData.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={handleThumbError} />
-        : <div className="w-full h-full bg-gradient-to-br from-purple-900/40 to-indigo-900/40" />
-      }
+      {thumbnail ? (
+        <img 
+          src={thumbnail} 
+          alt={courseData.title} 
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+          onError={(e) => { e.target.style.display = 'none'; }} 
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-muted">
+          <BookOpen className="w-10 h-10" />
+        </div>
+      )}
       
       {canWatch ? (
-        // Playable Preview Overlay - Re-routes to Classroom
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 hover:bg-black/55 transition-all duration-300">
-          <div className="w-16 h-16 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-2xl">
-            <Play className="h-6 w-6 text-white ml-1 fill-current" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 hover:bg-black/50 transition-colors">
+          <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <Play className="h-5 w-5 text-black ml-0.5 fill-current" />
           </div>
-          <span className="absolute bottom-4 left-4 text-[10px] font-black uppercase tracking-wider text-white bg-purple-600/80 border border-purple-500/30 px-3 py-1 rounded-full shadow-lg">
-            {isEnrolled ? "Go to Classroom" : "Free Course"}
+          <span className="absolute bottom-3 left-3 text-[11px] font-semibold text-white bg-black/70 px-2.5 py-0.5 rounded">
+            {isEnrolled ? "Go to Classroom" : "Free Access"}
           </span>
         </div>
       ) : (
-        // Locked Preview Overlay
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 backdrop-blur-[3px] p-4 text-center transition-all duration-300 hover:bg-black/80">
-          <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 p-4 text-center">
+          <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center mb-2 text-white">
+            <Lock className="w-5 h-5" />
           </div>
-          <span className="text-sm font-black text-white tracking-widest uppercase">Enroll to Watch</span>
-          <span className="text-[10px] text-gray-400 mt-1 max-w-[200px] leading-relaxed">This video is only available inside the classroom.</span>
+          <span className="text-xs font-semibold text-white">Enroll to View Coursework</span>
+          <span className="text-[11px] text-muted mt-0.5">Lectures & materials accessible in classroom</span>
         </div>
       )}
     </div>
@@ -96,207 +86,114 @@ const CourseDetail = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   
-  // Redux Token & Profile Auth Selector
   const { user } = useSelector((state) => state.profile);
   const { token } = useSelector((state) => state.auth);
   const { wishlist } = useSelector((state) => state.wishlist);
-  
+  const { cart } = useSelector((state) => state.cart);
+
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const searchParams = new URLSearchParams(location.search);
-  const shouldAutoEnroll = searchParams.get("enroll") === "true";
+  const isWishlisted = wishlist.some((item) => item.id === courseId);
 
-  const isWishlisted = wishlist?.some((item) => item.id === courseData?.id);
-
-  const handleWishlist = () => {
-    if (!token) {
-      toast.error("Please login to add to wishlist");
-      navigate('/login');
-      return;
-    }
-    if (isWishlisted) {
-      dispatch(removeFromWishlist(courseData.id, token));
-    } else {
-      dispatch(addToWishlist(courseData.id, courseData, token));
-    }
-  };
-
-  const handleShare = () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: courseData?.title,
-        text: courseData?.description,
-        url: url,
-      }).catch((err) => console.error("Error sharing", err));
-    } else {
-      navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard!");
-    }
-  };
-
-  const handleAddToCart = () => {
-    if (courseData) {
-      dispatch(addToCart(courseData));
-    }
-  };
-
+  // Fetch course details & sections from Supabase
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
         setLoading(true);
-        
-        const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(courseId);
-        
-        let query = supabase
-          .from("courses")
+        const { data: course, error } = await supabase
+          .from('courses')
           .select(`
             *,
-            instructor:instructor_id(first_name, last_name, avatar_url, image, about)
-          `);
-          
-        if (isUUID) {
-          query = query.eq("id", courseId);
-        } else {
-          query = query.eq("slug", courseId);
-        }
-        
-        const { data: course, error: courseError } = await query.single();
-        if (courseError || !course) throw courseError || new Error("Course not found");
+            instructor:instructor_id(
+              id,
+              first_name,
+              last_name,
+              avatar_url,
+              image,
+              about
+            )
+          `)
+          .eq('id', courseId)
+          .single();
 
-        // Fetch curriculum sections — use 'sections' table (new schema)
-        const { data: sectionsData } = await supabase
-          .from("sections")
-          .select("id, section_name, order_index")
-          .eq("course_id", course.id)
-          .order("order_index", { ascending: true });
+        if (error) throw error;
 
-        // Fetch lessons — get YouTube columns too
-        const { data: lessonsData } = await supabase
-          .from("course_lessons")
-          .select("id, title, duration, duration_seconds, section_id, position, lesson_order, youtube_video_id, youtube_video_url, youtube_thumbnail_url, video_url")
-          .eq("course_id", course.id)
-          .order("position", { ascending: true });
+        if (course) {
+          // Fetch sections and lessons in parallel
+          const [secRes, lesRes] = await Promise.all([
+            supabase
+              .from('sections')
+              .select('id, section_name, order_index')
+              .eq('course_id', courseId)
+              .order('order_index', { ascending: true }),
+            supabase
+              .from('course_lessons')
+              .select('id, title, duration, duration_seconds, position, is_free_preview, section_id')
+              .eq('course_id', courseId)
+              .order('position', { ascending: true }),
+          ]);
 
-        // Derive first-lesson YouTube thumbnail for course card if not set
-        let firstLessonThumb = null;
-        if (lessonsData?.length > 0) {
-          const firstWithYt = lessonsData.find(
-            (l) => l.youtube_video_id || l.youtube_thumbnail_url ||
-                   extractYouTubeVideoId(l.youtube_video_url || l.video_url || '')
-          );
-          if (firstWithYt) {
-            const vid = firstWithYt.youtube_video_id ||
-              extractYouTubeVideoId(firstWithYt.youtube_video_url || firstWithYt.video_url || '');
-            firstLessonThumb = firstWithYt.youtube_thumbnail_url ||
-              (vid ? `https://img.youtube.com/vi/${vid}/maxresdefault.jpg` : null);
+          const sections = secRes.data || [];
+          const lessons = lesRes.data || [];
+
+          const sortedSections = sections.map(sec => ({
+            ...sec,
+            sub_sections: lessons.filter(l => l.section_id === sec.id)
+          }));
+
+          setCourseData({
+            ...course,
+            sections: sortedSections,
+            course_name: course.title || course.course_name,
+            course_description: course.description || course.course_description || course.short_description
+          });
+
+          if (sortedSections.length > 0) {
+            setActiveSection(sortedSections[0].id);
           }
         }
-
-        // Map lessons to sections
-        const formattedSections = (sectionsData || []).map(section => ({
-          ...section,
-          section_name: section.section_name,
-          sub_sections: (lessonsData || [])
-            .filter(lesson => lesson.section_id === section.id)
-            .map(lesson => ({
-              ...lesson,
-              time_duration: lesson.duration_seconds ? `${Math.round(lesson.duration_seconds / 60)} min` : "5 min"
-            }))
-        }));
-
-        // Enrich course data
-        const enrichedCourse = {
-          ...course,
-          course_name: course.title,
-          course_description: course.description,
-          enrolled_students_count: course.enrollment_count || 0,
-          instructor: course.instructor || {
-            first_name: "Instructor",
-            last_name: "",
-            avatar_url: null,
-            image: null
-          },
-          // Thumbnail: YouTube first, then first-lesson, then stored thumb
-          youtube_thumbnail_url:
-            course.youtube_thumbnail_url ||
-            firstLessonThumb ||
-            null,
-          final_thumbnail_url:
-            course.final_thumbnail_url ||
-            firstLessonThumb ||
-            null,
-          thumbnail:
-            course.youtube_thumbnail_url ||
-            firstLessonThumb ||
-            course.final_thumbnail_url ||
-            course.thumbnail_url ||
-            course.thumbnail ||
-            null,
-          what_you_will_learn: Array.isArray(course.what_you_will_learn)
-            ? course.what_you_will_learn
-            : Array.isArray(course.learning_outcomes)
-            ? course.learning_outcomes
-            : typeof (course.what_you_will_learn || course.learning_outcomes) === 'string'
-            ? (course.what_you_will_learn || course.learning_outcomes).split(/\r?\n/).map(s => s.trim()).filter(Boolean)
-            : [],
-          sections: formattedSections,
-          instructions: Array.isArray(course.instructions)
-            ? course.instructions
-            : Array.isArray(course.requirements)
-            ? course.requirements
-            : typeof (course.instructions || course.requirements) === 'string'
-            ? (course.instructions || course.requirements).split(/\r?\n/).map(s => s.trim()).filter(Boolean)
-            : []
-        };
-
-        setCourseData(enrichedCourse);
-
-        // Check user enrollment state safely using correct database student_id column and course UUID
-        let enrolled = false;
-        if (user) {
-          const { data: enrollData, error: enrollError } = await supabase
-            .from("course_enrollments")
-            .select("id, payment_status")
-            .eq("course_id", course.id)
-            .eq("student_id", user.id)
-            .maybeSingle();
-
-          if (!enrollError && enrollData) {
-            const status = enrollData.payment_status;
-            if (status === "paid" || status === "Free" || status === "completed") {
-              enrolled = true;
-            }
-          }
-        }
-        setIsEnrolled(enrolled);
-      } catch (error) {
-        console.error('[CourseDetail] Error fetching course details:', error);
+      } catch (err) {
+        console.error("Error fetching course detail:", err);
+        toast.error("Failed to load course details");
       } finally {
         setLoading(false);
       }
     };
-    if (courseId) {
-      fetchCourseDetails();
-    }
-  }, [courseId, user]);
 
+    fetchCourseDetails();
+  }, [courseId]);
+
+  // Check enrollment status
   useEffect(() => {
-    if (shouldAutoEnroll && token && user && courseData && !loading && !isEnrolled) {
-      // Clear the query param
-      navigate(location.pathname, { replace: true });
-      handleEnrollment();
-    }
-  }, [shouldAutoEnroll, token, user, courseData, loading, isEnrolled]);
+    const checkEnrollment = async () => {
+      if (!user?.id || !courseId) return;
+      try {
+        const { data } = await supabase
+          .from('course_enrollments')
+          .select('id')
+          .eq('course_id', courseId)
+          .eq('student_id', user.id)
+          .maybeSingle();
 
-  // Handler for Checkout & Enrollments
+        if (data) {
+          setIsEnrolled(true);
+        }
+      } catch (err) {
+        console.error("Enrollment check error:", err);
+      }
+    };
+
+    checkEnrollment();
+  }, [user, courseId]);
+
   const handleEnrollment = async () => {
-    const activeToken = token || localStorage.getItem("token");
-    if (!activeToken || !user) {
+    const activeToken = token || (await supabase.auth.getSession()).data.session?.access_token;
+
+    if (!activeToken) {
       toast.error("Please login to enroll in this course");
       navigate('/login', { state: { from: `/courses/${courseId}?enroll=true` } });
       return;
@@ -308,8 +205,7 @@ const CourseDetail = () => {
       const baseUrl = apiUrl.endsWith('/api/v1') ? apiUrl : `${apiUrl}/api/v1`;
 
       if (isFree) {
-        // FREE COURSE - Direct enrollment
-        toast.loading("Enrolling you instantly in this free course...");
+        toast.loading("Enrolling in course...");
         
         const response = await fetch(`${baseUrl}/course/enroll/free/${courseData.id}`, {
           method: "POST",
@@ -323,14 +219,13 @@ const CourseDetail = () => {
         toast.dismiss();
 
         if (resData.success) {
-          toast.success("Enrolled successfully! Enjoy start learning!");
+          toast.success("Enrolled successfully!");
           setIsEnrolled(true);
           navigate(`/learn/${courseData.id}`);
         } else {
           toast.error(resData.message || "Failed to process free enrollment");
         }
       } else {
-        // PAID COURSE - Open payment modal (Razorpay will handle enrollment after payment)
         setShowPaymentModal(true);
       }
     } catch (err) {
@@ -340,32 +235,67 @@ const CourseDetail = () => {
     }
   };
 
-  // Handle successful payment and enrollment
-  const handlePaymentSuccess = (enrollment) => {
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error('Please log in to add to cart');
+      return;
+    }
+    dispatch(addToCart(courseData));
+  };
+
+  const handleWishlist = (e) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error('Please log in to manage wishlist');
+      return;
+    }
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(courseData.id, token));
+    } else {
+      dispatch(addToWishlist(courseData.id, courseData, token));
+    }
+  };
+
+  const handleShare = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({
+        title: courseData.course_name,
+        text: courseData.course_description,
+        url: url
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url);
+      toast.success('Course link copied to clipboard!');
+    }
+  };
+
+  const handlePaymentSuccess = () => {
     setIsEnrolled(true);
     setShowPaymentModal(false);
-    toast.success("Payment successful! Redirecting to course...");
+    toast.success("Enrollment confirmed! Redirecting to classroom...");
     navigate(`/learn/${courseData.id}`);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B1020] flex items-center justify-center">
-        <FaSpinner className="text-purple-500 text-5xl animate-spin" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <FaSpinner className="text-muted text-3xl animate-spin" />
       </div>
     );
   }
 
   if (!courseData) {
     return (
-      <div className="min-h-screen bg-[#0B1020] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Course not found</h2>
+          <h2 className="text-xl font-semibold text-text mb-2">Course not found</h2>
           <button
             onClick={() => navigate('/explore-courses')}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-semibold hover:opacity-90 transition-opacity"
+            className="btn-primary py-2 px-4 rounded-lg text-xs font-semibold"
           >
-            Back to Courses
+            Back to Catalog
           </button>
         </div>
       </div>
@@ -377,294 +307,197 @@ const CourseDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1020]">
+    <div className="min-h-screen bg-canvas text-text">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-purple-900/30 via-blue-900/30 to-cyan-900/30 py-20">
-        <div className="absolute inset-0 opacity-20" style={bgPattern}></div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="bg-surface border-b border-border py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <button
+            onClick={() => navigate('/explore-courses')}
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to course catalog</span>
+          </button>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {courseData.tags?.slice(0, 3).map((tag, i) => (
-                    <span key={i} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-                      {tag}
-                    </span>
-                  ))}
+              <span className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-2">
+                Course Syllabus
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-semibold text-text tracking-tight mb-4 leading-tight">
+                {courseData.course_name}
+              </h1>
+
+              <p className="text-muted text-sm mb-6 leading-relaxed">
+                {courseData.course_description}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-6 text-xs text-muted mb-6">
+                <div className="flex items-center gap-1 text-warning">
+                  <Star className="h-4 w-4 fill-current" />
+                  <span className="text-text font-semibold">{courseData.average_rating || 0}</span>
                 </div>
-
-                <h1 className="text-5xl font-bold text-white mb-6">
-                  {courseData.course_name}
-                </h1>
-
-                <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                  {courseData.course_description}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-6 mb-8">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-6 w-6 text-yellow-400" />
-                    <span className="text-2xl font-bold text-white">{courseData.average_rating || 0}</span>
-                    <span className="text-gray-400">({courseData.ratings_count || 0} ratings)</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <Users className="h-5 w-5" />
-                    <span>{courseData.enrolled_students_count || 0} students</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <Clock className="h-5 w-5" />
-                    <span>{courseData.total_duration || '10 hours'}</span>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Users className="h-4 w-4" />
+                  <span>{courseData.enrolled_students_count || 0} enrolled</span>
                 </div>
-
-                <div className="flex items-center gap-4">
-                  {courseData.instructor?.image || courseData.instructor?.avatar_url ? (
-                    <img
-                      src={courseData.instructor?.image || courseData.instructor?.avatar_url}
-                      alt={courseData.instructor?.first_name}
-                      className="w-14 h-14 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xl font-bold">
-                        {courseData.instructor?.first_name?.charAt(0) || 'I'}
-                      </span>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-white font-semibold">
-                      {courseData.instructor?.first_name} {courseData.instructor?.last_name}
-                    </p>
-                    <p className="text-gray-400 text-sm">Course Instructor</p>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>{courseData.total_duration || 'Full Curriculum'}</span>
                 </div>
-              </motion.div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-surface-2 border border-border flex items-center justify-center font-semibold text-text text-sm">
+                  {courseData.instructor?.first_name?.charAt(0) || 'F'}
+                </div>
+                <div>
+                  <p className="text-text text-xs font-semibold">
+                    {courseData.instructor?.first_name} {courseData.instructor?.last_name}
+                  </p>
+                  <p className="text-muted text-[11px]">Faculty Instructor</p>
+                </div>
+              </div>
             </div>
 
-            {/* Sticky Enroll Card */}
+            {/* Sticky Enrollment Card */}
             <div className="lg:col-span-1">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="sticky top-8 bg-[#1A1F36] border border-white/10 rounded-2xl overflow-hidden"
-              >
-                <div className="relative overflow-hidden">
-                  <CourseVideoPlayer 
-                    courseData={courseData} 
-                    isEnrolled={isEnrolled} 
-                    navigate={navigate} 
-                    handleEnrollment={handleEnrollment} 
-                  />
-                </div>
+              <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm sticky top-24">
+                <CourseVideoPlayer 
+                  courseData={courseData} 
+                  isEnrolled={isEnrolled} 
+                  navigate={navigate} 
+                  handleEnrollment={handleEnrollment} 
+                />
 
-                <div className="p-6">
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-3 mb-2">
-                      <span className="text-4xl font-bold text-white">
-                        {courseData.price > 0 ? `₹${courseData.price}` : <span className="text-emerald-400">FREE</span>}
+                <div className="p-5 space-y-4">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-text">
+                      {courseData.price > 0 ? `₹${courseData.price}` : <span className="text-success">FREE</span>}
+                    </span>
+                    {courseData.original_price > courseData.price && (
+                      <span className="text-xs text-muted line-through">
+                        ₹{courseData.original_price}
                       </span>
-                      {courseData.original_price > courseData.price && (
-                        <span className="text-xl text-gray-500 line-through">
-                          ₹{courseData.original_price}
-                        </span>
-                      )}
-                    </div>
-                    {courseData.discount_percentage > 0 && (
-                      <p className="text-emerald-400 font-semibold">
-                        {courseData.discount_percentage}% off
-                      </p>
                     )}
                   </div>
 
                   <button 
                     onClick={isEnrolled ? () => navigate(`/learn/${courseData.id || courseId}`) : handleEnrollment}
-                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-bold text-lg hover:opacity-90 transition-opacity mb-4"
+                    className="w-full btn-primary py-2.5 rounded-lg text-sm font-semibold"
                   >
-                    {isEnrolled ? "Go To Classroom" : (courseData.is_free || Number(courseData.price) === 0 ? "Start Learning Free" : "Buy Now")}
+                    {isEnrolled ? "Go to Classroom" : (courseData.is_free || Number(courseData.price) === 0 ? "Enroll Free" : "Purchase Course")}
                   </button>
 
                   {!isEnrolled && token && user?.accountType === "Student" && (
                     <button 
                       onClick={handleAddToCart}
-                      className="w-full py-4 bg-richblack-800 text-richblack-5 rounded-xl font-bold text-lg mb-4 hover:bg-richblack-700 transition-all border border-richblack-700"
+                      className="w-full btn-secondary py-2 rounded-lg text-xs font-semibold"
                     >
                       Add to Cart
                     </button>
                   )}
 
-                  <div className="flex gap-2 mb-6">
+                  <div className="flex gap-2">
                     {token && user?.accountType === "Student" && (
                       <button 
                         onClick={handleWishlist}
-                        className="flex-1 py-3 border border-white/10 rounded-xl text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                        className={`flex-1 btn-secondary py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 ${
+                          isWishlisted ? 'text-danger' : ''
+                        }`}
                       >
-                        <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-pink-500 text-pink-500' : ''}`} />
-                        <span>{isWishlisted ? 'Wishlisted' : 'Wishlist'}</span>
+                        <Heart className={`h-3.5 w-3.5 ${isWishlisted ? 'fill-current' : ''}`} />
+                        <span>{isWishlisted ? 'Wishlisted' : 'Save'}</span>
                       </button>
                     )}
                     <button 
                       onClick={handleShare}
-                      className="flex-1 py-3 border border-white/10 rounded-xl text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 btn-secondary py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5"
                     >
-                      <Share2 className="h-5 w-5" />
+                      <Share2 className="h-3.5 w-3.5" />
                       <span>Share</span>
                     </button>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-gray-300">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
-                      <span>Lifetime access</span>
+                  <div className="space-y-2 pt-2 border-t border-border text-xs text-muted">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      <span>Permanent curriculum access</span>
                     </div>
-                    <div className="flex items-center gap-3 text-gray-300">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
-                      <span>Certificate of completion</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-gray-300">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
-                      <span>30-day money-back guarantee</span>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      <span>Verified completion certificate</span>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Course Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-16">
-            {/* What You'll Learn */}
+      {/* Curriculum & Details */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-10">
+            {/* Syllabus Sections */}
             <section>
-              <h2 className="text-3xl font-bold text-white mb-8">What You'll Learn</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {courseData.what_you_will_learn?.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-300">{item}</span>
-                  </div>
-                )) || (
-                  <>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="h-6 w-6 text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-300">Master the fundamentals</span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="h-6 w-6 text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-300">Build real-world projects</span>
-                    </div>
-                  </>
-                )}
-              </div>
-            </section>
-
-            {/* Course Content */}
-            <section>
-              <h2 className="text-3xl font-bold text-white mb-8">Course Content</h2>
-              <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-text mb-4">Course Syllabus & Modules</h2>
+              <div className="space-y-3">
                 {courseData.sections?.map((section, index) => (
-                  <div key={section.id} className="bg-[#1A1F36] border border-white/10 rounded-xl overflow-hidden">
+                  <div key={section.id} className="bg-surface border border-border rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleSection(section.id)}
-                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                      className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-surface-2 transition-colors"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="text-purple-400 font-bold text-lg">{index + 1}</div>
-                        <div>
-                          <h3 className="text-white font-semibold">{section.section_name}</h3>
-                          <p className="text-gray-400 text-sm">
-                            {section.sub_sections?.length || 0} lessons • {section.duration || '30 min'}
-                          </p>
-                        </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-semibold text-muted">Section {index + 1}:</span>
+                        <span className="text-xs font-semibold text-text">{section.section_name}</span>
+                        <span className="text-[11px] text-muted">
+                          ({section.sub_sections?.length || 0} lectures)
+                        </span>
                       </div>
                       {activeSection === section.id ? (
-                        <ChevronUp className="h-6 w-6 text-gray-400" />
+                        <ChevronUp className="h-4 w-4 text-muted" />
                       ) : (
-                        <ChevronDown className="h-6 w-6 text-gray-400" />
+                        <ChevronDown className="h-4 w-4 text-muted" />
                       )}
                     </button>
                     
                     {activeSection === section.id && (
-                      <div className="border-t border-white/10">
-                        {section.sub_sections?.map((lesson, lessonIndex) => (
-                          <div key={lesson.id} className="px-6 py-3 flex items-center gap-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-                            <Play className="h-5 w-5 text-gray-400" />
-                            <span className="text-gray-300 flex-1">{lesson.title}</span>
-                            <span className="text-gray-500 text-sm">{lesson.time_duration || '5 min'}</span>
+                      <div className="border-t border-border divide-y divide-border/60 bg-surface-2/40">
+                        {section.sub_sections?.map((lesson) => (
+                          <div key={lesson.id} className="px-5 py-2.5 flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2.5">
+                              <Play className="h-3.5 w-3.5 text-muted" />
+                              <span className="text-text">{lesson.title}</span>
+                            </div>
+                            {lesson.duration && (
+                              <span className="text-[11px] font-mono text-muted">{lesson.duration}</span>
+                            )}
                           </div>
-                        )) || (
-                          <div className="px-6 py-4 text-gray-400">No lessons yet</div>
-                        )}
+                        ))}
                       </div>
                     )}
                   </div>
-                )) || (
-                  <div className="text-gray-400">No sections available</div>
-                )}
+                ))}
               </div>
             </section>
 
-            {/* Requirements */}
-            {courseData.instructions?.length > 0 && (
-              <section>
-                <h2 className="text-3xl font-bold text-white mb-8">Requirements</h2>
-                <ul className="space-y-3">
-                  {courseData.instructions.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-gray-300">
-                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2 flex-shrink-0"></span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {/* Instructor */}
-            <section>
-              <h2 className="text-3xl font-bold text-white mb-8">Instructor</h2>
-              <div className="bg-[#1A1F36] border border-white/10 rounded-2xl p-8">
-                <div className="flex items-start gap-6">
-                  {courseData.instructor?.image || courseData.instructor?.avatar_url ? (
-                    <img
-                      src={courseData.instructor?.image || courseData.instructor?.avatar_url}
-                      alt={courseData.instructor?.first_name}
-                      className="w-24 h-24 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-3xl font-bold">
-                        {courseData.instructor?.first_name?.charAt(0) || 'I'}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-white mb-2">
-                      {courseData.instructor?.first_name} {courseData.instructor?.last_name}
-                    </h3>
-                    <p className="text-gray-400 mb-4">{courseData.instructor?.bio || 'Experienced instructor'}</p>
-                    <div className="flex flex-wrap gap-6 text-sm">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-white">{courseData.instructor?.courses_count || 1}</div>
-                        <div className="text-gray-400">Courses</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-white">{courseData.instructor?.students_count || 0}</div>
-                        <div className="text-gray-400">Students</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-white">{courseData.instructor?.reviews_count || 0}</div>
-                        <div className="text-gray-400">Reviews</div>
-                      </div>
-                    </div>
-                  </div>
+            {/* Instructor Bio */}
+            <section className="bg-surface border border-border rounded-xl p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-text mb-4">Faculty Information</h3>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-surface-2 border border-border flex items-center justify-center font-bold text-base text-text shrink-0">
+                  {courseData.instructor?.first_name?.charAt(0) || 'F'}
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-text">
+                    {courseData.instructor?.first_name} {courseData.instructor?.last_name}
+                  </h4>
+                  <p className="text-xs text-muted mt-1 leading-relaxed">
+                    {courseData.instructor?.about || 'Senior faculty instructor and domain specialist.'}
+                  </p>
                 </div>
               </div>
             </section>
@@ -674,7 +507,7 @@ const CourseDetail = () => {
 
       <Footer />
 
-      {/* Payment Modal for Paid Courses */}
+      {/* Payment Modal */}
       {showPaymentModal && courseData && (
         <PaymentModalSecure
           course={courseData}

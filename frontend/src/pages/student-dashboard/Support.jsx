@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, CheckCircle, Mail, Zap, BookOpen, Paperclip, Upload, X, Loader2 } from 'lucide-react';
+import { ChevronDown, CheckCircle, Mail, MessageSquare, BookOpen, Paperclip, Upload, X, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../../config/supabaseClient';
 import { uploadFile as uploadSupportFile, validateFile } from '../../services/storage/supportAttachments';
-import { GlassCard, Badge } from '../../components/dashboard/Common';
+import { Badge } from '../../components/dashboard/Common';
 import { FAQ_DATA } from '../../data/student-dashboard-data';
 
 const SupportPage = () => {
@@ -97,79 +97,60 @@ const SupportPage = () => {
       }
 
       let attachmentUrl = null;
-
       if (file) {
         attachmentUrl = await handleFileUpload();
       }
 
-      const { error } = await supabase
-        .from('support_tickets')
-        .insert([
-          {
-            user_id: authUser.id,
-            name: `${userData?.firstName || user?.firstName || ''} ${userData?.lastName || user?.lastName || ''}`,
-            email: userData?.email || user?.email || '',
-            subject,
-            category: subject,
-            message,
-            attachment_url: attachmentUrl,
-            status: 'open',
-            priority: 'medium',
-          },
-        ]);
+      const { error } = await supabase.from('support_tickets').insert([
+        {
+          user_id: authUser.id,
+          subject,
+          message,
+          attachment_url: attachmentUrl,
+          status: 'open',
+          priority: 'normal',
+        },
+      ]);
 
-      if (error) {
-        console.error(error);
-        toast.error('Ticket creation failed');
-        return;
-      }
+      if (error) throw error;
 
       toast.success('Support ticket submitted successfully');
       setFormSent(true);
-      setSubject('Course Content Issue');
       setMessage('');
-      setFile(null);
-      setFilePreview(null);
-
+      removeFile();
     } catch (err) {
       console.error(err);
-      toast.error('Something went wrong');
+      toast.error(err.message || 'Failed to submit ticket');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-12 animate-in fade-in duration-500">
-      <div className="text-center space-y-4">
-        <motion.h2 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-bold text-white"
-        >
-          How can we help?
-        </motion.h2>
-        <p className="text-gray-400 text-lg">Browse FAQ or contact our support experts</p>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-xl font-semibold text-text">Academic Help Desk & Support</h2>
+        <p className="text-xs text-muted mt-0.5">Submit technical or coursework inquiries directly to faculty assistants</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="space-y-4">
-          <h3 className="text-xl font-bold text-white mb-6">Frequently Asked Questions</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* FAQ Accordion */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-text mb-4">Frequently Asked Questions</h3>
           {FAQ_DATA.map((item, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10"
+              className="bg-surface border border-border rounded-lg overflow-hidden transition-colors"
             >
               <button
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
-                className="w-full p-5 flex justify-between items-center text-left hover:bg-white/5 transition-colors"
+                className="w-full p-4 flex justify-between items-center text-left hover:bg-surface-2 transition-colors"
               >
-                <span className="text-sm font-bold text-gray-200">{item.q}</span>
+                <span className="text-xs font-semibold text-text">{item.q}</span>
                 <ChevronDown
-                  className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${openIdx === i ? 'rotate-180 text-cyan-400' : ''}`}
+                  className={`w-4 h-4 text-muted transition-transform duration-200 shrink-0 ml-2 ${
+                    openIdx === i ? 'rotate-180 text-text' : ''
+                  }`}
                 />
               </button>
               <AnimatePresence>
@@ -178,103 +159,98 @@ const SupportPage = () => {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <p className="p-5 pt-0 text-sm text-gray-400 leading-relaxed border-t border-white/5">
+                    <p className="p-4 pt-0 text-xs text-muted leading-relaxed border-t border-border">
                       {item.a}
                     </p>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        <GlassCard className="h-fit">
+        {/* Ticket Form */}
+        <div className="bg-surface border border-border rounded-xl p-6 shadow-sm">
           {formSent ? (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="py-20 flex flex-col items-center text-center"
-            >
-              <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6">
-                <CheckCircle className="w-10 h-10 text-emerald-500" />
+            <div className="py-12 flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-full bg-success/10 border border-success/30 flex items-center justify-center mb-3">
+                <CheckCircle className="w-6 h-6 text-success" />
               </div>
-              <h3 className="text-2xl font-bold text-white">Message Sent!</h3>
-              <p className="text-gray-400 mt-2">We'll get back to you within 2 hours.</p>
+              <h3 className="text-base font-semibold text-text">Ticket Dispatched</h3>
+              <p className="text-xs text-muted mt-1 max-w-xs">
+                Your support inquiry has been logged. Our academic team responds within 2-4 business hours.
+              </p>
               <button
                 onClick={() => setFormSent(false)}
-                className="mt-8 text-cyan-400 font-bold hover:underline transition-colors"
+                className="btn-secondary mt-5 py-2 px-4 rounded-lg text-xs font-medium"
               >
-                Send another message
+                Submit another inquiry
               </button>
-            </motion.div>
+            </div>
           ) : (
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-bold text-white">Get in Touch</h3>
-                <Badge text="Replies Within 2 Hours" color="emerald" />
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-sm font-semibold text-text">Open Support Ticket</h3>
+                <Badge text="Academic Response Desk" color="indigo" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase">Name</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-medium text-muted mb-1">Name</label>
                   <input
                     type="text"
                     value={displayName}
                     readOnly
-                    className="w-full bg-gray-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-                    placeholder="Your name"
+                    className="input-field bg-surface-2 text-muted"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase">Email</label>
+                <div>
+                  <label className="block text-[11px] font-medium text-muted mb-1">Email</label>
                   <input
                     type="email"
                     value={userEmail}
                     readOnly
-                    className="w-full bg-gray-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-                    placeholder="your@email.com"
+                    className="input-field bg-surface-2 text-muted"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-500 uppercase">Subject</label>
+              <div>
+                <label className="block text-[11px] font-medium text-muted mb-1">Issue Category</label>
                 <select
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full bg-gray-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                  className="input-field"
                 >
                   <option>Course Content Issue</option>
-                  <option>Payment Problem</option>
-                  <option>Technical Issue</option>
-                  <option>Certificate Issue</option>
-                  <option>Account Problem</option>
+                  <option>Payment & Enrollment Problem</option>
+                  <option>Lecture Player Technical Issue</option>
+                  <option>Quiz Submission / Grade Review</option>
+                  <option>Certificate Verification Inquiry</option>
                 </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-500 uppercase">Message</label>
+              <div>
+                <label className="block text-[11px] font-medium text-muted mb-1">Detailed Description</label>
                 <textarea
                   required
-                  rows={5}
+                  rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full bg-gray-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none"
-                  placeholder="Describe your issue..."
+                  className="input-field resize-none"
+                  placeholder="Describe the issue encountered, including lesson title if relevant..."
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-500 uppercase">Attachment</label>
+              <div>
+                <label className="block text-[11px] font-medium text-muted mb-1">Attachment (Optional)</label>
                 {!file ? (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer bg-gray-900 hover:border-cyan-500/50 transition-colors">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                      <p className="text-xs text-gray-400">Click to upload or drag and drop</p>
-                      <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP, PDF (max 5MB)</p>
-                    </div>
+                  <label className="flex flex-col items-center justify-center w-full p-4 border border-dashed border-border rounded-lg cursor-pointer bg-surface-2 hover:border-border/80 transition-colors">
+                    <Upload className="w-5 h-5 text-muted mb-1" />
+                    <span className="text-xs text-text font-medium">Click to select screenshot or log file</span>
+                    <span className="text-[10px] text-muted">PNG, JPG, PDF up to 5MB</span>
                     <input
                       type="file"
                       className="hidden"
@@ -283,26 +259,20 @@ const SupportPage = () => {
                     />
                   </label>
                 ) : (
-                  <div className="flex items-center justify-between p-4 bg-gray-900 border border-white/10 rounded-xl">
-                    <div className="flex items-center space-x-3">
-                      {filePreview ? (
-                        <img src={filePreview} alt="Preview" className="w-12 h-12 object-cover rounded-lg" />
-                      ) : (
-                        <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
-                          <Paperclip className="w-6 h-6 text-gray-400" />
-                        </div>
-                      )}
+                  <div className="flex items-center justify-between p-3 bg-surface-2 border border-border rounded-lg">
+                    <div className="flex items-center gap-2.5">
+                      <Paperclip className="w-4 h-4 text-muted" />
                       <div>
-                        <p className="text-sm text-white font-medium">{file.name}</p>
-                        <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        <p className="text-xs font-medium text-text">{file.name}</p>
+                        <p className="text-[10px] text-muted">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={removeFile}
-                      className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                      className="p-1 hover:bg-surface rounded text-muted hover:text-text transition-colors"
                     >
-                      <X className="w-4 h-4 text-gray-400" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 )}
@@ -311,53 +281,39 @@ const SupportPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-cyan-600 to-purple-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-cyan-500/20 active:scale-[0.98] transition-all flex items-center justify-center"
+                className="w-full btn-primary py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Sending...
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Dispatched to Support...</span>
                   </>
                 ) : (
-                  'Send Message →'
+                  <span>Submit Ticket</span>
                 )}
               </button>
             </form>
           )}
-        </GlassCard>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 border border-white/10 p-6 rounded-2xl text-center group cursor-pointer hover:bg-white/10 transition-all hover:border-cyan-500/30"
-        >
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-cyan-500/20 transition-colors">
-            <Mail className="w-6 h-6 text-cyan-400" />
-          </div>
-          <h4 className="font-bold text-white">Email Support</h4>
-          <p className="text-xs text-gray-400 mt-1">support@eduspace.io</p>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 border border-white/10 p-6 rounded-2xl text-center group cursor-pointer hover:bg-white/10 transition-all hover:border-emerald-500/30"
-        >
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-500/20 transition-colors">
-            <Zap className="w-6 h-6 text-emerald-400" />
-          </div>
-          <h4 className="font-bold text-white">Live Chat</h4>
-          <p className="text-xs text-gray-400 mt-1">Average wait: 2m</p>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 border border-white/10 p-6 rounded-2xl text-center group cursor-pointer hover:bg-white/10 transition-all hover:border-purple-500/30"
-        >
-          <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-500/20 transition-colors">
-            <BookOpen className="w-6 h-6 text-purple-400" />
-          </div>
-          <h4 className="font-bold text-white">Documentation</h4>
-          <p className="text-xs text-gray-400 mt-1">Self-serve guides</p>
-        </motion.div>
+      {/* Support Channels */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-surface border border-border p-4 rounded-xl shadow-sm text-center">
+          <Mail className="w-5 h-5 text-accent mx-auto mb-2" />
+          <h4 className="text-xs font-semibold text-text">Direct Inquiries</h4>
+          <p className="text-[11px] text-muted mt-0.5">support@edtech-platform.edu</p>
+        </div>
+        <div className="bg-surface border border-border p-4 rounded-xl shadow-sm text-center">
+          <MessageSquare className="w-5 h-5 text-success mx-auto mb-2" />
+          <h4 className="text-xs font-semibold text-text">Faculty Office Hours</h4>
+          <p className="text-[11px] text-muted mt-0.5">Mon–Fri: 10:00 – 17:00 IST</p>
+        </div>
+        <div className="bg-surface border border-border p-4 rounded-xl shadow-sm text-center">
+          <BookOpen className="w-5 h-5 text-warning mx-auto mb-2" />
+          <h4 className="text-xs font-semibold text-text">Documentation</h4>
+          <p className="text-[11px] text-muted mt-0.5">Syllabus & platform guidebooks</p>
+        </div>
       </div>
     </div>
   );

@@ -17,24 +17,24 @@ const InstructorDashboardLayout = () => {
 
   if (checking) {
     return (
-      <div className="flex h-screen bg-[#000814] items-center justify-center">
+      <div className="flex h-screen bg-canvas text-text items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
-            <svg className="w-6 h-6 animate-spin text-white" viewBox="0 0 24 24" fill="none">
+          <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center">
+            <svg className="w-5 h-5 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
           </div>
-          <p className="text-slate-400 text-sm">Checking your onboarding status...</p>
+          <p className="text-muted text-sm font-medium">Checking your onboarding status...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#000814] overflow-hidden safe-top safe-bottom">
+    <div className="flex h-screen bg-canvas text-text overflow-hidden safe-top safe-bottom">
       {/* Sidebar */}
-      <div className="hidden lg:block h-full shrink-0">
+      <div className="hidden lg:block h-full shrink-0 border-r border-border bg-surface">
         <InstructorSidebar />
       </div>
 
@@ -44,7 +44,7 @@ const InstructorDashboardLayout = () => {
           <DashboardNavbar />
         </div>
 
-        <main className="flex-1 overflow-y-auto custom-scrollbar bg-[#000814]">
+        <main className="flex-1 overflow-y-auto custom-scrollbar bg-canvas">
           <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             <AnimatePresence mode="wait">
               <motion.div

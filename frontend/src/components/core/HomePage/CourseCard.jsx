@@ -80,32 +80,28 @@ const CourseCard = React.memo(function CourseCard({ course }) {
   }, [handleNavigate]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -10 }}
+    <div
       onClick={handleNavigate}
-      className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-full border border-richblack-50 group cursor-pointer relative"
+      className="bg-surface rounded-xl border border-border hover:border-border/80 transition-colors overflow-hidden flex flex-col h-full group cursor-pointer relative shadow-sm"
     >
       {/* Top Image */}
-      <div className="relative overflow-hidden aspect-video bg-gradient-to-br from-blue-100 to-indigo-100">
+      <div className="relative overflow-hidden aspect-video bg-surface-2 border-b border-border">
         {resolvedThumbnail ? (
           <img
             src={resolvedThumbnail}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={handleImgError}
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <FaPlay className="text-4xl text-blue-300 opacity-50" />
+          <div className="w-full h-full flex items-center justify-center text-muted">
+            <FaPlay className="text-2xl opacity-40" />
           </div>
         )}
         {isFree && (
-          <div className="absolute top-4 left-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg z-10">
-            Free Demo
+          <div className="absolute top-3 left-3 bg-success/20 border border-success/40 text-success text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10">
+            Free Course
           </div>
         )}
         
@@ -113,62 +109,62 @@ const CourseCard = React.memo(function CourseCard({ course }) {
         {token && user?.accountType === "Student" && (
           <button
             onClick={handleWishlistClick}
-            className={`absolute top-4 right-4 z-20 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 ${
+            className={`absolute top-3 right-3 z-20 p-2 rounded-lg border text-xs transition-colors ${
               isWishlisted 
-                ? 'bg-pink-500/90 text-white shadow-[0_0_15px_rgba(236,72,153,0.5)]' 
-                : 'bg-white/30 text-white hover:bg-white/50 hover:scale-110'
+                ? 'bg-danger/20 border-danger text-danger' 
+                : 'bg-surface/80 border-border text-muted hover:text-danger'
             }`}
             title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
           >
-            <FaHeart className={isWishlisted ? "scale-110" : ""} />
+            <FaHeart className={isWishlisted ? "text-danger" : ""} />
           </button>
         )}
       </div>
 
       {/* Course Info */}
-      <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold text-richblack-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
+      <div className="p-5 flex flex-col flex-grow">
+        <h3 className="text-base font-semibold text-text mb-1.5 group-hover:text-accent transition-colors line-clamp-1">
           {title}
         </h3>
-        <p className="text-richblack-500 text-sm mb-4 line-clamp-2 leading-relaxed">
+        <p className="text-muted text-xs mb-3 line-clamp-2 leading-relaxed">
           {description}
         </p>
 
         {/* Rating */}
-        <div className="flex items-center gap-2 mb-4">
-          <RatingStars Review_Count={rating} Star_Size={16} />
-          <span className="text-sm font-semibold text-richblack-700">({rating})</span>
+        <div className="flex items-center gap-2 mb-3">
+          <RatingStars Review_Count={rating} Star_Size={14} />
+          <span className="text-xs font-semibold text-text">({rating})</span>
         </div>
 
         {/* Meta Details */}
-        <div className="flex items-center justify-between py-4 border-t border-richblack-50 mb-4">
-          <div className="flex items-center gap-2 text-richblack-600 text-xs font-medium">
-            <FaClock className="text-blue-500" />
+        <div className="flex items-center justify-between py-3 border-t border-border mb-4">
+          <div className="flex items-center gap-1.5 text-muted text-xs">
+            <FaClock className="text-muted text-[11px]" />
             <span>{duration}</span>
           </div>
-          <div className="flex items-center gap-2 text-richblack-600 text-xs font-medium">
-            <FaSignal className="text-blue-500" />
+          <div className="flex items-center gap-1.5 text-muted text-xs">
+            <FaSignal className="text-muted text-[11px]" />
             <span>{level}</span>
           </div>
         </div>
 
         {/* Pricing & CTA */}
-        <div className="mt-auto flex items-center justify-between gap-4">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2">
           <div className="flex flex-col">
-            <span className="text-[10px] uppercase font-bold text-richblack-400 tracking-wider">Course Fee</span>
-            <span className={`text-xl font-extrabold ${isFree ? 'text-emerald-600' : 'text-blue-600'}`}>
+            <span className="text-[10px] uppercase font-semibold text-muted tracking-wider">Tuition</span>
+            <span className={`text-base font-semibold ${isFree ? 'text-success' : 'text-text'}`}>
               {isFree ? 'FREE' : `₹${price}`}
             </span>
           </div>
           <button 
             onClick={handleButtonClick}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all active:scale-95"
+            className="btn-primary py-1.5 px-3.5 rounded-lg text-xs font-semibold"
           >
             Enroll Now
           </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 

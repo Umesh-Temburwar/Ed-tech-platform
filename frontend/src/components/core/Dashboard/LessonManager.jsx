@@ -1,15 +1,10 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// LESSON MANAGER — Add/Edit/Delete lessons inside Edit Course page
-// Instructors can manage unlimited lessons per section
-// ═══════════════════════════════════════════════════════════════════════════
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
 import {
   FaPlus, FaTrash, FaEdit, FaCheck, FaTimes, FaYoutube,
   FaChevronDown, FaChevronUp, FaGripVertical, FaSpinner,
-  FaPlay, FaEye
+  FaPlay
 } from "react-icons/fa";
 import {
   getSectionsByCourse,
@@ -21,7 +16,7 @@ import {
   updateLesson,
   deleteLesson,
 } from "../../../services/lessonService";
-import { getYoutubeVideoId, getYoutubeThumbnail } from "../../../utils/youtubeUtils";
+import { getYoutubeVideoId } from "../../../utils/youtubeUtils";
 
 // ── Inline YouTube Preview ───────────────────────────────────────────────────
 function YoutubePreview({ url }) {
@@ -29,11 +24,11 @@ function YoutubePreview({ url }) {
   if (!videoId) return null;
   const thumb = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
   return (
-    <div className="mt-2 flex items-center gap-3 p-2 bg-black/30 rounded-lg border border-white/10">
-      <img src={thumb} alt="Preview" className="w-16 aspect-video object-cover rounded" onError={(e) => (e.target.style.display = "none")} />
+    <div className="mt-2 flex items-center gap-2.5 p-2 bg-surface-2 rounded-md border border-border">
+      <img src={thumb} alt="Preview" className="w-14 aspect-video object-cover rounded border border-border" onError={(e) => (e.target.style.display = "none")} />
       <div>
-        <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">✓ Valid YouTube URL</p>
-        <p className="text-[10px] text-slate-500 font-mono">{videoId}</p>
+        <p className="text-[11px] text-success font-medium">Valid YouTube URL</p>
+        <p className="text-[10px] text-muted font-mono">{videoId}</p>
       </div>
     </div>
   );
@@ -67,12 +62,12 @@ function LessonForm({ sectionId, courseId, onSave, onCancel, initialData = null 
       if (initialData?.id) {
         const { data, error } = await updateLesson(initialData.id, payload);
         if (error) throw error;
-        toast.success("Lesson updated!");
+        toast.success("Lesson updated");
         onSave(data);
       } else {
         const { data, error } = await createLesson(courseId, sectionId, payload);
         if (error) throw error;
-        toast.success("Lesson added!");
+        toast.success("Lesson added");
         onSave(data);
       }
     } catch (err) {
@@ -85,51 +80,51 @@ function LessonForm({ sectionId, courseId, onSave, onCancel, initialData = null 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-[#0A0F22] border border-white/10 rounded-xl p-4 space-y-3"
+      className="bg-surface-2 border border-border rounded-lg p-3.5 space-y-3"
     >
       <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <label className="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">
-            Lesson Title *
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-text block">
+            Lesson Title <span className="text-danger">*</span>
           </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Introduction to React Hooks"
-            className="w-full px-3 py-2 text-sm rounded-lg bg-richblack-900 border border-white/10 focus:border-yellow-400 outline-none text-white placeholder-slate-600 transition-colors"
+            placeholder="e.g. Cache Invalidation Strategies"
+            className="w-full px-3 py-1.5 text-xs rounded-md bg-surface border border-border focus:border-accent outline-none text-text transition-colors"
             required
           />
         </div>
 
-        <div>
-          <label className="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-text block">
             YouTube URL
           </label>
           <div className="relative">
-            <FaYoutube className="absolute left-3 top-1/2 -translate-y-1/2 text-red-400 text-sm" />
+            <FaYoutube className="absolute left-2.5 top-1/2 -translate-y-1/2 text-danger text-xs" />
             <input
               type="url"
               value={youtubeUrl}
               onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-richblack-900 border border-white/10 focus:border-red-400 outline-none text-white placeholder-slate-600 transition-colors"
+              placeholder="https://youtube.com/watch?v=..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-surface border border-border focus:border-accent outline-none text-text transition-colors"
             />
           </div>
           <YoutubePreview url={youtubeUrl} />
         </div>
       </div>
 
-      <div>
-        <label className="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">
+      <div className="space-y-1">
+        <label className="text-xs font-semibold text-text block">
           Description (optional)
         </label>
         <textarea
           rows={2}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Brief description of this lesson..."
-          className="w-full px-3 py-2 text-sm rounded-lg bg-richblack-900 border border-white/10 focus:border-yellow-400 outline-none text-white placeholder-slate-600 resize-none transition-colors"
+          placeholder="Summary of concepts covered in this lesson..."
+          className="w-full px-3 py-1.5 text-xs rounded-md bg-surface border border-border focus:border-accent outline-none text-text resize-none transition-colors"
         />
       </div>
 
@@ -139,10 +134,10 @@ function LessonForm({ sectionId, courseId, onSave, onCancel, initialData = null 
           id={`free_preview_${sectionId}`}
           checked={isFreePreview}
           onChange={(e) => setIsFreePreview(e.target.checked)}
-          className="accent-yellow-400"
+          className="accent-hot cursor-pointer"
         />
-        <label htmlFor={`free_preview_${sectionId}`} className="text-xs text-slate-400 cursor-pointer">
-          Free preview (visible without enrollment)
+        <label htmlFor={`free_preview_${sectionId}`} className="text-xs text-muted cursor-pointer">
+          Free preview (accessible without enrollment)
         </label>
       </div>
 
@@ -150,17 +145,17 @@ function LessonForm({ sectionId, courseId, onSave, onCancel, initialData = null 
         <button
           type="submit"
           disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-richblack-900 text-xs font-black rounded-lg hover:bg-yellow-100 disabled:opacity-50 transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-hot text-white text-xs font-semibold rounded-md hover:bg-[#e5482a] disabled:opacity-50 transition-colors"
         >
-          {saving ? <FaSpinner className="animate-spin" /> : <FaCheck />}
+          {saving ? <FaSpinner className="animate-spin text-xs" /> : <FaCheck className="text-xs" />}
           {saving ? "Saving..." : initialData ? "Update Lesson" : "Add Lesson"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="flex items-center gap-2 px-4 py-2 bg-white/5 text-slate-400 text-xs font-bold rounded-lg hover:bg-white/10 border border-white/10 transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-surface text-muted text-xs font-medium rounded-md hover:text-text border border-border transition-colors"
         >
-          <FaTimes /> Cancel
+          <FaTimes className="text-xs" /> Cancel
         </button>
       </div>
     </form>
@@ -189,60 +184,54 @@ function LessonRow({ lesson, onEdit, onDelete }) {
   }
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/5 rounded-xl group hover:border-white/10 transition-all"
-    >
-      <FaGripVertical className="text-slate-700 text-xs shrink-0 cursor-grab" />
+    <div className="flex items-center gap-3 p-2.5 bg-surface border border-border rounded-md group hover:border-border-muted transition-colors">
+      <FaGripVertical className="text-muted text-xs shrink-0 cursor-grab opacity-50" />
 
       {/* Thumbnail or play icon */}
-      <div className="w-12 aspect-video rounded-lg overflow-hidden bg-black/40 shrink-0 flex items-center justify-center">
+      <div className="w-10 aspect-video rounded overflow-hidden bg-surface-2 border border-border shrink-0 flex items-center justify-center">
         {thumb ? (
           <img src={thumb} alt={lesson.title} className="w-full h-full object-cover" onError={(e) => (e.target.style.display = "none")} />
         ) : (
-          <FaPlay className="text-slate-700 text-xs" />
+          <FaPlay className="text-muted text-[10px]" />
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-white line-clamp-1">{lesson.title}</p>
+        <p className="text-xs font-medium text-text truncate">{lesson.title}</p>
         <div className="flex items-center gap-2 mt-0.5">
           {hasVideo ? (
-            <span className="flex items-center gap-1 text-[10px] text-red-400 font-bold">
-              <FaYoutube /> YouTube
+            <span className="flex items-center gap-1 text-[10px] text-danger font-medium">
+              <FaYoutube /> Video
             </span>
           ) : (
-            <span className="text-[10px] text-slate-600">No video attached</span>
+            <span className="text-[10px] text-muted">No video URL</span>
           )}
           {lesson.is_free_preview && (
-            <span className="text-[10px] text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
+            <span className="text-[10px] text-success border border-success/30 px-1 rounded font-medium">
               Free Preview
             </span>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => onEdit(lesson)}
-          className="p-2 rounded-lg bg-white/5 text-slate-400 hover:bg-yellow-50/10 hover:text-yellow-50 border border-white/10 transition-all text-xs"
+          className="p-1 rounded text-muted hover:text-text hover:bg-surface-2 border border-border transition-colors text-xs"
           title="Edit lesson"
         >
-          <FaEdit />
+          <FaEdit className="text-xs" />
         </button>
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="p-2 rounded-lg bg-white/5 text-slate-400 hover:bg-red-500/20 hover:text-red-400 border border-white/10 transition-all text-xs disabled:opacity-50"
+          className="p-1 rounded text-muted hover:text-danger hover:bg-danger/10 border border-border transition-colors text-xs disabled:opacity-50"
           title="Delete lesson"
         >
-          {deleting ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+          {deleting ? <FaSpinner className="animate-spin text-xs" /> : <FaTrash className="text-xs" />}
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -305,10 +294,10 @@ function SectionCard({ section, courseId, sectionIndex, onSectionUpdated, onSect
   }
 
   return (
-    <div className="border border-white/10 rounded-2xl overflow-hidden bg-richblack-800">
+    <div className="border border-border rounded-xl overflow-hidden bg-surface">
       {/* Section Header */}
-      <div className="flex items-center gap-3 p-4 bg-white/[0.04] border-b border-white/5">
-        <span className="w-7 h-7 rounded-lg bg-yellow-50/10 border border-yellow-50/20 flex items-center justify-center text-xs font-black text-yellow-50 shrink-0">
+      <div className="flex items-center gap-3 p-3.5 bg-surface-2 border-b border-border">
+        <span className="w-6 h-6 rounded bg-surface border border-border flex items-center justify-center text-xs font-semibold text-text shrink-0">
           {sectionIndex + 1}
         </span>
 
@@ -318,110 +307,100 @@ function SectionCard({ section, courseId, sectionIndex, onSectionUpdated, onSect
               value={sectionTitle}
               onChange={(e) => setSectionTitle(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSaveTitle(); if (e.key === "Escape") setEditingTitle(false); }}
-              className="flex-1 px-2 py-1 text-sm bg-richblack-900 border border-yellow-50/40 rounded-lg outline-none text-white"
+              className="flex-1 px-2 py-1 text-xs bg-surface border border-accent rounded outline-none text-text"
               autoFocus
             />
-            <button onClick={handleSaveTitle} disabled={savingTitle} className="text-emerald-400 hover:text-emerald-300 text-xs">
+            <button onClick={handleSaveTitle} disabled={savingTitle} className="text-success hover:opacity-80 text-xs">
               {savingTitle ? <FaSpinner className="animate-spin" /> : <FaCheck />}
             </button>
-            <button onClick={() => { setSectionTitle(section.section_name); setEditingTitle(false); }} className="text-slate-500 hover:text-slate-300 text-xs">
+            <button onClick={() => { setSectionTitle(section.section_name); setEditingTitle(false); }} className="text-muted hover:text-text text-xs">
               <FaTimes />
             </button>
           </div>
         ) : (
           <button
             onClick={() => setEditingTitle(true)}
-            className="flex-1 text-left font-bold text-white text-sm hover:text-yellow-50 transition-colors group"
+            className="flex-1 text-left font-semibold text-text text-xs hover:text-accent transition-colors flex items-center gap-2"
           >
-            {section.section_name}
-            <FaEdit className="inline ml-2 text-slate-600 group-hover:text-slate-400 text-xs" />
+            <span>{section.section_name}</span>
+            <FaEdit className="text-muted text-[10px]" />
           </button>
         )}
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-[10px] text-slate-500 font-bold px-2">{lessons.length} lesson{lessons.length !== 1 ? "s" : ""}</span>
+          <span className="text-[10px] text-muted font-medium px-2">{lessons.length} lesson{lessons.length !== 1 ? "s" : ""}</span>
           <button
             onClick={handleDeleteSection}
             disabled={deletingSection}
-            className="p-1.5 rounded-lg bg-white/5 text-slate-600 hover:bg-red-500/20 hover:text-red-400 border border-white/10 transition-all text-xs disabled:opacity-50"
+            className="p-1 rounded text-muted hover:text-danger hover:bg-danger/10 border border-border transition-colors text-xs disabled:opacity-50"
             title="Delete section"
           >
-            {deletingSection ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+            {deletingSection ? <FaSpinner className="animate-spin text-xs" /> : <FaTrash className="text-xs" />}
           </button>
           <button
             onClick={() => setIsExpanded((p) => !p)}
-            className="p-1.5 rounded-lg bg-white/5 text-slate-500 hover:bg-white/10 border border-white/10 transition-all text-xs"
+            className="p-1 rounded text-muted hover:text-text hover:bg-surface border border-border transition-colors text-xs"
           >
-            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+            {isExpanded ? <FaChevronUp className="text-xs" /> : <FaChevronDown className="text-xs" />}
           </button>
         </div>
       </div>
 
       {/* Section Body */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="p-4 space-y-3">
-              {loadingLessons ? (
-                <div className="flex items-center gap-2 text-slate-500 text-sm">
-                  <FaSpinner className="animate-spin" /> Loading lessons...
-                </div>
-              ) : (
-                <AnimatePresence>
-                  {lessons.length === 0 && !showAddForm && (
-                    <p className="text-slate-600 text-sm text-center py-4">
-                      No lessons yet. Click <strong className="text-slate-400">Add Lesson</strong> below.
-                    </p>
-                  )}
-                  {lessons.map((lesson) =>
-                    editingLesson?.id === lesson.id ? (
-                      <LessonForm
-                        key={lesson.id}
-                        sectionId={section.id}
-                        courseId={courseId}
-                        initialData={lesson}
-                        onSave={handleLessonSaved}
-                        onCancel={() => setEditingLesson(null)}
-                      />
-                    ) : (
-                      <LessonRow
-                        key={lesson.id}
-                        lesson={lesson}
-                        onEdit={setEditingLesson}
-                        onDelete={handleLessonDeleted}
-                      />
-                    )
-                  )}
-                </AnimatePresence>
+      {isExpanded && (
+        <div className="p-4 space-y-2.5">
+          {loadingLessons ? (
+            <div className="flex items-center gap-2 text-muted text-xs py-2">
+              <FaSpinner className="animate-spin" /> Loading lessons...
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {lessons.length === 0 && !showAddForm && (
+                <p className="text-muted text-xs text-center py-3">
+                  No lessons in this section. Click <strong className="text-text">Add Lesson</strong> below.
+                </p>
               )}
-
-              {/* Add Lesson Form */}
-              {showAddForm && (
-                <LessonForm
-                  sectionId={section.id}
-                  courseId={courseId}
-                  onSave={handleLessonSaved}
-                  onCancel={() => setShowAddForm(false)}
-                />
-              )}
-
-              {!showAddForm && !editingLesson && (
-                <button
-                  onClick={() => setShowAddForm(true)}
-                  className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-yellow-50 bg-yellow-50/10 border border-yellow-50/20 rounded-xl hover:bg-yellow-50/20 transition-all"
-                >
-                  <FaPlus /> Add Lesson
-                </button>
+              {lessons.map((lesson) =>
+                editingLesson?.id === lesson.id ? (
+                  <LessonForm
+                    key={lesson.id}
+                    sectionId={section.id}
+                    courseId={courseId}
+                    initialData={lesson}
+                    onSave={handleLessonSaved}
+                    onCancel={() => setEditingLesson(null)}
+                  />
+                ) : (
+                  <LessonRow
+                    key={lesson.id}
+                    lesson={lesson}
+                    onEdit={setEditingLesson}
+                    onDelete={handleLessonDeleted}
+                  />
+                )
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+
+          {showAddForm && (
+            <LessonForm
+              sectionId={section.id}
+              courseId={courseId}
+              onSave={handleLessonSaved}
+              onCancel={() => setShowAddForm(false)}
+            />
+          )}
+
+          {!showAddForm && !editingLesson && (
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent bg-surface-2 border border-border rounded-md hover:bg-surface transition-colors mt-2"
+            >
+              <FaPlus className="text-[10px]" /> Add Lesson
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -457,7 +436,7 @@ export default function LessonManager({ courseId }) {
       setSections((p) => [...p, data]);
       setNewSectionTitle("");
       setAddingSection(false);
-      toast.success("Section added!");
+      toast.success("Section added");
     }
     setSavingSection(false);
   }
@@ -472,8 +451,8 @@ export default function LessonManager({ courseId }) {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-8 justify-center text-slate-500 text-sm">
-        <FaSpinner className="animate-spin" /> Loading curriculum...
+      <div className="flex items-center gap-2 py-6 justify-center text-muted text-xs">
+        <FaSpinner className="animate-spin text-accent" /> Loading curriculum modules...
       </div>
     );
   }
@@ -481,82 +460,76 @@ export default function LessonManager({ courseId }) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-2 border-b border-border">
         <div>
-          <h2 className="text-lg font-black text-white">Course Curriculum</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {sections.length} section{sections.length !== 1 ? "s" : ""} · Add lessons to each section below
+          <h2 className="text-sm font-semibold text-text">Course Curriculum</h2>
+          <p className="text-xs text-muted">
+            {sections.length} section{sections.length !== 1 ? "s" : ""} · Manage sections and lessons
           </p>
         </div>
         <button
           onClick={() => setAddingSection(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-richblack-900 text-xs font-black rounded-xl hover:bg-yellow-100 transition-all shadow-md"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-hot text-white text-xs font-semibold rounded-md hover:bg-[#e5482a] transition-colors"
         >
-          <FaPlus /> Add Section
+          <FaPlus className="text-[10px]" /> Add Section
         </button>
       </div>
 
       {/* Add Section Form */}
-      <AnimatePresence>
-        {addingSection && (
-          <motion.form
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            onSubmit={handleAddSection}
-            className="flex items-center gap-3 p-4 bg-white/[0.04] border border-white/10 rounded-xl"
+      {addingSection && (
+        <form
+          onSubmit={handleAddSection}
+          className="flex items-center gap-2 p-3 bg-surface-2 border border-border rounded-lg"
+        >
+          <input
+            autoFocus
+            type="text"
+            value={newSectionTitle}
+            onChange={(e) => setNewSectionTitle(e.target.value)}
+            placeholder="Section title (e.g. Memory Layout & Virtual Memory)"
+            className="flex-1 px-3 py-1.5 text-xs bg-surface border border-border focus:border-accent rounded-md outline-none text-text"
+            onKeyDown={(e) => e.key === "Escape" && setAddingSection(false)}
+          />
+          <button
+            type="submit"
+            disabled={savingSection}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-hot text-white text-xs font-semibold rounded-md disabled:opacity-50 hover:bg-[#e5482a] transition-colors"
           >
-            <input
-              autoFocus
-              type="text"
-              value={newSectionTitle}
-              onChange={(e) => setNewSectionTitle(e.target.value)}
-              placeholder="Section title e.g. Introduction, HTML Basics..."
-              className="flex-1 px-3 py-2 text-sm bg-richblack-900 border border-white/10 focus:border-yellow-50 rounded-lg outline-none text-white placeholder-slate-600"
-              onKeyDown={(e) => e.key === "Escape" && setAddingSection(false)}
-            />
-            <button
-              type="submit"
-              disabled={savingSection}
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-richblack-900 text-xs font-black rounded-lg disabled:opacity-50"
-            >
-              {savingSection ? <FaSpinner className="animate-spin" /> : <FaCheck />}
-              {savingSection ? "Saving..." : "Save Section"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setAddingSection(false)}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs"
-            >
-              <FaTimes />
-            </button>
-          </motion.form>
-        )}
-      </AnimatePresence>
+            {savingSection ? <FaSpinner className="animate-spin text-xs" /> : <FaCheck className="text-xs" />}
+            <span>Save</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAddingSection(false)}
+            className="p-1.5 rounded-md bg-surface border border-border text-muted hover:text-text text-xs"
+          >
+            <FaTimes className="text-xs" />
+          </button>
+        </form>
+      )}
 
       {/* Empty state */}
       {sections.length === 0 && !addingSection && (
-        <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
-          <FaPlay className="text-slate-700 text-3xl mx-auto mb-3" />
-          <p className="text-slate-500 font-bold text-sm">No sections yet</p>
-          <p className="text-slate-700 text-xs mt-1">Click "Add Section" to start building your curriculum</p>
+        <div className="text-center py-10 border border-dashed border-border rounded-xl">
+          <FaPlay className="text-muted text-xl mx-auto mb-2 opacity-50" />
+          <p className="text-text font-medium text-xs">No sections created yet</p>
+          <p className="text-muted text-xs mt-0.5">Click "Add Section" to begin structuring your curriculum</p>
         </div>
       )}
 
       {/* Section Cards */}
-      <AnimatePresence>
+      <div className="space-y-3">
         {sections.map((section, idx) => (
-          <motion.div key={section.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <SectionCard
-              section={section}
-              courseId={courseId}
-              sectionIndex={idx}
-              onSectionUpdated={handleSectionUpdated}
-              onSectionDeleted={handleSectionDeleted}
-            />
-          </motion.div>
+          <SectionCard
+            key={section.id}
+            section={section}
+            courseId={courseId}
+            sectionIndex={idx}
+            onSectionUpdated={handleSectionUpdated}
+            onSectionDeleted={handleSectionDeleted}
+          />
         ))}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

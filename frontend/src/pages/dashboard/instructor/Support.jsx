@@ -442,14 +442,8 @@ const InstructorSupport = () => {
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#020617] relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[150px]"></div>
-        <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-cyan-900/20 rounded-full blur-[150px]"></div>
-      </div>
-
-      <div className="container mx-auto px-6 py-8 relative z-10">
+    <div className="space-y-6 text-text">
+      <div className="space-y-6">
         {/* Ticket Details Modal */}
         <AnimatePresence>
           {selectedTicket && (
@@ -457,7 +451,7 @@ const InstructorSupport = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4"
+              className="fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-4"
               onClick={() => setSelectedTicket(null)}
             >
               <motion.div
@@ -664,39 +658,33 @@ const InstructorSupport = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.15 + idx * 0.03 }}
                     onClick={() => setCategory(cat.label)}
-                    whileHover={{ scale: 1.05, y: -4 }}
-                    className={`glass-dark border border-white/10 rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-[0_0_40px_rgba(6,182,212,0.15)] ${
+                    className={`bg-surface border rounded-xl p-4 text-left transition-colors ${
                       category === cat.label 
-                        ? 'border-cyan-500/50 bg-cyan-500/5' 
-                        : 'hover:border-cyan-500/30'
+                        ? 'border-accent bg-surface-2' 
+                        : 'border-border hover:border-border-muted'
                     }`}
                   >
-                    <div className={`w-10 h-10 ${cat.bg} rounded-xl flex items-center justify-center mb-3`}>
-                      <Icon className={`text-lg ${cat.color}`} />
+                    <div className="w-8 h-8 bg-surface-2 rounded-lg flex items-center justify-center mb-2.5 border border-border">
+                      <Icon className="text-base text-muted" />
                     </div>
-                    <h3 className="text-white font-bold text-xs">{cat.label}</h3>
+                    <h3 className="text-text font-semibold text-xs">{cat.label}</h3>
                   </motion.button>
                 );
               })}
             </motion.div>
 
             {/* CREATE SUPPORT TICKET SECTION */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="glass-dark border border-[#1E293B] rounded-3xl p-8 bg-[#0F172A]"
-            >
-              <div className="mb-8 space-y-6">
+            <div className="bg-surface border border-border rounded-xl p-6">
+              <div className="mb-6 space-y-4">
                 {/* Instructor Profile Box */}
-                <div className="p-6 rounded-3xl bg-gradient-to-br from-cyan-500/10 via-blue-500/5 to-transparent border border-cyan-500/30">
-                  <div className="flex items-center gap-5">
+                <div className="p-4 rounded-xl bg-surface-2 border border-border">
+                  <div className="flex items-center gap-4">
                     {profileLoading ? (
                       <>
-                        <div className="w-20 h-20 rounded-2xl bg-white/10 animate-pulse"></div>
-                        <div className="space-y-2">
-                          <div className="h-6 bg-white/10 rounded w-48 animate-pulse"></div>
-                          <div className="h-4 bg-white/10 rounded w-32 animate-pulse"></div>
+                        <div className="w-14 h-14 rounded-xl bg-surface animate-pulse"></div>
+                        <div className="space-y-1.5">
+                          <div className="h-5 bg-surface rounded w-40 animate-pulse"></div>
+                          <div className="h-3.5 bg-surface rounded w-28 animate-pulse"></div>
                         </div>
                       </>
                     ) : (
@@ -705,17 +693,14 @@ const InstructorSupport = () => {
                           <img 
                             src={instructorProfile?.avatar || `https://api.dicebear.com/5.x/initials/svg?seed=Instructor`} 
                             alt="Instructor" 
-                            className="w-20 h-20 rounded-2xl object-cover border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)]"
+                            className="w-14 h-14 rounded-xl object-cover border border-border"
                           />
-                          <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-[#0F172A] flex items-center justify-center">
-                            <FaCheckCircle className="text-xs text-white" />
-                          </div>
                         </div>
                         <div>
-                          <h3 className="text-2xl font-bold text-white">
+                          <h3 className="text-base font-bold text-text">
                             {instructorProfile?.name || "Instructor"}
                           </h3>
-                          <p className="text-cyan-300 text-sm font-medium">
+                          <p className="text-muted text-xs">
                             {instructorProfile?.email || "instructor@example.com"}
                           </p>
                         </div>
@@ -895,53 +880,46 @@ const InstructorSupport = () => {
                 </div>
 
                 {/* Submit Button */}
-                <motion.button
-                  whileHover={{ scale: submitting ? 1 : 1.02 }}
-                  whileTap={{ scale: submitting ? 1 : 0.98 }}
+                <button
                   type="submit"
                   disabled={submitting || uploading}
-                  className="w-full py-4 bg-gradient-to-r from-cyan-600 via-blue-600 to-violet-600 text-white font-bold rounded-2xl shadow-[0_0_40px_rgba(6,182,212,0.3)] transition-all duration-300 hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none flex items-center justify-center gap-3"
+                  className="w-full py-2.5 bg-hot hover:bg-[#e5482a] text-white font-semibold text-xs rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>
-                      <FaSpinner className="animate-spin" />
-                      Submitting...
+                      <FaSpinner className="animate-spin text-xs" />
+                      <span>Submitting Ticket...</span>
                     </>
                   ) : (
                     <>
-                      Submit Ticket
-                      <FaArrowRight />
+                      <span>Submit Support Ticket</span>
+                      <FaArrowRight className="text-xs" />
                     </>
                   )}
-                </motion.button>
+                </button>
               </form>
-            </motion.div>
+            </div>
 
             {/* FAQ SECTION */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
-              className="glass-dark border border-[#1E293B] rounded-3xl overflow-hidden bg-[#0F172A]"
-            >
-              <div className="p-6 border-b border-[#1E293B]">
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <FaQuestionCircle className="text-yellow-400" />
+            <div className="bg-surface border border-border rounded-xl overflow-hidden">
+              <div className="p-5 border-b border-border">
+                <h2 className="text-sm font-bold text-text flex items-center gap-2">
+                  <FaQuestionCircle className="text-warning text-xs" />
                   Instructor FAQs
                 </h2>
               </div>
-              <div className="divide-y divide-[#1E293B]">
+              <div className="divide-y divide-border">
                 {INSTRUCTOR_FAQS.map((faq, idx) => (
-                  <div key={idx} className="p-6">
+                  <div key={idx} className="p-4">
                     <button
                       onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
                       className="w-full flex items-center justify-between text-left"
                     >
-                      <span className="text-white font-semibold text-sm">{faq.q}</span>
+                      <span className="text-text font-medium text-xs">{faq.q}</span>
                       {expandedFAQ === idx ? (
-                        <FaChevronUp className="text-slate-400" />
+                        <FaChevronUp className="text-muted text-xs" />
                       ) : (
-                        <FaChevronDown className="text-slate-400" />
+                        <FaChevronDown className="text-muted text-xs" />
                       )}
                     </button>
                     <AnimatePresence>
@@ -952,7 +930,7 @@ const InstructorSupport = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <p className="text-slate-400 text-sm mt-4 leading-relaxed">
+                          <p className="text-muted text-xs mt-2 leading-relaxed">
                             {faq.a}
                           </p>
                         </motion.div>
@@ -961,25 +939,21 @@ const InstructorSupport = () => {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
           </div>
 
           {/* RIGHT SECTION (1 column) */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             
             {/* MY TICKETS PANEL */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="glass-dark border border-[#1E293B] rounded-3xl p-6 bg-[#0F172A]"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <FaInbox className="text-pink-400" />
+            <div className="bg-surface border border-border rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-bold text-text flex items-center gap-2">
+                  <FaInbox className="text-muted text-xs" />
                   My Tickets
                 </h2>
-                <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full">
+                <span className="px-2 py-0.5 bg-surface-2 border border-border text-muted text-[11px] font-medium rounded">
                   {tickets.length} Active
                 </span>
               </div>
@@ -1084,85 +1058,65 @@ const InstructorSupport = () => {
                   })
                 )}
               </div>
-            </motion.div>
+            </div>
 
             {/* SLA / SUPPORT INFO CARD */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent p-6"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-500/20 to-transparent rounded-full blur-3xl"></div>
-              
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                    <FaHeadset className="text-amber-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold text-sm">INSTRUCTOR PRIORITY SLA</h3>
-                    <p className="text-amber-300 text-xs font-semibold">Priority Support Active</p>
-                  </div>
+            <div className="rounded-xl border border-border bg-surface p-5 space-y-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-surface-2 border border-border rounded-lg flex items-center justify-center">
+                  <FaHeadset className="text-muted text-xs" />
                 </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-[#1E293B]">
-                    <span className="text-slate-400 text-xs">Average response time</span>
-                    <span className="text-white text-xs font-bold flex items-center gap-1">
-                      <FaBolt className="text-amber-400" /> Under 2 Hours
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-[#1E293B]">
-                    <span className="text-slate-400 text-xs">Dedicated support</span>
-                    <span className="text-white text-xs font-bold">Instructor-only Queue</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-[#1E293B]">
-                    <span className="text-slate-400 text-xs">Live support</span>
-                    <span className="text-green-400 text-xs font-bold flex items-center gap-1">
-                      <FaCheckCircle /> Available 24/7
-                    </span>
-                  </div>
+                <div>
+                  <h3 className="text-text font-semibold text-xs">Instructor Support SLA</h3>
+                  <p className="text-muted text-[11px]">Priority queue active</p>
                 </div>
               </div>
-            </motion.div>
+
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between p-2 rounded-md bg-surface-2 border border-border">
+                  <span className="text-muted">Target turnaround</span>
+                  <span className="text-text font-medium flex items-center gap-1">
+                    <FaBolt className="text-warning text-[10px]" /> Within 2 Hours
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-md bg-surface-2 border border-border">
+                  <span className="text-muted">Queue tier</span>
+                  <span className="text-text font-medium">Faculty Dedicated</span>
+                </div>
+              </div>
+            </div>
 
             {/* Quick Help Links */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="glass-dark border border-[#1E293B] rounded-3xl p-6 bg-[#0F172A]"
-            >
-              <h3 className="text-white font-bold text-sm mb-4 flex items-center gap-2">
-                <FaBook className="text-blue-400" />
+            <div className="bg-surface border border-border rounded-xl p-5">
+              <h3 className="text-text font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
+                <FaBook className="text-muted text-xs" />
                 Quick Help
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {[
-                  { icon: FaBook, label: 'Documentation', color: 'text-blue-400' },
-                  { icon: FaFileInvoiceDollar, label: 'Payout Help', color: 'text-green-400' },
-                  { icon: FaFileVideo, label: 'Upload Guide', color: 'text-yellow-400' },
-                  { icon: FaQuestionCircle, label: 'Verification FAQ', color: 'text-violet-400' },
+                  { icon: FaBook, label: 'Platform Documentation' },
+                  { icon: FaFileInvoiceDollar, label: 'Payout Policies' },
+                  { icon: FaFileVideo, label: 'Video Upload Specs' },
+                  { icon: FaQuestionCircle, label: 'Instructor Verification FAQ' },
                 ].map((link, idx) => {
                   const Icon = link.icon;
                   return (
                     <a
                       key={idx}
                       href="#"
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-300 group"
+                      className="flex items-center gap-2.5 p-2 rounded-md hover:bg-surface-2 transition-colors group"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                        <Icon className={`text-sm ${link.color}`} />
+                      <div className="w-6 h-6 rounded bg-surface-2 border border-border flex items-center justify-center text-muted group-hover:text-text">
+                        <Icon className="text-xs" />
                       </div>
-                      <span className="text-slate-300 text-sm font-medium group-hover:text-white transition-colors">
+                      <span className="text-muted text-xs font-medium group-hover:text-text transition-colors">
                         {link.label}
                       </span>
                     </a>
                   );
                 })}
               </div>
-            </motion.div>
+            </div>
 
           </div>
         </div>

@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Star, Users, Clock, Tag, Heart, Share2, ShoppingCart } from 'lucide-react';
-import RatingStars from '../components/common/RatingStars';
+import { Search, Filter, Star, Users, Clock, Heart, Share2, ShoppingCart, BookOpen } from 'lucide-react';
 import Footer from '../components/common/Footer';
-import CourseCard from '../components/common/CourseCard';
 import { supabase } from '../config/supabaseClient';
 import { getYoutubeThumbnail } from '../utils/youtubeUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import { addToWishlist, removeFromWishlist } from '../services/operations/wishlistAPI';
 import { addToCart } from '../slices/cartSlice';
-
-const bgPattern = {
-  backgroundImage: `url("data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-};
 
 const ExploreCourses = () => {
   const dispatch = useDispatch();
@@ -30,8 +24,6 @@ const ExploreCourses = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
-  const [category, setCategory] = useState('all');
-  const [flyingHearts, setFlyingHearts] = useState([]);
 
   const handleAddToCart = (course, e) => {
     e.preventDefault();
@@ -41,7 +33,6 @@ const ExploreCourses = () => {
       return;
     }
     dispatch(addToCart(course));
-    // toast.success removed to avoid duplicate notification (cartSlice already shows toast)
   };
 
   const handleToggleWishlist = (course, e) => {
@@ -55,13 +46,6 @@ const ExploreCourses = () => {
     if (isWishlisted) {
       dispatch(removeFromWishlist(course.id, token));
     } else {
-      const newHeart = { id: Date.now(), x: e.clientX, y: e.clientY };
-      setFlyingHearts(prev => [...prev, newHeart]);
-      
-      setTimeout(() => {
-        setFlyingHearts(prev => prev.filter(h => h.id !== newHeart.id));
-      }, 1000);
-      
       dispatch(addToWishlist(course.id, course, token));
     }
   };
@@ -98,56 +82,73 @@ const ExploreCourses = () => {
     }
   }, [user]);
 
-  // Fetch all published courses from Supabase directly
+  // Fetch courses from Supabase
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await supabase
-          .from("courses")
+        const { data, error } = await supabase
+          .from('courses')
           .select(`
             id,
             title,
+            course_name,
             description,
+            course_description,
             short_description,
             price,
-            thumbnail,
-            thumbnail_url,
-            custom_thumbnail_url,
-            final_thumbnail_url,
-            thumbnail_source,
-            youtube_thumbnail_url,
-            youtube_video_url,
-            youtube_video_id,
-            preview_video_url,
-            tags,
-            category_id,
+            discount_price,
+            discounted_price,
             status,
-            created_at,
-            sold_count,
+            is_published,
             is_free,
-            level,
+            final_thumbnail_url,
+            youtube_thumbnail_url,
+            custom_thumbnail_url,
+            thumbnail_url,
+            thumbnail,
+            computed_thumbnail,
+            preview_video_url,
+            youtube_video_url,
+            created_at,
+            average_rating,
             rating,
             total_students,
-            is_featured,
-            instructor:instructor_id(first_name, last_name, avatar_url, image)
+            enrolled_students_count,
+            instructor:instructor_id(
+              id,
+              first_name,
+              last_name,
+              avatar_url,
+              image
+            )
           `)
-          .eq("status", "published")
-          .order("created_at", { ascending: false });
+          .order('created_at', { ascending: false });
 
-        if (response && !response.error && response.data) {
-          const enrichedCourses = response.data.map(course => ({
-            ...course,
-            course_name: course.title,
-            course_description: course.description,
-            enrolled_students_count: course.sold_count || 0,
-            instructor: course.instructor || {
-              first_name: "Instructor",
-              last_name: "",
-              avatar_url: null,
-              image: null
-            },
-          }));
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const enrichedCourses = data.map(course => {
+            const rawThumb =
+              course.final_thumbnail_url ||
+              course.youtube_thumbnail_url ||
+              course.custom_thumbnail_url ||
+              course.thumbnail_url ||
+              course.thumbnail ||
+              course.computed_thumbnail ||
+              (course.preview_video_url ? getYoutubeThumbnail(course.preview_video_url) : '') ||
+              (course.youtube_video_url ? getYoutubeThumbnail(course.youtube_video_url) : '');
+
+            return {
+              ...course,
+              course_name: course.title || course.course_name || 'Untitled Course',
+              course_description: course.description || course.course_description || course.short_description || '',
+              thumbnail: rawThumb,
+              price: course.is_free ? 0 : (course.price || 0),
+              average_rating: course.average_rating || course.rating || 0,
+              enrolled_students_count: course.enrolled_students_count || course.total_students || 0,
+            };
+          });
           
           setCourses(enrichedCourses);
           setFilteredCourses(enrichedCourses);
@@ -170,7 +171,6 @@ const ExploreCourses = () => {
   useEffect(() => {
     let result = [...courses];
 
-    // Search filter
     if (searchQuery) {
       result = result.filter(
         course =>
@@ -179,7 +179,6 @@ const ExploreCourses = () => {
       );
     }
 
-    // Sorting
     switch (sortBy) {
       case 'popular':
         result.sort((a, b) => (b.enrolled_students_count || 0) - (a.enrolled_students_count || 0));
@@ -201,56 +200,45 @@ const ExploreCourses = () => {
   }, [courses, searchQuery, sortBy]);
 
   return (
-    <div className="min-h-screen bg-[#070B19]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900/30 via-purple-900/30 to-slate-900/30 py-24 border-b border-white/5">
-        <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-gradient-to-b from-purple-500/10 to-transparent blur-[80px] -z-10"></div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-6 tracking-tight">
-              Explore <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">Courses</span>
+    <div className="min-h-screen bg-canvas text-text">
+      {/* Header Section */}
+      <div className="border-b border-border bg-surface py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-2xl">
+            <span className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-2">
+              Academic Offerings
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-semibold text-text tracking-tight mb-3">
+              Course Catalog
             </h1>
-            <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-medium">
-              Discover courses from top instructors. Learn anything, anywhere.
+            <p className="text-muted text-sm leading-relaxed mb-6">
+              Rigorous, university-level curricula across core Computer Science disciplines, systems, and algorithms.
             </p>
 
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
-              <div className="relative flex items-center">
-                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                  <Search className="h-6 w-6 text-slate-400 group-focus-within:text-cyan-400 transition-colors" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search for courses..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-6 py-5 bg-[#0B1228]/80 backdrop-blur-xl border border-white/10 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-2xl text-lg"
-                />
-              </div>
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+              <input
+                type="text"
+                placeholder="Search courses by topic, algorithm, or title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-10"
+              />
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Filters Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-2xl backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <Filter className="h-5 w-5 text-slate-400" />
+      {/* Filter Toolbar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div className="flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-[#0B1228] border border-white/10 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-cyan-500/50 appearance-none hover:bg-[#0B1228]/80 cursor-pointer transition-colors"
-              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+              className="bg-surface border border-border rounded-lg px-3 py-1.5 text-xs text-text focus:outline-none cursor-pointer"
             >
               <option value="popular">Most Popular</option>
               <option value="newest">Newest Additions</option>
@@ -259,8 +247,8 @@ const ExploreCourses = () => {
             </select>
           </div>
           
-          <div className="text-slate-400 font-medium px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-            <span className="text-white font-bold">{filteredCourses.length}</span> courses found
+          <div className="text-xs text-muted">
+            <span className="text-text font-semibold">{filteredCourses.length}</span> courses available
           </div>
         </div>
       </div>
@@ -268,222 +256,153 @@ const ExploreCourses = () => {
       {/* Courses Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-[#1A1F36] border border-white/10 rounded-2xl animate-pulse">
-                <div className="h-48 bg-[#232842] rounded-t-2xl"></div>
-                <div className="p-6 space-y-3">
-                  <div className="h-6 bg-[#232842] rounded w-3/4"></div>
-                  <div className="h-4 bg-[#232842] rounded w-1/2"></div>
-                  <div className="h-4 bg-[#232842] rounded w-1/4"></div>
-                </div>
+              <div key={i} className="bg-surface border border-border rounded-xl p-4 space-y-3 animate-pulse">
+                <div className="h-44 bg-surface-2 rounded-lg"></div>
+                <div className="h-5 bg-surface-2 rounded w-3/4"></div>
+                <div className="h-4 bg-surface-2 rounded w-1/2"></div>
               </div>
             ))}
           </div>
         ) : filteredCourses.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-2xl font-bold text-white mb-2">No courses found</h3>
-            <p className="text-gray-400">Try adjusting your search or filters</p>
+          <div className="text-center py-20 bg-surface border border-dashed border-border rounded-xl">
+            <BookOpen className="w-10 h-10 text-muted mx-auto mb-3" />
+            <h3 className="text-base font-semibold text-text mb-1">No courses found</h3>
+            <p className="text-xs text-muted">Try adjusting your search criteria or filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCourses.map((course, index) => (
-              <motion.div
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <div
                 key={course.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.4, delay: (index % 6) * 0.08 }}
-                whileHover={{ y: -8 }}
-                className="group bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.15)] transition-all duration-300"
+                className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm hover:border-border/80 transition-colors flex flex-col justify-between"
               >
                 <Link to={`/courses/${course.id}`} className="block">
-                  <div className="relative">
-                    {/* Thumbnail: DB pre-computed > YouTube generated > uploaded > placeholder */}
-                    {(() => {
-                      // Use DB pre-computed thumbnail first (set by Postgres trigger)
-                      const dbThumb = course.final_thumbnail_url || course.youtube_thumbnail_url || null;
-                      const ytUrl = course.preview_video_url || course.youtube_video_url || null;
-                      const ytThumb = dbThumb || getYoutubeThumbnail(ytUrl);
-                      const resolvedThumb = ytThumb || course.custom_thumbnail_url || course.thumbnail_url || (course.thumbnail && course.thumbnail !== '' ? course.thumbnail : null) || null;
-
-                      function handleErr(e) {
-                        if (ytUrl && e.target.src.includes('maxresdefault')) {
-                          const hq = getYoutubeThumbnail(ytUrl, 'hq');
-                          if (hq && hq !== e.target.src) { e.target.src = hq; return; }
-                        }
-                        const fallback = course.thumbnail_url || course.thumbnail;
-                        if (fallback && e.target.src !== fallback) { e.target.src = fallback; return; }
-                        e.target.style.display = 'none';
-                      }
-
-                      return resolvedThumb ? (
-                        <img
-                          src={resolvedThumb}
-                          alt={course.title}
-                          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-                          onError={handleErr}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-48 bg-gradient-to-br from-purple-900/30 to-blue-900/30 flex items-center justify-center">
-                          <span className="text-4xl">🎓</span>
-                        </div>
-                      );
-                    })()}
-
-                    {course.is_bestseller && (
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-                          Bestseller
-                        </span>
+                  <div className="relative h-44 bg-surface-2 border-b border-border overflow-hidden">
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.course_name || course.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const src = e.target.src;
+                          if (src.includes('maxresdefault')) {
+                            e.target.src = src.replace('maxresdefault', 'hqdefault');
+                          } else {
+                            e.target.style.display = 'none';
+                          }
+                        }}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted">
+                        <BookOpen className="w-8 h-8" />
                       </div>
                     )}
                   </div>
 
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
+                  <div className="p-5">
+                    <h3 className="text-base font-semibold text-text mb-1.5 line-clamp-1">
                       {course.course_name}
                     </h3>
                     
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                    <p className="text-muted text-xs mb-3 line-clamp-2 leading-relaxed">
                       {course.course_description}
                     </p>
 
-                    <div className="flex items-center gap-2 mb-4">
-                      {course.instructor?.image || course.instructor?.avatar_url ? (
-                        <img
-                          src={course.instructor?.image || course.instructor?.avatar_url}
-                          alt={course.instructor?.first_name || 'Instructor'}
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm font-bold">
-                            {course.instructor?.first_name?.charAt(0) || 'I'}
-                          </span>
-                        </div>
-                      )}
-                      <span className="text-gray-300 text-sm">
+                    <div className="flex items-center gap-2 mb-3 text-xs text-muted">
+                      <span className="text-text font-medium">
                         {course.instructor?.first_name} {course.instructor?.last_name}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 text-yellow-400" />
-                        <span>{course.average_rating || 0}</span>
+                    <div className="flex items-center gap-4 text-xs text-muted">
+                      <div className="flex items-center gap-1 text-warning">
+                        <Star className="h-3.5 w-3.5 fill-current" />
+                        <span className="text-text font-medium">{course.average_rating || 0}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span>{course.enrolled_students_count || 0} students</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{course.total_duration || '10h'}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                      <div>
-                        <span className="text-2xl font-bold text-white">
-                          {course.price > 0 ? `₹${course.price}` : <span className="text-emerald-400">FREE</span>}
-                        </span>
-                        {course.original_price > course.price && (
-                          <span className="text-gray-500 line-through ml-2">
-                            ₹{course.original_price}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {enrolledCourseIds.has(course.id || course._id) ? (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              navigate(`/learn/${course.id || course._id}`);
-                            }}
-                            className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-sm font-bold hover:scale-105 transition-all shadow-lg text-center flex items-center justify-center"
-                          >
-                            Go To Classroom
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                // Navigate to course details or handle enroll
-                                navigate(`/courses/${course.id || course._id}`);
-                              }}
-                              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-sm font-bold hover:scale-105 transition-all shadow-lg"
-                            >
-                              Enroll Now
-                            </button>
-                            {token && user?.accountType === 'Student' && (
-                              <button
-                                onClick={(e) => {
-                                  const c = { ...course };
-                                  if (!c._id) c._id = c.id;
-                                  handleAddToCart(c, e);
-                                }}
-                                className={`p-2 ${cart.some(item => (item._id || item.id) === (course._id || course.id)) ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-white/10 hover:bg-white/20'} rounded-full transition-colors`}
-                              >
-                                <ShoppingCart className="h-4 w-4 text-gray-400" />
-                              </button>
-                            )}
-                          </>
-                        )}
-                        {token && user?.accountType === 'Student' && (
-                          <button
-                            onClick={(e) => handleToggleWishlist(course, e)}
-                            className={`p-2 rounded-full transition-colors ${
-                              wishlist.some((item) => item.id === course.id)
-                                ? 'bg-pink-500 hover:bg-pink-600'
-                                : 'bg-white/10 hover:bg-white/20'
-                            }`}
-                          >
-                            <Heart className={`h-4 w-4 ${wishlist.some((item) => item.id === course.id) ? 'text-white fill-current' : 'text-gray-400'}`} />
-                          </button>
-                        )}
-                        <button
-                          onClick={(e) => handleShare(course, e)}
-                          className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-                        >
-                          <Share2 className="h-4 w-4 text-gray-400" />
-                        </button>
+                        <Users className="h-3.5 w-3.5" />
+                        <span>{course.enrolled_students_count || 0} enrolled</span>
                       </div>
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+
+                <div className="px-5 pb-5 pt-3 border-t border-border flex items-center justify-between">
+                  <div>
+                    <span className="text-base font-semibold text-text">
+                      {course.price > 0 ? `₹${course.price}` : <span className="text-success">FREE</span>}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {enrolledCourseIds.has(course.id || course._id) ? (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/learn/${course.id || course._id}`);
+                        }}
+                        className="btn-primary py-1.5 px-3 rounded-lg text-xs font-semibold"
+                      >
+                        Go to Classroom
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/courses/${course.id || course._id}`);
+                          }}
+                          className="btn-primary py-1.5 px-3 rounded-lg text-xs font-semibold"
+                        >
+                          Enroll Now
+                        </button>
+                        {token && user?.accountType === 'Student' && (
+                          <button
+                            onClick={(e) => {
+                              const c = { ...course };
+                              if (!c._id) c._id = c.id;
+                              handleAddToCart(c, e);
+                            }}
+                            className="btn-secondary p-1.5 rounded-lg text-xs"
+                            title="Add to cart"
+                          >
+                            <ShoppingCart className="h-3.5 w-3.5 text-muted" />
+                          </button>
+                        )}
+                      </>
+                    )}
+                    {token && user?.accountType === 'Student' && (
+                      <button
+                        onClick={(e) => handleToggleWishlist(course, e)}
+                        className={`p-1.5 rounded-lg border text-xs transition-colors ${
+                          wishlist.some((item) => item.id === course.id)
+                            ? 'bg-danger/10 border-danger text-danger'
+                            : 'btn-secondary'
+                        }`}
+                        title="Wishlist"
+                      >
+                        <Heart className="h-3.5 w-3.5 fill-current" />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => handleShare(course, e)}
+                      className="btn-secondary p-1.5 rounded-lg text-xs text-muted hover:text-text"
+                      title="Share course"
+                    >
+                      <Share2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
 
       <Footer />
-
-      {/* Flying Hearts Animation */}
-      <AnimatePresence>
-        {flyingHearts.map(heart => (
-          <motion.div
-            key={heart.id}
-            initial={{ x: heart.x, y: heart.y, scale: 1, opacity: 1 }}
-            animate={{ 
-              x: window.innerWidth > 768 ? window.innerWidth - 200 : window.innerWidth - 60, 
-              y: 20,
-              scale: 0.2, 
-              opacity: 0 
-            }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed z-[9999] pointer-events-none drop-shadow-[0_0_15px_rgba(236,72,153,0.8)]"
-          >
-            <Heart className="h-8 w-8 text-pink-500 fill-current" />
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 };

@@ -28,60 +28,38 @@ const resizeObserverErrorHandler = (e) => {
 window.addEventListener('error', resizeObserverErrorHandler);
 
 function BootstrapApp() {
-  const [appReady, setAppReady] = useState(false);
-  const [exitingLoader, setExitingLoader] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setExitingLoader(true);
-      setTimeout(() => setAppReady(true), 500);
-    }, 1600);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
     <React.StrictMode>
       <Provider store={store}>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <LoadingProvider>
             <AuthProvider>
-              <AnimatePresence mode="wait">
-                {!appReady && (
-                  <GlobalLoader key="boot-loader" isExiting={exitingLoader} />
-                )}
-              </AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={appReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <App />
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
+              <App />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  style: {
+                    background: 'rgba(17, 24, 39, 0.92)',
+                    color: '#fff',
+                    borderRadius: '14px',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
+                  },
+                  success: {
                     style: {
-                      background: 'rgba(17, 24, 39, 0.92)',
-                      color: '#fff',
-                      borderRadius: '14px',
-                      backdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
+                      background: 'linear-gradient(135deg, #065f46, #047857)',
+                      border: '1px solid rgba(16,185,129,0.3)',
                     },
-                    success: {
-                      style: {
-                        background: 'linear-gradient(135deg, #065f46, #047857)',
-                        border: '1px solid rgba(16,185,129,0.3)',
-                      },
+                  },
+                  error: {
+                    style: {
+                      background: 'linear-gradient(135deg, #7f1d1d, #991b1b)',
+                      border: '1px solid rgba(239,68,68,0.3)',
                     },
-                    error: {
-                      style: {
-                        background: 'linear-gradient(135deg, #7f1d1d, #991b1b)',
-                        border: '1px solid rgba(239,68,68,0.3)',
-                      },
-                    },
-                  }}
-                />
-              </motion.div>
+                  },
+                }}
+              />
             </AuthProvider>
           </LoadingProvider>
         </BrowserRouter>

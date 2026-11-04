@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { motion } from "framer-motion"
+import { FaEye, FaEyeSlash, FaChalkboardTeacher } from "react-icons/fa"
 import { registerWithSupabase } from "../../services/operations/authAPI"
 import { setSignupData } from "../../slices/authSlice"
 import { toast } from "react-hot-toast"
@@ -72,59 +73,57 @@ export default function InstructorSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-[#000814] flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
-      </div>
-
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4 py-16">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl glass-dark p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative z-10 border border-white/5"
+        transition={{ duration: 0.25 }}
+        className="w-full max-w-2xl bg-surface p-6 sm:p-8 rounded-xl shadow-sm border border-border"
       >
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Instructor Signup</h1>
-          <p className="mt-2 text-slate-400 text-sm font-medium">Share your knowledge with the world</p>
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-surface-2 text-accent rounded-xl flex items-center justify-center mx-auto mb-3 border border-border">
+            <FaChalkboardTeacher className="text-lg" />
+          </div>
+          <h1 className="text-2xl font-semibold text-text tracking-tight">Instructor Registration</h1>
+          <p className="mt-1 text-muted text-xs">Join our faculty and build academic course offerings</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Full Name</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Full Name</label>
               <input
                 type="text"
                 name="name"
-                className={`input-field ${errors.name ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                placeholder="John Doe"
+                className={`input-field ${errors.name ? 'border-danger focus:border-danger' : ''}`}
+                placeholder="Dr. Alan Turing"
                 value={formData.name}
                 onChange={handleInputChange}
               />
-              {errors.name && <p className="mt-1 text-xs font-bold text-red-400">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-[11px] text-danger">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Email</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Email</label>
               <input
                 type="email"
                 name="email"
-                className={`input-field ${errors.email ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                placeholder="you@example.com"
+                className={`input-field ${errors.email ? 'border-danger focus:border-danger' : ''}`}
+                placeholder="alan@university.edu"
                 value={formData.email}
                 onChange={handleInputChange}
               />
-              {errors.email && <p className="mt-1 text-xs font-bold text-red-400">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-[11px] text-danger">{errors.email}</p>}
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Password</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className={`input-field pr-10 ${errors.password ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                  className={`input-field pr-9 ${errors.password ? 'border-danger focus:border-danger' : ''}`}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
@@ -132,41 +131,41 @@ export default function InstructorSignup() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-text"
                 >
-                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
+                  {showPassword ? <FaEyeSlash className="text-xs" /> : <FaEye className="text-xs" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs font-bold text-red-400">{errors.password}</p>}
+              {errors.password && <p className="mt-1 text-[11px] text-danger">{errors.password}</p>}
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Confirm</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Confirm Password</label>
               <input
                 type={showPassword ? "text" : "password"}
                 name="confirm"
-                className={`input-field ${errors.confirm ? 'border-red-500/50 focus:border-red-500' : ''}`}
+                className={`input-field ${errors.confirm ? 'border-danger focus:border-danger' : ''}`}
                 placeholder="••••••••"
                 value={formData.confirm}
                 onChange={handleInputChange}
               />
-              {errors.confirm && <p className="mt-1 text-xs font-bold text-red-400">{errors.confirm}</p>}
+              {errors.confirm && <p className="mt-1 text-[11px] text-danger">{errors.confirm}</p>}
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Expertise</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Primary Subject Expertise</label>
               <input
                 type="text"
                 name="expertise"
                 className="input-field"
-                placeholder="Web Dev, Data Science"
+                placeholder="Algorithms, Operating Systems, Compilers"
                 value={formData.expertise}
                 onChange={handleInputChange}
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Experience (Years)</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Teaching Experience (Years)</label>
               <input
                 type="text"
                 name="experience"
@@ -180,18 +179,18 @@ export default function InstructorSignup() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">LinkedIn Profile</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Academic / LinkedIn Profile</label>
               <input
                 type="text"
                 name="linkedin"
                 className="input-field"
-                placeholder="linkedin.com/in/..."
+                placeholder="https://linkedin.com/in/..."
                 value={formData.linkedin}
                 onChange={handleInputChange}
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-1">Phone Number</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Contact Phone Number</label>
               <input
                 type="text"
                 name="phone"
@@ -204,12 +203,12 @@ export default function InstructorSignup() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-1">Bio</label>
+            <label className="block text-xs font-medium text-text mb-1.5">Faculty Bio & Research Summary</label>
             <textarea
               name="bio"
               className="input-field"
-              placeholder="Tell us about yourself..."
-              rows={2}
+              placeholder="Brief summary of your academic background and teaching interests..."
+              rows={3}
               value={formData.bio}
               onChange={handleInputChange}
             />
@@ -218,22 +217,19 @@ export default function InstructorSignup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary py-4 text-lg font-bold flex items-center justify-center gap-3 relative overflow-hidden mt-2 group"
+            className="w-full btn-primary py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
-              <>
-                <i className="fas fa-rocket"></i>
-                Create Instructor Account
-              </>
+              <span>Create Instructor Account</span>
             )}
           </button>
 
-          <p className="text-center text-slate-400 text-sm mt-6">
+          <p className="text-center text-xs text-muted mt-5">
             Already have an account?{" "}
-            <Link to="/login" className="text-cyan-400 hover:text-cyan-300 font-bold transition-colors">
-              Log In
+            <Link to="/login" className="text-accent font-semibold hover:underline">
+              Sign In
             </Link>
           </p>
         </form>
